@@ -286,17 +286,17 @@ export default function CourtMap({ onShotRecorded, quarter, timeLeft, shotMarker
             return (
               <>
                 {/* Left corner line */}
-                <line x1={cornerX} y1="0" x2={cornerX} y2={arcStartY}
-                  stroke="#fff" strokeWidth="3" filter="url(#lineShadow)"/>
+                <line x1={cornerX} y1="2" x2={cornerX} y2={arcStartY}
+                  stroke="#fff" strokeWidth="4" filter="url(#lineShadow)"/>
                 {/* Right corner line */}
-                <line x1={cornerRightX} y1="0" x2={cornerRightX} y2={arcEndY}
-                  stroke="#fff" strokeWidth="3" filter="url(#lineShadow)"/>
+                <line x1={cornerRightX} y1="2" x2={cornerRightX} y2={arcEndY}
+                  stroke="#fff" strokeWidth="4" filter="url(#lineShadow)"/>
                 {/* Arc - drawn from basket center, curving away from basket */}
                 <path
                   d={`M ${cornerX} ${arcStartY} A ${radius} ${radius} 0 0 0 ${cornerRightX} ${arcEndY}`}
                   fill="none"
                   stroke="#fff"
-                  strokeWidth="3"
+                  strokeWidth="4"
                   filter="url(#lineShadow)"
                 />
               </>
