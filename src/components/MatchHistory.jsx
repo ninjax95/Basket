@@ -4,7 +4,18 @@ import PerformanceRadar from './PerformanceRadar'
 import ShotHeatmap from './ShotHeatmap'
 import ThermalHeatmap from './ThermalHeatmap'
 
-export default function MatchHistory({ history, averages, onDelete, onClear, onImport }) {
+export default function MatchHistory({
+  history,
+  averages,
+  onDelete,
+  onClear,
+  onImport,
+  onSaveGist,
+  onLoadGist,
+  onOpenGistSettings,
+  gistLoading,
+  gistConnected
+}) {
   const [selectedMatchId, setSelectedMatchId] = useState('all') // 'all' or match id
   const lastMatch = history.length > 0 ? history[history.length - 1] : null
 
@@ -178,13 +189,45 @@ export default function MatchHistory({ history, averages, onDelete, onClear, onI
         <PerformanceRadar averages={averages} lastMatch={lastMatch} />
       </div>
 
+      {/* GitHub Gist Sync Section */}
+      <div className="gist-section">
+        <div className="gist-header">
+          <h3>☁️ Synchronisation GitHub</h3>
+          <button
+            className="gist-settings-btn"
+            onClick={onOpenGistSettings}
+            title="Configurer GitHub"
+          >
+            ⚙️ Config
+          </button>
+        </div>
+        <div className="gist-buttons">
+          <button
+            className="gist-action-btn"
+            onClick={onSaveGist}
+            disabled={gistLoading || history.length === 0}
+          >
+            {gistLoading ? '⏳' : '⬆️'} Sauvegarder sur Gist
+          </button>
+          <button
+            className="gist-action-btn"
+            onClick={onLoadGist}
+            disabled={gistLoading}
+          >
+            {gistLoading ? '⏳' : '⬇️'} Charger depuis Gist
+          </button>
+          {gistConnected && <span className="gist-status connected">● Token configuré</span>}
+          {!gistConnected && <span className="gist-status">● Non configuré</span>}
+        </div>
+      </div>
+
       {/* Match List */}
       <div className="match-list">
         <div className="match-list-header">
           <h3>📋 Liste des matchs</h3>
           <div className="match-list-actions">
             <button className="import-btn" onClick={onImport}>
-              📥 Restaurer backup
+              📥 Backup local
             </button>
             {history.length > 0 && (
               <button className="clear-btn" onClick={onClear}>

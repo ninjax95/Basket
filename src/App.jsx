@@ -2137,6 +2137,212 @@ const styles = `
   .pin-back-btn:hover {
     color: #fff;
   }
+
+  /* Gist Modal Styles */
+  .gist-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.2s ease;
+  }
+
+  .gist-modal {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border: 2px solid #61dafb;
+    border-radius: 16px;
+    padding: 30px;
+    max-width: 450px;
+    width: 90%;
+    animation: scaleIn 0.2s ease;
+  }
+
+  .gist-modal h3 {
+    color: #61dafb;
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 1.3rem;
+  }
+
+  .gist-modal-info {
+    background: rgba(97, 218, 251, 0.1);
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 20px;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.5;
+  }
+
+  .gist-input-group {
+    margin-bottom: 20px;
+  }
+
+  .gist-input-group label {
+    display: block;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+  }
+
+  .gist-input-group input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    padding: 12px 15px;
+    color: #fff;
+    font-size: 1rem;
+  }
+
+  .gist-input-group input:focus {
+    outline: none;
+    border-color: #61dafb;
+  }
+
+  .gist-input-group input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+  }
+
+  .gist-modal-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+  }
+
+  .gist-btn {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .gist-btn.save {
+    background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+    color: #fff;
+  }
+
+  .gist-btn.save:hover {
+    background: linear-gradient(135deg, #3ddb80 0%, #2ecc71 100%);
+    transform: translateY(-2px);
+  }
+
+  .gist-btn.cancel {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .gist-btn.cancel:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  /* Gist Buttons in History */
+  .gist-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .gist-action-btn {
+    background: linear-gradient(135deg, rgba(97, 218, 251, 0.2) 0%, rgba(97, 218, 251, 0.1) 100%);
+    border: 1px solid #61dafb;
+    color: #61dafb;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .gist-action-btn:hover:not(:disabled) {
+    background: linear-gradient(135deg, rgba(97, 218, 251, 0.3) 0%, rgba(97, 218, 251, 0.2) 100%);
+    transform: translateY(-2px);
+  }
+
+  .gist-action-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .gist-action-btn.settings {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  .gist-action-btn.settings:hover {
+    border-color: #61dafb;
+    color: #61dafb;
+  }
+
+  .gist-status {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.5);
+    margin-left: auto;
+  }
+
+  .gist-status.connected {
+    color: #2ecc71;
+  }
+
+  /* Gist Section */
+  .gist-section {
+    background: rgba(97, 218, 251, 0.1);
+    border: 1px solid rgba(97, 218, 251, 0.3);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+
+  .gist-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+
+  .gist-header h3 {
+    color: #61dafb;
+    margin: 0;
+    font-size: 1.1rem;
+  }
+
+  .gist-settings-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: rgba(255, 255, 255, 0.8);
+    padding: 8px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+  }
+
+  .gist-settings-btn:hover {
+    background: rgba(97, 218, 251, 0.2);
+    border-color: #61dafb;
+    color: #61dafb;
+  }
+
+  .gist-buttons {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
 `
 
 export default function App() {
@@ -2144,6 +2350,14 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('match')
   const [opponent, setOpponent] = useState('')
   const [shotMarkers, setShotMarkers] = useState([])
+  const [githubToken, setGithubToken] = useState(() => {
+    const saved = localStorage.getItem('basketGithubToken')
+    return saved ? atob(saved) : ''
+  })
+  const [gistId, setGistId] = useState(() => localStorage.getItem('basketGistId') || '')
+  const [showGistSettings, setShowGistSettings] = useState(false)
+  const [gistLoading, setGistLoading] = useState(false)
+  const [tempToken, setTempToken] = useState('')
 
   // Check if already unlocked this session
   useEffect(() => {
@@ -2161,7 +2375,7 @@ export default function App() {
   const { stats, updateStat, resetStats, importStats, getSummary, actionHistory, getStatsByQuarter, undoLastAction } = useStats()
   const { player, updatePlayer } = usePlayer()
   const timer = useTimer()
-  const { history, saveMatch, deleteMatch, clearHistory, getAverages } = useMatchHistory()
+  const { history, saveMatch, deleteMatch, clearHistory, importHistory, getAverages } = useMatchHistory()
   const playingTime = usePlayingTime()
 
   const summary = getSummary()
@@ -2254,7 +2468,7 @@ export default function App() {
     const savedMatch = saveMatch(player, stats, opponent, shotMarkers)
 
     // Auto backup after save
-    const updatedHistory = [...matchHistory.history, savedMatch]
+    const updatedHistory = [...history, savedMatch]
     backupHistory(updatedHistory)
 
     alert('Match sauvegardé ! Backup téléchargé.')
@@ -2293,7 +2507,7 @@ export default function App() {
           const data = JSON.parse(event.target.result)
           if (data.history && Array.isArray(data.history)) {
             if (confirm(`Restaurer ${data.history.length} match(s) depuis le backup du ${new Date(data.exportDate).toLocaleDateString('fr-FR')} ?\n\nCela remplacera l'historique actuel.`)) {
-              matchHistory.importHistory(data.history)
+              importHistory(data.history)
               alert('Historique restauré avec succès !')
             }
           } else {
@@ -2306,6 +2520,125 @@ export default function App() {
       reader.readAsText(file)
     }
     input.click()
+  }
+
+  // GitHub Gist functions
+  const saveGithubToken = (token) => {
+    setGithubToken(token)
+    if (token) {
+      localStorage.setItem('basketGithubToken', btoa(token))
+    } else {
+      localStorage.removeItem('basketGithubToken')
+    }
+  }
+
+  const saveToGist = async () => {
+    if (!githubToken) {
+      setShowGistSettings(true)
+      return
+    }
+
+    setGistLoading(true)
+    const backupData = {
+      exportDate: new Date().toISOString(),
+      player: player,
+      matchCount: history.length,
+      history: history
+    }
+
+    try {
+      const gistData = {
+        description: `Stats Basket - Backup ${player.name || 'joueur'}`,
+        public: false,
+        files: {
+          'stats_basket_backup.json': {
+            content: JSON.stringify(backupData, null, 2)
+          }
+        }
+      }
+
+      let response
+      if (gistId) {
+        // Update existing gist
+        response = await fetch(`https://api.github.com/gists/${gistId}`, {
+          method: 'PATCH',
+          headers: {
+            'Authorization': `token ${githubToken}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(gistData)
+        })
+      } else {
+        // Create new gist
+        response = await fetch('https://api.github.com/gists', {
+          method: 'POST',
+          headers: {
+            'Authorization': `token ${githubToken}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(gistData)
+        })
+      }
+
+      if (response.ok) {
+        const data = await response.json()
+        setGistId(data.id)
+        localStorage.setItem('basketGistId', data.id)
+        alert(`Sauvegardé sur GitHub Gist !\nID: ${data.id}`)
+      } else {
+        const error = await response.json()
+        alert(`Erreur: ${error.message || 'Impossible de sauvegarder'}`)
+      }
+    } catch (err) {
+      alert(`Erreur: ${err.message}`)
+    } finally {
+      setGistLoading(false)
+    }
+  }
+
+  const loadFromGist = async () => {
+    if (!githubToken) {
+      setShowGistSettings(true)
+      return
+    }
+
+    const inputGistId = gistId || prompt('Entre l\'ID du Gist à charger:')
+    if (!inputGistId) return
+
+    setGistLoading(true)
+    try {
+      const response = await fetch(`https://api.github.com/gists/${inputGistId}`, {
+        headers: {
+          'Authorization': `token ${githubToken}`
+        }
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        const fileContent = data.files['stats_basket_backup.json']?.content
+        if (fileContent) {
+          const backupData = JSON.parse(fileContent)
+          if (backupData.history && Array.isArray(backupData.history)) {
+            if (confirm(`Restaurer ${backupData.history.length} match(s) depuis le Gist ?\nBackup du ${new Date(backupData.exportDate).toLocaleDateString('fr-FR')}`)) {
+              importHistory(backupData.history)
+              setGistId(inputGistId)
+              localStorage.setItem('basketGistId', inputGistId)
+              alert('Historique restauré depuis GitHub Gist !')
+            }
+          } else {
+            alert('Fichier de backup invalide dans le Gist.')
+          }
+        } else {
+          alert('Fichier stats_basket_backup.json non trouvé dans le Gist.')
+        }
+      } else {
+        alert('Gist non trouvé ou accès refusé.')
+      }
+    } catch (err) {
+      alert(`Erreur: ${err.message}`)
+    } finally {
+      setGistLoading(false)
+    }
   }
 
   const exportData = () => {
@@ -2594,7 +2927,62 @@ export default function App() {
             onDelete={handleDeleteMatch}
             onClear={handleClearHistory}
             onImport={handleImportHistory}
+            onSaveGist={saveToGist}
+            onLoadGist={loadFromGist}
+            onOpenGistSettings={() => { setTempToken(githubToken); setShowGistSettings(true) }}
+            gistLoading={gistLoading}
+            gistConnected={!!githubToken}
           />
+        )}
+
+        {/* Gist Settings Modal */}
+        {showGistSettings && (
+          <div className="gist-modal-overlay" onClick={() => setShowGistSettings(false)}>
+            <div className="gist-modal" onClick={e => e.stopPropagation()}>
+              <h3>GitHub Gist Configuration</h3>
+              <div className="gist-modal-info">
+                Pour sauvegarder tes stats sur GitHub Gist, tu as besoin d'un token personnel.<br/>
+                Va sur <strong>github.com/settings/tokens</strong> et crée un token avec le scope "gist".
+              </div>
+              <div className="gist-input-group">
+                <label>Token GitHub</label>
+                <input
+                  type="password"
+                  placeholder="ghp_xxxxxxxxxxxx"
+                  value={tempToken}
+                  onChange={e => setTempToken(e.target.value)}
+                />
+              </div>
+              {gistId && (
+                <div className="gist-input-group">
+                  <label>ID du Gist actuel</label>
+                  <input
+                    type="text"
+                    value={gistId}
+                    onChange={e => setGistId(e.target.value)}
+                    placeholder="ID du Gist (optionnel)"
+                  />
+                </div>
+              )}
+              <div className="gist-modal-buttons">
+                <button
+                  className="gist-btn save"
+                  onClick={() => {
+                    saveGithubToken(tempToken)
+                    setShowGistSettings(false)
+                  }}
+                >
+                  Enregistrer
+                </button>
+                <button
+                  className="gist-btn cancel"
+                  onClick={() => setShowGistSettings(false)}
+                >
+                  Annuler
+                </button>
+              </div>
+            </div>
+          </div>
         )}
       </div>
     </>
