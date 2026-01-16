@@ -414,7 +414,7 @@ const styles = `
 
   /* Confirmation Modal */
   .confirm-overlay {
-    position: fixed;
+    position: absolute;
     top: 0;
     left: 0;
     right: 0;
@@ -423,19 +423,19 @@ const styles = `
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 1000;
+    border-radius: 12px;
+    z-index: 10;
     animation: fadeIn 0.2s ease;
   }
 
   .confirm-modal {
     background: linear-gradient(135deg, rgba(26, 26, 46, 0.98) 0%, rgba(22, 33, 62, 0.98) 100%);
     border: 2px solid #61dafb;
-    border-radius: 16px;
-    padding: 30px 40px;
+    border-radius: 12px;
+    padding: 20px 25px;
     text-align: center;
     animation: scaleIn 0.2s ease;
-    min-width: 280px;
-    max-width: 90%;
+    margin: 10px;
   }
 
   @keyframes scaleIn {
@@ -444,33 +444,33 @@ const styles = `
   }
 
   .confirm-icon {
-    font-size: 2.5rem;
-    margin-bottom: 15px;
+    font-size: 1.8rem;
+    margin-bottom: 10px;
     color: #61dafb;
   }
 
   .confirm-modal p {
-    font-size: 1.1rem;
-    margin-bottom: 8px;
+    font-size: 1rem;
+    margin-bottom: 5px;
   }
 
   .confirm-warning {
-    font-size: 0.9rem !important;
+    font-size: 0.8rem !important;
     color: rgba(255, 255, 255, 0.5);
-    margin-bottom: 20px !important;
+    margin-bottom: 15px !important;
   }
 
   .confirm-buttons {
     display: flex;
-    gap: 12px;
+    gap: 10px;
     justify-content: center;
   }
 
   .confirm-btn {
-    padding: 10px 20px;
+    padding: 8px 16px;
     border: none;
     border-radius: 8px;
-    font-size: 1rem;
+    font-size: 0.9rem;
     cursor: pointer;
     transition: all 0.2s;
     font-weight: 500;
