@@ -1687,6 +1687,14 @@ const styles = `
     }
   }
 
+  /* Shot Charts Grid */
+  .shot-charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+
   /* Shot Heatmap Styles */
   .heatmap-wrapper {
     display: flex;
@@ -1696,15 +1704,16 @@ const styles = `
 
   .heatmap-svg {
     width: 100%;
-    max-width: 450px;
+    max-width: 400px;
     height: auto;
     border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
   }
 
   .heatmap-stats {
     display: flex;
     justify-content: center;
-    gap: 30px;
+    gap: 20px;
     margin-bottom: 15px;
   }
 
@@ -1714,13 +1723,13 @@ const styles = `
 
   .heatmap-stat-value {
     display: block;
-    font-size: 1.3rem;
+    font-size: 1.2rem;
     font-weight: bold;
     color: #61dafb;
   }
 
   .heatmap-stat-label {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     color: rgba(255, 255, 255, 0.6);
   }
 
@@ -1743,6 +1752,38 @@ const styles = `
     width: 14px;
     height: 14px;
     border-radius: 3px;
+  }
+
+  /* Thermal Legend */
+  .thermal-legend {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 0.8rem;
+  }
+
+  .thermal-cold {
+    color: #3498db;
+    font-weight: bold;
+  }
+
+  .thermal-hot {
+    color: #e74c3c;
+    font-weight: bold;
+  }
+
+  .thermal-gradient {
+    width: 120px;
+    height: 12px;
+    border-radius: 6px;
+    background: linear-gradient(to right, #3498db, #9b59b6, #e67e22, #f39c12, #e74c3c);
+  }
+
+  @media (max-width: 800px) {
+    .shot-charts-grid {
+      grid-template-columns: 1fr;
+    }
   }
 
   /* PIN Lock Styles */
