@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-export default function CourtMap({ onShotRecorded, quarter, shotMarkers, setShotMarkers }) {
+export default function CourtMap({ onShotRecorded, quarter, timeLeft, shotMarkers, setShotMarkers, actionHistory, onShowReplay, onShowHistory }) {
   const [pendingShot, setPendingShot] = useState(null)
   const [showMarkerMenu, setShowMarkerMenu] = useState(false)
 
@@ -60,7 +60,8 @@ export default function CourtMap({ onShotRecorded, quarter, shotMarkers, setShot
     setShotMarkers(prev => [...prev, {
       ...pendingShot,
       made,
-      quarter, // Add current quarter to the marker
+      quarter,
+      timeLeft: timeLeft || 0,
       id: Date.now()
     }])
 
@@ -478,6 +479,20 @@ export default function CourtMap({ onShotRecorded, quarter, shotMarkers, setShot
             <span className="stat-label">3PTS</span>
           </div>
         </div>
+      </div>
+
+      {/* Action buttons */}
+      <div className="court-action-buttons">
+        {actionHistory && actionHistory.length > 0 && (
+          <button className="court-action-btn history" onClick={onShowHistory}>
+            📝 Historique ({actionHistory.length})
+          </button>
+        )}
+        {shotMarkers.length > 0 && (
+          <button className="court-action-btn replay" onClick={onShowReplay}>
+            🎬 Replay
+          </button>
+        )}
       </div>
     </div>
   )

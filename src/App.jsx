@@ -1622,6 +1622,52 @@ const styles = `
     background: rgba(255, 255, 255, 0.2);
   }
 
+  /* Court Action Buttons */
+  .court-action-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    justify-content: center;
+  }
+
+  .court-action-btn {
+    flex: 1;
+    max-width: 180px;
+    padding: 10px 15px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .court-action-btn:hover {
+    transform: translateY(-2px);
+  }
+
+  .court-action-btn.history {
+    color: #61dafb;
+    border-color: rgba(97, 218, 251, 0.3);
+  }
+
+  .court-action-btn.history:hover {
+    background: rgba(97, 218, 251, 0.15);
+    border-color: #61dafb;
+  }
+
+  .court-action-btn.replay {
+    color: #ff6b35;
+    border-color: rgba(255, 107, 53, 0.3);
+  }
+
+  .court-action-btn.replay:hover {
+    background: rgba(255, 107, 53, 0.15);
+    border-color: #ff6b35;
+  }
+
   /* Playing Time Section */
   .playing-time-section {
     background: rgba(255, 255, 255, 0.1);
@@ -3218,8 +3264,12 @@ export default function App() {
             <CourtMap
               onShotRecorded={handleShotRecorded}
               quarter={timer.quarter}
+              timeLeft={timer.timeLeft}
               shotMarkers={shotMarkers}
               setShotMarkers={setShotMarkers}
+              actionHistory={actionHistory}
+              onShowReplay={() => setShowReplay(true)}
+              onShowHistory={() => setShowActionPanel(true)}
             />
 
             <div className="stats-grid">
@@ -3291,26 +3341,6 @@ export default function App() {
                   </div>
                 ))}
               </div>
-            </div>
-
-            {/* Action History & Replay Buttons */}
-            <div className="action-buttons-row">
-              {actionHistory.length > 0 && (
-                <button
-                  className="action-history-toggle"
-                  onClick={() => setShowActionPanel(true)}
-                >
-                  📝 Historique ({actionHistory.length})
-                </button>
-              )}
-              {shotMarkers.length > 0 && (
-                <button
-                  className="replay-toggle"
-                  onClick={() => setShowReplay(true)}
-                >
-                  🎬 Replay Match
-                </button>
-              )}
             </div>
 
             <StatsDisplay summary={summary} />

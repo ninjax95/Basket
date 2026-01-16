@@ -147,17 +147,17 @@ export default function ShotReplay({ shotMarkers, actionHistory, onClose }) {
                 <g key={shot.id} className="replay-shot-marker">
                   {/* Pulse effect */}
                   <circle
-                    cx={shot.x * 5}
-                    cy={shot.y * 4.7}
+                    cx={shot.x}
+                    cy={shot.y}
                     r="20"
                     fill={shot.made ? 'rgba(46, 204, 113, 0.3)' : 'rgba(231, 76, 60, 0.3)'}
                     className="shot-pulse"
                   />
                   {/* Shot marker */}
                   <circle
-                    cx={shot.x * 5}
-                    cy={shot.y * 4.7}
-                    r="10"
+                    cx={shot.x}
+                    cy={shot.y}
+                    r="12"
                     fill={shot.made ? '#2ecc71' : '#e74c3c'}
                     stroke="#fff"
                     strokeWidth="2"
@@ -165,8 +165,8 @@ export default function ShotReplay({ shotMarkers, actionHistory, onClose }) {
                   />
                   {/* Shot number */}
                   <text
-                    x={shot.x * 5}
-                    y={shot.y * 4.7 + 4}
+                    x={shot.x}
+                    y={shot.y + 4}
                     textAnchor="middle"
                     fill="#fff"
                     fontSize="10"
