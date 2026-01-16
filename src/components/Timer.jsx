@@ -102,7 +102,7 @@ export default function Timer({
           <button className="time-adjust-btn" onClick={() => onAdjustTime(-60)} title="-1 min">-1m</button>
           <button className="time-adjust-btn" onClick={() => onAdjustTime(-10)} title="-10 sec">-10s</button>
         </div>
-        <div className="timer-display">{formattedTime}</div>
+        <div className={`timer-display ${isRunning ? 'running' : ''}`}>{formattedTime}</div>
         <div className="time-adjust-group">
           <button className="time-adjust-btn" onClick={() => onAdjustTime(10)} title="+10 sec">+10s</button>
           <button className="time-adjust-btn" onClick={() => onAdjustTime(60)} title="+1 min">+1m</button>
