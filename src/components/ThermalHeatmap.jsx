@@ -74,7 +74,7 @@ export default function ThermalHeatmap({ history, selectedMatchId }) {
   if (markers.length === 0) {
     return (
       <div className="chart-container">
-        <h3>🌡️ Zones chaudes/froides</h3>
+        <h3>🎯 Zones de réussite</h3>
         <div className="chart-empty">
           <p>Aucune donnée disponible</p>
         </div>
@@ -84,7 +84,7 @@ export default function ThermalHeatmap({ history, selectedMatchId }) {
 
   return (
     <div className="chart-container">
-      <h3>🌡️ Zones chaudes/froides</h3>
+      <h3>🎯 Zones de réussite</h3>
 
       <div className="heatmap-wrapper">
         <svg viewBox={`0 0 ${courtWidth} ${courtHeight}`} className="heatmap-svg">
