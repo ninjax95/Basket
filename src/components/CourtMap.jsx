@@ -263,45 +263,18 @@ export default function CourtMap({ onShotRecorded, quarter, timeLeft, shotMarker
           <path d={`M 210 0 A 40 40 0 0 0 290 0`}
             fill="none" stroke="#fff" strokeWidth="2"/>
 
-          {/* Three-point line */}
-          {(() => {
-            // Basket position
-            const bx = 250;
-            const by = 50;
-            // 3-point radius from basket center
-            const radius = 238;
-            // Corner 3-point X positions
-            const cornerX = 30;
-            const cornerRightX = 470;
-
-            // Calculate where the arc meets the corner lines
-            // Arc equation: (x - bx)² + (y - by)² = radius²
-            // At x = cornerX: y = by + sqrt(radius² - (cornerX - bx)²)
-            const leftDx = cornerX - bx;
-            const arcStartY = by + Math.sqrt(radius * radius - leftDx * leftDx);
-
-            const rightDx = cornerRightX - bx;
-            const arcEndY = by + Math.sqrt(radius * radius - rightDx * rightDx);
-
-            return (
-              <>
-                {/* Left corner line */}
-                <line x1={cornerX} y1="2" x2={cornerX} y2={arcStartY}
-                  stroke="#fff" strokeWidth="4" filter="url(#lineShadow)"/>
-                {/* Right corner line */}
-                <line x1={cornerRightX} y1="2" x2={cornerRightX} y2={arcEndY}
-                  stroke="#fff" strokeWidth="4" filter="url(#lineShadow)"/>
-                {/* Arc - drawn from basket center, curving away from basket */}
-                <path
-                  d={`M ${cornerX} ${arcStartY} A ${radius} ${radius} 0 0 0 ${cornerRightX} ${arcEndY}`}
-                  fill="none"
-                  stroke="#fff"
-                  strokeWidth="4"
-                  filter="url(#lineShadow)"
-                />
-              </>
-            );
-          })()}
+          {/* Three-point line - corner lines and arc */}
+          {/* Left corner line */}
+          <line x1="30" y1="2" x2="30" y2="141" stroke="#fff" strokeWidth="4"/>
+          {/* Right corner line */}
+          <line x1="470" y1="2" x2="470" y2="141" stroke="#fff" strokeWidth="4"/>
+          {/* Arc connecting the corner lines */}
+          <path
+            d="M 30 141 A 238 238 0 0 0 470 141"
+            fill="none"
+            stroke="#fff"
+            strokeWidth="4"
+          />
 
           {/* Court border */}
           <rect x="2" y="2" width={courtWidth - 4} height={courtHeight - 4}
