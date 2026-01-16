@@ -1,8 +1,7 @@
 import { useState } from 'react'
 
-export default function CourtMap({ onShotRecorded, quarter }) {
+export default function CourtMap({ onShotRecorded, quarter, shotMarkers, setShotMarkers }) {
   const [pendingShot, setPendingShot] = useState(null)
-  const [shotMarkers, setShotMarkers] = useState([])
   const [showMarkerMenu, setShowMarkerMenu] = useState(false)
 
   // Court dimensions (half court, proportional)

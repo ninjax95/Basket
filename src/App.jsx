@@ -1687,6 +1687,64 @@ const styles = `
     }
   }
 
+  /* Shot Heatmap Styles */
+  .heatmap-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 15px;
+  }
+
+  .heatmap-svg {
+    width: 100%;
+    max-width: 450px;
+    height: auto;
+    border-radius: 8px;
+  }
+
+  .heatmap-stats {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-bottom: 15px;
+  }
+
+  .heatmap-stat {
+    text-align: center;
+  }
+
+  .heatmap-stat-value {
+    display: block;
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #61dafb;
+  }
+
+  .heatmap-stat-label {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .heatmap-legend {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .legend-color {
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+  }
+
   /* PIN Lock Styles */
   .pin-lock-overlay {
     position: fixed;
@@ -1842,6 +1900,7 @@ export default function App() {
   const [isUnlocked, setIsUnlocked] = useState(false)
   const [activeTab, setActiveTab] = useState('match')
   const [opponent, setOpponent] = useState('')
+  const [shotMarkers, setShotMarkers] = useState([])
 
   // Check if already unlocked this session
   useEffect(() => {
@@ -1931,7 +1990,7 @@ export default function App() {
       return
     }
 
-    saveMatch(player, stats, opponent)
+    saveMatch(player, stats, opponent, shotMarkers)
     alert('Match sauvegardé !')
 
     // Reset for next match
@@ -1939,6 +1998,7 @@ export default function App() {
     timer.resetTimer()
     playingTime.resetPlayingTime()
     setOpponent('')
+    setShotMarkers([])  // Clear shot markers
   }
 
   const handleDeleteMatch = (matchId) => {
@@ -2107,7 +2167,12 @@ export default function App() {
               </div>
             </div>
 
-            <CourtMap onShotRecorded={handleShotRecorded} quarter={timer.quarter} />
+            <CourtMap
+              onShotRecorded={handleShotRecorded}
+              quarter={timer.quarter}
+              shotMarkers={shotMarkers}
+              setShotMarkers={setShotMarkers}
+            />
 
             <div className="stats-grid">
               <div className="stat-card">

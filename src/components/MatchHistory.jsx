@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import EvolutionChart from './EvolutionChart'
 import PerformanceRadar from './PerformanceRadar'
+import ShotHeatmap from './ShotHeatmap'
 
 export default function MatchHistory({ history, averages, onDelete, onClear }) {
   const [selectedMatchId, setSelectedMatchId] = useState('all') // 'all' or match id
@@ -163,6 +164,9 @@ export default function MatchHistory({ history, averages, onDelete, onClear }) {
           )}
         </div>
       )}
+
+      {/* Heatmap Section */}
+      <ShotHeatmap history={history} selectedMatchId={selectedMatchId} />
 
       {/* Charts Section */}
       <div className="charts-grid">
