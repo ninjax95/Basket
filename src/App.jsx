@@ -2076,8 +2076,6 @@ export default function App() {
               onAdjustTime={timer.adjustTime}
             />
 
-            <CourtMap onShotRecorded={handleShotRecorded} quarter={timer.quarter} />
-
             {/* Playing Time Toggle */}
             <div className="playing-time-section">
               <div className="playing-time-header">
@@ -2108,6 +2106,8 @@ export default function App() {
                 )}
               </div>
             </div>
+
+            <CourtMap onShotRecorded={handleShotRecorded} quarter={timer.quarter} />
 
             <div className="stats-grid">
               <div className="stat-card">
