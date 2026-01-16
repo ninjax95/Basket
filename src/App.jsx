@@ -1798,59 +1798,132 @@ const styles = `
     color: rgba(255, 255, 255, 0.6);
   }
 
-  /* Action History Section */
-  .action-history-section {
+  /* Action History Toggle Button */
+  .action-history-toggle {
+    display: block;
+    width: 100%;
     background: rgba(255, 255, 255, 0.1);
-    border-radius: 12px;
-    padding: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #61dafb;
+    padding: 12px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
     margin-bottom: 20px;
+    transition: all 0.2s;
   }
 
-  .action-history-header {
+  .action-history-toggle:hover {
+    background: rgba(97, 218, 251, 0.15);
+    border-color: #61dafb;
+    transform: translateY(-2px);
+  }
+
+  /* Action History Panel */
+  .action-panel-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    animation: fadeIn 0.2s ease;
+  }
+
+  .action-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 350px;
+    max-width: 90%;
+    height: 100%;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border-left: 2px solid #61dafb;
+    display: flex;
+    flex-direction: column;
+    animation: slideInRight 0.3s ease;
+  }
+
+  @keyframes slideInRight {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+  }
+
+  .action-panel-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 15px;
+    padding: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   }
 
-  .action-history-header h3 {
+  .action-panel-header h3 {
     color: #61dafb;
     margin: 0;
-    font-size: 1rem;
+    font-size: 1.2rem;
+  }
+
+  .action-panel-close {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 2rem;
+    cursor: pointer;
+    padding: 0 10px;
+    line-height: 1;
+    transition: color 0.2s;
+  }
+
+  .action-panel-close:hover {
+    color: #e74c3c;
+  }
+
+  .action-panel-actions {
+    padding: 15px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   }
 
   .undo-action-btn {
     background: rgba(255, 255, 255, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.2);
     color: rgba(255, 255, 255, 0.8);
-    padding: 6px 12px;
-    border-radius: 6px;
+    padding: 10px 15px;
+    border-radius: 8px;
     cursor: pointer;
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     transition: all 0.2s;
+    width: 100%;
   }
 
-  .undo-action-btn:hover {
+  .undo-action-btn:hover:not(:disabled) {
     background: rgba(231, 76, 60, 0.2);
     border-color: #e74c3c;
     color: #e74c3c;
   }
 
-  .action-list {
+  .undo-action-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .action-panel-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 15px 20px;
     display: flex;
     flex-direction: column;
     gap: 8px;
-    max-height: 200px;
-    overflow-y: auto;
   }
 
   .action-item {
     display: flex;
     align-items: center;
     gap: 15px;
-    padding: 8px 12px;
+    padding: 10px 12px;
     background: rgba(255, 255, 255, 0.05);
-    border-radius: 6px;
+    border-radius: 8px;
   }
 
   .action-time {
@@ -1865,11 +1938,10 @@ const styles = `
     font-size: 0.9rem;
   }
 
-  .action-more {
+  .action-empty {
     text-align: center;
     color: rgba(255, 255, 255, 0.5);
-    font-size: 0.85rem;
-    padding: 8px;
+    padding: 30px;
   }
 
   @media (max-width: 600px) {
@@ -2359,6 +2431,7 @@ export default function App() {
   const [showGistSettings, setShowGistSettings] = useState(false)
   const [gistLoading, setGistLoading] = useState(false)
   const [tempToken, setTempToken] = useState('')
+  const [showActionPanel, setShowActionPanel] = useState(false)
 
   // Check if already unlocked this session
   useEffect(() => {
@@ -2874,27 +2947,14 @@ export default function App() {
               </div>
             </div>
 
-            {/* Action History (Play-by-Play) */}
+            {/* Action History Button */}
             {actionHistory.length > 0 && (
-              <div className="action-history-section">
-                <div className="action-history-header">
-                  <h3>📝 Historique des actions</h3>
-                  <button className="undo-action-btn" onClick={undoLastAction}>
-                    ↩ Annuler
-                  </button>
-                </div>
-                <div className="action-list">
-                  {actionHistory.slice(0, 10).map(action => (
-                    <div key={action.id} className="action-item">
-                      <span className="action-time">Q{action.quarter} {Math.floor(action.timeLeft / 60)}:{(action.timeLeft % 60).toString().padStart(2, '0')}</span>
-                      <span className="action-label">{action.label}</span>
-                    </div>
-                  ))}
-                  {actionHistory.length > 10 && (
-                    <div className="action-more">+{actionHistory.length - 10} autres actions</div>
-                  )}
-                </div>
-              </div>
+              <button
+                className="action-history-toggle"
+                onClick={() => setShowActionPanel(true)}
+              >
+                📝 Historique ({actionHistory.length})
+              </button>
             )}
 
             <StatsDisplay summary={summary} />
@@ -2934,6 +2994,35 @@ export default function App() {
             gistLoading={gistLoading}
             gistConnected={!!githubToken}
           />
+        )}
+
+        {/* Action History Panel */}
+        {showActionPanel && (
+          <div className="action-panel-overlay" onClick={() => setShowActionPanel(false)}>
+            <div className="action-panel" onClick={e => e.stopPropagation()}>
+              <div className="action-panel-header">
+                <h3>📝 Historique des actions</h3>
+                <button className="action-panel-close" onClick={() => setShowActionPanel(false)}>×</button>
+              </div>
+              <div className="action-panel-actions">
+                <button className="undo-action-btn" onClick={undoLastAction} disabled={actionHistory.length === 0}>
+                  ↩ Annuler dernière action
+                </button>
+              </div>
+              <div className="action-panel-list">
+                {actionHistory.length === 0 ? (
+                  <div className="action-empty">Aucune action enregistrée</div>
+                ) : (
+                  actionHistory.map(action => (
+                    <div key={action.id} className="action-item">
+                      <span className="action-time">Q{action.quarter} {Math.floor(action.timeLeft / 60)}:{(action.timeLeft % 60).toString().padStart(2, '0')}</span>
+                      <span className="action-label">{action.label}</span>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
         )}
 
         {/* Gist Settings Modal */}
