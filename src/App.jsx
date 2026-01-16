@@ -2794,7 +2794,7 @@ export default function App() {
     <>
       <style>{styles}</style>
       <div className="container">
-        <h1>🏀 Stats Basket <span className="badge">React</span></h1>
+        <h1>🏀 Stats Basket 2026</h1>
 
         {/* Navigation */}
         <div className="nav-tabs">
