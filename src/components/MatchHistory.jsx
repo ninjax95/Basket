@@ -4,7 +4,7 @@ import PerformanceRadar from './PerformanceRadar'
 import ShotHeatmap from './ShotHeatmap'
 import ThermalHeatmap from './ThermalHeatmap'
 
-export default function MatchHistory({ history, averages, onDelete, onClear }) {
+export default function MatchHistory({ history, averages, onDelete, onClear, onImport }) {
   const [selectedMatchId, setSelectedMatchId] = useState('all') // 'all' or match id
   const lastMatch = history.length > 0 ? history[history.length - 1] : null
 
@@ -182,11 +182,16 @@ export default function MatchHistory({ history, averages, onDelete, onClear }) {
       <div className="match-list">
         <div className="match-list-header">
           <h3>📋 Liste des matchs</h3>
-          {history.length > 0 && (
-            <button className="clear-btn" onClick={onClear}>
-              Tout effacer
+          <div className="match-list-actions">
+            <button className="import-btn" onClick={onImport}>
+              📥 Restaurer backup
             </button>
-          )}
+            {history.length > 0 && (
+              <button className="clear-btn" onClick={onClear}>
+                Tout effacer
+              </button>
+            )}
+          </div>
         </div>
 
         {history.length === 0 ? (

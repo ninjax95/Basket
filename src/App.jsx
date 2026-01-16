@@ -877,6 +877,27 @@ const styles = `
     color: #61dafb;
   }
 
+  .match-list-actions {
+    display: flex;
+    gap: 10px;
+  }
+
+  .import-btn {
+    background: transparent;
+    border: 1px solid #61dafb;
+    color: #61dafb;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+  }
+
+  .import-btn:hover {
+    background: rgba(97, 218, 251, 0.2);
+    transform: scale(1.05);
+  }
+
   .clear-btn {
     background: transparent;
     border: 1px solid #e74c3c;
@@ -890,6 +911,7 @@ const styles = `
 
   .clear-btn:hover {
     background: rgba(231, 76, 60, 0.2);
+    transform: scale(1.05);
   }
 
   .no-matches {
@@ -2199,6 +2221,24 @@ export default function App() {
 
   const perMinuteStats = getPerMinuteStats()
 
+  // Backup history to JSON file
+  const backupHistory = (updatedHistory) => {
+    const backupData = {
+      exportDate: new Date().toISOString(),
+      player: player,
+      matchCount: updatedHistory.length,
+      history: updatedHistory
+    }
+    const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    const date = new Date().toLocaleDateString('fr-FR').replace(/\//g, '-')
+    a.download = `backup_stats_${player.name || 'joueur'}_${date}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
   const handleSaveMatch = () => {
     if (!player.name) {
       alert('Entre le nom du joueur avant de sauvegarder !')
@@ -2211,8 +2251,13 @@ export default function App() {
       return
     }
 
-    saveMatch(player, stats, opponent, shotMarkers)
-    alert('Match sauvegardé !')
+    const savedMatch = saveMatch(player, stats, opponent, shotMarkers)
+
+    // Auto backup after save
+    const updatedHistory = [...matchHistory.history, savedMatch]
+    backupHistory(updatedHistory)
+
+    alert('Match sauvegardé ! Backup téléchargé.')
 
     // Reset for next match
     resetStats()
@@ -2232,6 +2277,35 @@ export default function App() {
     if (confirm('Supprimer tout l\'historique ? Cette action est irréversible.')) {
       clearHistory()
     }
+  }
+
+  const handleImportHistory = () => {
+    const input = document.createElement('input')
+    input.type = 'file'
+    input.accept = '.json'
+    input.onchange = (e) => {
+      const file = e.target.files[0]
+      if (!file) return
+
+      const reader = new FileReader()
+      reader.onload = (event) => {
+        try {
+          const data = JSON.parse(event.target.result)
+          if (data.history && Array.isArray(data.history)) {
+            if (confirm(`Restaurer ${data.history.length} match(s) depuis le backup du ${new Date(data.exportDate).toLocaleDateString('fr-FR')} ?\n\nCela remplacera l'historique actuel.`)) {
+              matchHistory.importHistory(data.history)
+              alert('Historique restauré avec succès !')
+            }
+          } else {
+            alert('Fichier de backup invalide.')
+          }
+        } catch {
+          alert('Erreur lors de la lecture du fichier.')
+        }
+      }
+      reader.readAsText(file)
+    }
+    input.click()
   }
 
   const exportData = () => {
@@ -2519,6 +2593,7 @@ export default function App() {
             averages={averages}
             onDelete={handleDeleteMatch}
             onClear={handleClearHistory}
+            onImport={handleImportHistory}
           />
         )}
       </div>

@@ -418,6 +418,10 @@ export function useMatchHistory() {
     setHistory([])
   }
 
+  const importHistory = (newHistory) => {
+    setHistory(newHistory)
+  }
+
   const getAverages = () => {
     if (history.length === 0) return null
 
@@ -443,5 +447,5 @@ export function useMatchHistory() {
     }
   }
 
-  return { history, saveMatch, deleteMatch, clearHistory, getAverages }
+  return { history, saveMatch, deleteMatch, clearHistory, importHistory, getAverages }
 }
