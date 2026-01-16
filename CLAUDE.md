@@ -5,7 +5,27 @@
 Application React pour tracker les statistiques d'un joueur de basketball pendant un match. Déployée sur Vercel.
 
 - **Repo GitHub** : https://github.com/ninjax95/Basket
-- **Hébergement** : Vercel
+- **Hébergement** : Vercel (auto-deploy depuis GitHub)
+
+## Configuration Git & Déploiement
+
+### GitHub
+- **Username** : ninjax95
+- **Email** : jaxmaj@gmail.com
+- **Repo** : Basket (https://github.com/ninjax95/Basket)
+
+### Vercel
+- **Framework Preset** : Vite
+- **Build Command** : `npm run build` (auto-détecté)
+- **Output Directory** : `dist` (auto-détecté)
+- **Déploiement** : Automatique à chaque push sur `main`
+
+### Workflow de déploiement
+1. Faire les modifications localement
+2. `git add .`
+3. `git commit -m "message"`
+4. `git push` (peut nécessiter un token GitHub)
+5. Vercel redéploie automatiquement
 
 ## Stack technique
 
