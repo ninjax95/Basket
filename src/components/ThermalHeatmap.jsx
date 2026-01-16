@@ -89,11 +89,12 @@ export default function ThermalHeatmap({ history, selectedMatchId }) {
       <div className="heatmap-wrapper">
         <svg viewBox={`0 0 ${courtWidth} ${courtHeight}`} className="heatmap-svg">
           <defs>
-            {/* Radial gradients for each heat point */}
+            {/* Radial gradients for each heat point - sharper edges */}
             {heatData.map((point, i) => (
               <radialGradient key={`grad-${i}`} id={`heatGrad-${i}`}>
-                <stop offset="0%" stopColor={getHeatColor(point.percentage)} stopOpacity={0.8 * point.intensity} />
-                <stop offset="50%" stopColor={getHeatColor(point.percentage)} stopOpacity={0.4 * point.intensity} />
+                <stop offset="0%" stopColor={getHeatColor(point.percentage)} stopOpacity={0.9 * point.intensity} />
+                <stop offset="40%" stopColor={getHeatColor(point.percentage)} stopOpacity={0.7 * point.intensity} />
+                <stop offset="70%" stopColor={getHeatColor(point.percentage)} stopOpacity={0.3 * point.intensity} />
                 <stop offset="100%" stopColor={getHeatColor(point.percentage)} stopOpacity="0" />
               </radialGradient>
             ))}
@@ -113,7 +114,7 @@ export default function ThermalHeatmap({ history, selectedMatchId }) {
               key={`heat-${i}`}
               cx={point.x}
               cy={point.y}
-              r={gridSize * 1.5}
+              r={gridSize * 1.2}
               fill={`url(#heatGrad-${i})`}
             />
           ))}
@@ -157,32 +158,6 @@ export default function ThermalHeatmap({ history, selectedMatchId }) {
 
           {/* Center line */}
           <line x1="0" y1={courtHeight - 2} x2={courtWidth} y2={courtHeight - 2} stroke="rgba(255,255,255,0.4)" strokeWidth="2"/>
-
-          {/* Percentage labels on hot spots */}
-          {heatData.filter(p => p.total >= 3).map((point, i) => (
-            <g key={`label-${i}`}>
-              <circle cx={point.x} cy={point.y} r="18" fill="rgba(0,0,0,0.6)" />
-              <text
-                x={point.x}
-                y={point.y + 1}
-                textAnchor="middle"
-                fill="#fff"
-                fontSize="11"
-                fontWeight="bold"
-              >
-                {Math.round(point.percentage * 100)}%
-              </text>
-              <text
-                x={point.x}
-                y={point.y + 12}
-                textAnchor="middle"
-                fill="rgba(255,255,255,0.7)"
-                fontSize="8"
-              >
-                {point.made}/{point.total}
-              </text>
-            </g>
-          ))}
         </svg>
       </div>
 
