@@ -1568,37 +1568,38 @@ const styles = `
   .court-side-stats {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    min-width: 60px;
+    gap: 12px;
+    min-width: 75px;
   }
 
   .side-stat-group {
-    background: rgba(255, 255, 255, 0.05);
-    padding: 8px;
-    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.08);
+    padding: 12px 10px;
+    border-radius: 10px;
     text-align: center;
   }
 
   .side-stat-label {
     font-weight: bold;
     color: #61dafb;
-    font-size: 0.7rem;
+    font-size: 0.9rem;
     text-transform: uppercase;
-    margin-bottom: 5px;
+    margin-bottom: 8px;
   }
 
   .side-stat-row {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 2px;
-    font-size: 0.8rem;
-    margin-bottom: 3px;
+    gap: 3px;
+    font-size: 1.1rem;
+    margin-bottom: 6px;
   }
 
   .side-made {
     color: #2ecc71;
     font-weight: bold;
+    font-size: 1.2rem;
   }
 
   .side-sep {
@@ -1611,8 +1612,8 @@ const styles = `
 
   .side-type {
     color: rgba(255, 255, 255, 0.5);
-    font-size: 0.65rem;
-    margin-left: 3px;
+    font-size: 0.8rem;
+    margin-left: 4px;
   }
 
   /* Court wrapper (CENTER) */
@@ -1624,27 +1625,28 @@ const styles = `
   .court-side-buttons {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    min-width: 50px;
+    gap: 12px;
+    min-width: 65px;
   }
 
   .court-side-btn {
-    padding: 12px 10px;
-    border-radius: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 18px 14px;
+    border-radius: 12px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
     background: rgba(255, 255, 255, 0.1);
     color: #fff;
-    font-size: 1.2rem;
+    font-size: 1.8rem;
     cursor: pointer;
     transition: all 0.2s;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 4px;
+    gap: 6px;
   }
 
   .court-side-btn span {
-    font-size: 0.7rem;
+    font-size: 0.85rem;
+    font-weight: 500;
   }
 
   .court-side-btn:hover {
