@@ -29,7 +29,8 @@ react/
 │   │   ├── StatsDisplay.jsx # Affichage résumé des stats
 │   │   ├── MatchHistory.jsx # Historique des matchs avec filtres
 │   │   ├── EvolutionChart.jsx    # Graphique d'évolution
-│   │   └── PerformanceRadar.jsx  # Graphique radar
+│   │   ├── PerformanceRadar.jsx  # Graphique radar
+│   │   └── PinLock.jsx      # Écran de verrouillage PIN
 │   └── hooks/
 │       └── useStats.js      # Hooks personnalisés (stats, timer, playing time, history)
 ├── index.html
@@ -38,6 +39,13 @@ react/
 ```
 
 ## Fonctionnalités
+
+### Authentification PIN
+- Code PIN 4-6 chiffres pour protéger l'accès
+- Première visite : création du PIN avec confirmation
+- Visites suivantes : saisie du PIN pour déverrouiller
+- Clavier numérique tactile
+- Session persistante (reste déverrouillé jusqu'à fermeture du navigateur)
 
 ### Stats trackées
 - **Points** : tirs 2pts, 3pts, lancers francs (réussis/ratés)
@@ -104,6 +112,7 @@ Les tirs réussis/ratés sont gérés intelligemment :
 
 ## localStorage keys
 
+- `basketAppPin` : code PIN (encodé en base64)
 - `basketStats` : stats du match en cours
 - `basketActionHistory` : historique des actions
 - `basketPlayer` : infos joueur
@@ -113,3 +122,7 @@ Les tirs réussis/ratés sont gérés intelligemment :
 - `basketPlayingTime` : temps de jeu
 - `basketBenchTime` : temps sur le banc
 - `basketIsOnCourt` : sur terrain ou non
+
+## sessionStorage keys
+
+- `basketAppUnlocked` : état de déverrouillage de la session
