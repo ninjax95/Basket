@@ -7,6 +7,7 @@ import StatsDisplay from './components/StatsDisplay'
 import MatchHistory from './components/MatchHistory'
 import CourtMap from './components/CourtMap'
 import PinLock from './components/PinLock'
+import ShotReplay from './components/ShotReplay'
 
 const styles = `
   * {
@@ -1944,6 +1945,350 @@ const styles = `
     padding: 30px;
   }
 
+  /* Action Buttons Row */
+  .action-buttons-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .action-history-toggle,
+  .replay-toggle {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #61dafb;
+    padding: 12px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+
+  .action-history-toggle:hover,
+  .replay-toggle:hover {
+    background: rgba(97, 218, 251, 0.15);
+    border-color: #61dafb;
+    transform: translateY(-2px);
+  }
+
+  .replay-toggle {
+    color: #ff6b35;
+    border-color: rgba(255, 107, 53, 0.3);
+  }
+
+  .replay-toggle:hover {
+    background: rgba(255, 107, 53, 0.15);
+    border-color: #ff6b35;
+  }
+
+  /* Shot Replay Styles */
+  .replay-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .replay-container {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border: 2px solid #ff6b35;
+    border-radius: 20px;
+    width: 95%;
+    max-width: 600px;
+    max-height: 95vh;
+    overflow-y: auto;
+    animation: scaleIn 0.3s ease;
+  }
+
+  .replay-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 25px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .replay-header h2 {
+    color: #ff6b35;
+    margin: 0;
+    font-size: 1.4rem;
+  }
+
+  .replay-close {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 2.5rem;
+    cursor: pointer;
+    line-height: 1;
+    transition: color 0.2s;
+  }
+
+  .replay-close:hover {
+    color: #e74c3c;
+  }
+
+  .replay-content {
+    padding: 20px;
+  }
+
+  .replay-court-wrapper {
+    position: relative;
+    margin-bottom: 20px;
+  }
+
+  .replay-court {
+    width: 100%;
+    border-radius: 10px;
+    box-shadow: 0 5px 30px rgba(0, 0, 0, 0.5);
+  }
+
+  .replay-shot-marker {
+    animation: shotAppear 0.5s ease forwards;
+  }
+
+  @keyframes shotAppear {
+    0% { opacity: 0; transform: scale(0); }
+    50% { transform: scale(1.5); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+
+  .shot-pulse {
+    animation: shotPulse 1s ease-out;
+  }
+
+  @keyframes shotPulse {
+    0% { r: 10; opacity: 1; }
+    100% { r: 30; opacity: 0; }
+  }
+
+  .ft-indicator {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 15px 30px;
+    border-radius: 30px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    animation: ftBounce 0.5s ease;
+  }
+
+  .ft-indicator.made {
+    background: linear-gradient(135deg, #2ecc71, #27ae60);
+    color: #fff;
+    box-shadow: 0 0 30px rgba(46, 204, 113, 0.6);
+  }
+
+  .ft-indicator.missed {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: #fff;
+    box-shadow: 0 0 30px rgba(231, 76, 60, 0.6);
+  }
+
+  @keyframes ftBounce {
+    0% { transform: translateX(-50%) scale(0); }
+    50% { transform: translateX(-50%) scale(1.2); }
+    100% { transform: translateX(-50%) scale(1); }
+  }
+
+  .replay-info {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .current-action {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+  }
+
+  .current-action.made {
+    border: 2px solid #2ecc71;
+    background: rgba(46, 204, 113, 0.1);
+  }
+
+  .current-action.missed {
+    border: 2px solid #e74c3c;
+    background: rgba(231, 76, 60, 0.1);
+  }
+
+  .current-action.waiting {
+    color: rgba(255, 255, 255, 0.5);
+    font-style: italic;
+  }
+
+  .action-quarter {
+    background: #61dafb;
+    color: #000;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 1rem;
+  }
+
+  .action-time-display {
+    font-family: 'Courier New', monospace;
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #fff;
+  }
+
+  .action-type {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #ff6b35;
+  }
+
+  .replay-progress {
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 10px;
+  }
+
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #ff6b35, #ff8c5a);
+    border-radius: 3px;
+    transition: width 0.3s ease;
+  }
+
+  .replay-counter {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.9rem;
+  }
+
+  .replay-stats {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+  }
+
+  .replay-stat {
+    text-align: center;
+  }
+
+  .replay-stat .stat-label {
+    display: block;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 5px;
+  }
+
+  .replay-stat .stat-value {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #61dafb;
+  }
+
+  .replay-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+
+  .replay-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    padding: 12px 25px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.2s;
+  }
+
+  .replay-btn:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+  }
+
+  .replay-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .replay-btn.primary {
+    background: linear-gradient(135deg, #ff6b35, #ff8c5a);
+    border: none;
+    font-weight: bold;
+    min-width: 120px;
+  }
+
+  .replay-btn.primary:hover:not(:disabled) {
+    background: linear-gradient(135deg, #ff8c5a, #ffaa7a);
+  }
+
+  .replay-btn.primary.playing {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+  }
+
+  .speed-control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+  }
+
+  .speed-control select {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  .speed-control select option {
+    background: #1a1a2e;
+  }
+
+  @media (max-width: 600px) {
+    .action-buttons-row {
+      flex-direction: column;
+    }
+
+    .current-action {
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .action-time-display {
+      font-size: 1.4rem;
+    }
+
+    .replay-controls {
+      flex-direction: column;
+    }
+
+    .replay-btn {
+      width: 100%;
+    }
+  }
+
   @media (max-width: 600px) {
     .quarter-stats-grid {
       grid-template-columns: repeat(2, 1fr);
@@ -2432,6 +2777,7 @@ export default function App() {
   const [gistLoading, setGistLoading] = useState(false)
   const [tempToken, setTempToken] = useState('')
   const [showActionPanel, setShowActionPanel] = useState(false)
+  const [showReplay, setShowReplay] = useState(false)
 
   // Check if already unlocked this session
   useEffect(() => {
@@ -2947,15 +3293,25 @@ export default function App() {
               </div>
             </div>
 
-            {/* Action History Button */}
-            {actionHistory.length > 0 && (
-              <button
-                className="action-history-toggle"
-                onClick={() => setShowActionPanel(true)}
-              >
-                📝 Historique ({actionHistory.length})
-              </button>
-            )}
+            {/* Action History & Replay Buttons */}
+            <div className="action-buttons-row">
+              {actionHistory.length > 0 && (
+                <button
+                  className="action-history-toggle"
+                  onClick={() => setShowActionPanel(true)}
+                >
+                  📝 Historique ({actionHistory.length})
+                </button>
+              )}
+              {shotMarkers.length > 0 && (
+                <button
+                  className="replay-toggle"
+                  onClick={() => setShowReplay(true)}
+                >
+                  🎬 Replay Match
+                </button>
+              )}
+            </div>
 
             <StatsDisplay summary={summary} />
 
@@ -2993,6 +3349,15 @@ export default function App() {
             onOpenGistSettings={() => { setTempToken(githubToken); setShowGistSettings(true) }}
             gistLoading={gistLoading}
             gistConnected={!!githubToken}
+          />
+        )}
+
+        {/* Shot Replay */}
+        {showReplay && (
+          <ShotReplay
+            shotMarkers={shotMarkers}
+            actionHistory={actionHistory}
+            onClose={() => setShowReplay(false)}
           />
         )}
 
