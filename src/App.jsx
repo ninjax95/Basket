@@ -414,17 +414,16 @@ const styles = `
 
   /* Confirmation Modal */
   .confirm-overlay {
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.8);
+    background: rgba(0, 0, 0, 0.85);
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 12px;
-    z-index: 10;
+    z-index: 1000;
     animation: fadeIn 0.2s ease;
   }
 
@@ -432,9 +431,11 @@ const styles = `
     background: linear-gradient(135deg, rgba(26, 26, 46, 0.98) 0%, rgba(22, 33, 62, 0.98) 100%);
     border: 2px solid #61dafb;
     border-radius: 16px;
-    padding: 25px 35px;
+    padding: 30px 40px;
     text-align: center;
     animation: scaleIn 0.2s ease;
+    min-width: 280px;
+    max-width: 90%;
   }
 
   @keyframes scaleIn {
