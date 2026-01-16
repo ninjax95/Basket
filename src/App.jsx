@@ -6,6 +6,7 @@ import PlayerInfo from './components/PlayerInfo'
 import StatsDisplay from './components/StatsDisplay'
 import MatchHistory from './components/MatchHistory'
 import CourtMap from './components/CourtMap'
+import PinLock from './components/PinLock'
 
 const styles = `
   * {
@@ -1685,11 +1686,175 @@ const styles = `
       justify-content: center;
     }
   }
+
+  /* PIN Lock Styles */
+  .pin-lock-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+  }
+
+  .pin-lock-container {
+    text-align: center;
+    padding: 40px;
+    max-width: 350px;
+    width: 100%;
+  }
+
+  .pin-lock-icon {
+    font-size: 4rem;
+    margin-bottom: 15px;
+  }
+
+  .pin-lock-container h2 {
+    color: #61dafb;
+    margin-bottom: 30px;
+    font-size: 1.8rem;
+  }
+
+  .pin-instruction {
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 25px;
+    font-size: 1rem;
+  }
+
+  .pin-dots {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .pin-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    background: transparent;
+    transition: all 0.2s;
+  }
+
+  .pin-dot.filled {
+    background: #61dafb;
+    border-color: #61dafb;
+  }
+
+  .pin-error {
+    color: #e74c3c;
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+  }
+
+  .pin-keypad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 25px;
+    max-width: 280px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .pin-key {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
+    font-size: 1.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .pin-key:hover:not(:disabled) {
+    background: rgba(97, 218, 251, 0.2);
+    border-color: #61dafb;
+  }
+
+  .pin-key:active:not(:disabled) {
+    transform: scale(0.95);
+  }
+
+  .pin-key-empty {
+    visibility: hidden;
+  }
+
+  .pin-key-back {
+    font-size: 1.5rem;
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .pin-key-back:hover {
+    color: #e74c3c;
+    border-color: #e74c3c;
+    background: rgba(231, 76, 60, 0.2);
+  }
+
+  .pin-submit {
+    background: linear-gradient(135deg, #61dafb 0%, #4fa8c7 100%);
+    border: none;
+    color: #000;
+    padding: 15px 50px;
+    border-radius: 30px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .pin-submit:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(97, 218, 251, 0.4);
+  }
+
+  .pin-submit:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .pin-back-btn {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    margin-top: 20px;
+    cursor: pointer;
+    font-size: 0.95rem;
+  }
+
+  .pin-back-btn:hover {
+    color: #fff;
+  }
 `
 
 export default function App() {
+  const [isUnlocked, setIsUnlocked] = useState(false)
   const [activeTab, setActiveTab] = useState('match')
   const [opponent, setOpponent] = useState('')
+
+  // Check if already unlocked this session
+  useEffect(() => {
+    const sessionUnlocked = sessionStorage.getItem('basketAppUnlocked')
+    if (sessionUnlocked === 'true') {
+      setIsUnlocked(true)
+    }
+  }, [])
+
+  const handleUnlock = () => {
+    setIsUnlocked(true)
+    sessionStorage.setItem('basketAppUnlocked', 'true')
+  }
 
   const { stats, updateStat, resetStats, importStats, getSummary, actionHistory, getStatsByQuarter, undoLastAction } = useStats()
   const { player, updatePlayer } = usePlayer()
@@ -1848,6 +2013,16 @@ export default function App() {
         handleShotAttemptedIncrement('fg2Attempted')
       }
     }
+  }
+
+  // Show PIN lock if not unlocked
+  if (!isUnlocked) {
+    return (
+      <>
+        <style>{styles}</style>
+        <PinLock onUnlock={handleUnlock} />
+      </>
+    )
   }
 
   return (
