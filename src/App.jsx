@@ -1557,100 +1557,116 @@ const styles = `
     background: rgba(231, 76, 60, 0.4);
   }
 
-  /* Court Bottom Row - Stats left, Buttons right */
-  .court-bottom-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 15px;
-    padding-top: 15px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    gap: 15px;
-  }
-
-  .court-stats {
-    display: flex;
-    gap: 15px;
-    flex-wrap: wrap;
-  }
-
-  .court-stat-group {
+  /* Court Layout - Stats | Court | Buttons */
+  .court-layout {
     display: flex;
     align-items: center;
     gap: 10px;
-    background: rgba(255, 255, 255, 0.05);
-    padding: 8px 12px;
-    border-radius: 8px;
   }
 
-  .court-stat-label {
+  /* Side Stats (LEFT) */
+  .court-side-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 60px;
+  }
+
+  .side-stat-group {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 8px;
+    border-radius: 8px;
+    text-align: center;
+  }
+
+  .side-stat-label {
     font-weight: bold;
     color: #61dafb;
-    font-size: 0.8rem;
+    font-size: 0.7rem;
     text-transform: uppercase;
+    margin-bottom: 5px;
   }
 
-  .court-stat {
-    text-align: center;
-    font-size: 0.85rem;
+  .side-stat-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2px;
+    font-size: 0.8rem;
+    margin-bottom: 3px;
   }
 
-  .court-stat .made-count {
+  .side-made {
     color: #2ecc71;
     font-weight: bold;
   }
 
-  .court-stat .total-count {
+  .side-sep {
+    color: rgba(255, 255, 255, 0.4);
+  }
+
+  .side-total {
     color: rgba(255, 255, 255, 0.6);
   }
 
-  .court-stat .stat-label {
-    display: block;
+  .side-type {
     color: rgba(255, 255, 255, 0.5);
-    font-size: 0.7rem;
-    text-transform: uppercase;
+    font-size: 0.65rem;
+    margin-left: 3px;
   }
 
-  /* Court Action Buttons */
-  .court-action-buttons {
+  /* Court wrapper (CENTER) */
+  .court-wrapper {
+    flex: 1;
+  }
+
+  /* Side Buttons (RIGHT) */
+  .court-side-buttons {
     display: flex;
     flex-direction: column;
     gap: 8px;
+    min-width: 50px;
   }
 
-  .court-action-btn {
-    padding: 8px 14px;
-    border-radius: 8px;
+  .court-side-btn {
+    padding: 12px 10px;
+    border-radius: 10px;
     border: 1px solid rgba(255, 255, 255, 0.2);
     background: rgba(255, 255, 255, 0.1);
     color: #fff;
-    font-size: 0.85rem;
-    font-weight: 500;
+    font-size: 1.2rem;
     cursor: pointer;
     transition: all 0.2s;
-    white-space: nowrap;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
   }
 
-  .court-action-btn:hover {
+  .court-side-btn span {
+    font-size: 0.7rem;
+  }
+
+  .court-side-btn:hover {
     transform: translateY(-2px);
   }
 
-  .court-action-btn.history {
+  .court-side-btn.history {
     color: #61dafb;
     border-color: rgba(97, 218, 251, 0.3);
   }
 
-  .court-action-btn.history:hover {
+  .court-side-btn.history:hover {
     background: rgba(97, 218, 251, 0.15);
     border-color: #61dafb;
   }
 
-  .court-action-btn.replay {
+  .court-side-btn.replay {
     color: #ff6b35;
     border-color: rgba(255, 107, 53, 0.3);
   }
 
-  .court-action-btn.replay:hover {
+  .court-side-btn.replay:hover {
     background: rgba(255, 107, 53, 0.15);
     border-color: #ff6b35;
   }
