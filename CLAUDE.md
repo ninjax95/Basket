@@ -6,6 +6,7 @@ Application React pour tracker les statistiques d'un joueur de basketball pendan
 
 - **Repo GitHub** : https://github.com/ninjax95/Basket
 - **Hébergement** : Vercel (auto-deploy depuis GitHub)
+- **URL Production** : https://basket-roan.vercel.app
 
 ## Configuration Git & Déploiement
 
@@ -50,7 +51,9 @@ react/
 │   │   ├── MatchHistory.jsx # Historique des matchs avec filtres
 │   │   ├── EvolutionChart.jsx    # Graphique d'évolution
 │   │   ├── PerformanceRadar.jsx  # Graphique radar
-│   │   └── PinLock.jsx      # Écran de verrouillage PIN
+│   │   ├── ShotHeatmap.jsx       # Carte des tirs historique (parquet)
+│   │   ├── ThermalHeatmap.jsx    # Carte thermique zones chaudes/froides
+│   │   └── PinLock.jsx           # Écran de verrouillage PIN
 │   └── hooks/
 │       └── useStats.js      # Hooks personnalisés (stats, timer, playing time, history)
 ├── index.html
@@ -91,10 +94,18 @@ react/
 - Stats par minute (pts/min, reb/min, ast/min)
 
 ### Historique
-- Sauvegarde des matchs
+- Sauvegarde des matchs (stats + positions des tirs)
 - Filtre par match ou total
 - Stats détaillées avec pourcentages de tirs
 - Graphiques d'évolution et radar
+
+### Cartes de tirs (Historique)
+- **ShotHeatmap** : carte parquet avec tous les tirs (vert=réussi, rouge=raté)
+- **ThermalHeatmap** : carte thermique avec zones chaudes/froides
+  - Bleu = froid (faible %)
+  - Rouge = chaud (bon %)
+  - Dégradés radiaux par zone
+- Filtrable par match sélectionné
 
 ### Play-by-play
 - Chaque action enregistrée avec timestamp (Q2 5:30)
