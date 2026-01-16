@@ -1872,30 +1872,33 @@ export default function App() {
   }, [timer.isRunning, playingTime.isOnCourt])
 
   // Helper to update stat with current time
-  const updateStatWithTime = (statName, delta) => {
-    updateStat(statName, delta, timer.quarter, timer.timeLeft)
+  const updateStatWithTime = (statName, delta, silent = false) => {
+    updateStat(statName, delta, timer.quarter, timer.timeLeft, silent)
   }
 
   // Shot management: made shots automatically count as attempted
   const handleShotMadeIncrement = (madeKey, attemptedKey) => {
-    updateStatWithTime(madeKey, 1)
-    updateStatWithTime(attemptedKey, 1)
+    updateStatWithTime(madeKey, 1)  // Record in history: "2PTS réussi"
+    updateStatWithTime(attemptedKey, 1, true)  // Silent: don't record attempted
   }
 
-  const handleShotMadeDecrement = (madeKey) => {
+  const handleShotMadeDecrement = (madeKey, attemptedKey) => {
+    // Decrement made = convert a made shot to a miss
     if (stats[madeKey] > 0) {
-      updateStatWithTime(madeKey, -1)
+      updateStatWithTime(madeKey, -1)  // Remove "réussi" from history
+      // attempted stays the same (shot becomes a miss)
     }
   }
 
   const handleShotAttemptedIncrement = (attemptedKey) => {
-    updateStatWithTime(attemptedKey, 1)
+    // This is called for missed shots
+    updateStatWithTime(attemptedKey, 1)  // Record in history: "2PTS raté"
   }
 
   const handleShotAttemptedDecrement = (madeKey, attemptedKey) => {
     // Can only decrement if attempted > made (i.e., there are misses to remove)
     if (stats[attemptedKey] > stats[madeKey]) {
-      updateStatWithTime(attemptedKey, -1)
+      updateStatWithTime(attemptedKey, -1)  // Remove "raté" from history
     }
   }
 
@@ -2111,19 +2114,19 @@ export default function App() {
                 <h3>🎯 Points</h3>
                 <StatCounter label="Tirs 2pts réussis" value={stats.fg2Made}
                   onIncrement={() => handleShotMadeIncrement('fg2Made', 'fg2Attempted')}
-                  onDecrement={() => handleShotMadeDecrement('fg2Made')} />
+                  onDecrement={() => handleShotMadeDecrement('fg2Made', 'fg2Attempted')} />
                 <StatCounter label="Tirs 2pts ratés" value={stats.fg2Attempted - stats.fg2Made}
                   onIncrement={() => handleShotAttemptedIncrement('fg2Attempted')}
                   onDecrement={() => handleShotAttemptedDecrement('fg2Made', 'fg2Attempted')} />
                 <StatCounter label="Tirs 3pts réussis" value={stats.fg3Made}
                   onIncrement={() => handleShotMadeIncrement('fg3Made', 'fg3Attempted')}
-                  onDecrement={() => handleShotMadeDecrement('fg3Made')} />
+                  onDecrement={() => handleShotMadeDecrement('fg3Made', 'fg3Attempted')} />
                 <StatCounter label="Tirs 3pts ratés" value={stats.fg3Attempted - stats.fg3Made}
                   onIncrement={() => handleShotAttemptedIncrement('fg3Attempted')}
                   onDecrement={() => handleShotAttemptedDecrement('fg3Made', 'fg3Attempted')} />
                 <StatCounter label="LF réussis" value={stats.ftMade}
                   onIncrement={() => handleShotMadeIncrement('ftMade', 'ftAttempted')}
-                  onDecrement={() => handleShotMadeDecrement('ftMade')} />
+                  onDecrement={() => handleShotMadeDecrement('ftMade', 'ftAttempted')} />
                 <StatCounter label="LF ratés" value={stats.ftAttempted - stats.ftMade}
                   onIncrement={() => handleShotAttemptedIncrement('ftAttempted')}
                   onDecrement={() => handleShotAttemptedDecrement('ftMade', 'ftAttempted')} />

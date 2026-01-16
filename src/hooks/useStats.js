@@ -53,11 +53,14 @@ export function useStats() {
     localStorage.setItem('basketActionHistory', JSON.stringify(actionHistory))
   }, [actionHistory])
 
-  const updateStat = (statName, delta, quarter = 1, timeLeft = 0) => {
+  const updateStat = (statName, delta, quarter = 1, timeLeft = 0, silent = false) => {
     setStats(prev => ({
       ...prev,
       [statName]: Math.max(0, prev[statName] + delta)
     }))
+
+    // Skip history recording if silent mode
+    if (silent) return
 
     // Record action in history (only for positive actions)
     if (delta > 0) {
