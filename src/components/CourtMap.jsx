@@ -403,69 +403,71 @@ export default function CourtMap({ onShotRecorded, quarter, timeLeft, shotMarker
         )}
       </div>
 
-      {/* Shot stats summary */}
-      <div className="court-stats">
-        <div className="court-stat-group">
-          <div className="court-stat-label">Q{quarter}</div>
-          <div className="court-stat">
-            <span className="made-count">
-              {currentQuarterMarkers.filter(s => s.made && !s.isThree).length}
-            </span>
-            /
-            <span className="total-count">
-              {currentQuarterMarkers.filter(s => !s.isThree).length}
-            </span>
-            <span className="stat-label">2PTS</span>
+      {/* Stats and buttons row */}
+      <div className="court-bottom-row">
+        {/* Shot stats summary - LEFT */}
+        <div className="court-stats">
+          <div className="court-stat-group">
+            <div className="court-stat-label">Q{quarter}</div>
+            <div className="court-stat">
+              <span className="made-count">
+                {currentQuarterMarkers.filter(s => s.made && !s.isThree).length}
+              </span>
+              /
+              <span className="total-count">
+                {currentQuarterMarkers.filter(s => !s.isThree).length}
+              </span>
+              <span className="stat-label">2P</span>
+            </div>
+            <div className="court-stat">
+              <span className="made-count">
+                {currentQuarterMarkers.filter(s => s.made && s.isThree).length}
+              </span>
+              /
+              <span className="total-count">
+                {currentQuarterMarkers.filter(s => s.isThree).length}
+              </span>
+              <span className="stat-label">3P</span>
+            </div>
           </div>
-          <div className="court-stat">
-            <span className="made-count">
-              {currentQuarterMarkers.filter(s => s.made && s.isThree).length}
-            </span>
-            /
-            <span className="total-count">
-              {currentQuarterMarkers.filter(s => s.isThree).length}
-            </span>
-            <span className="stat-label">3PTS</span>
+          <div className="court-stat-group">
+            <div className="court-stat-label">Tot</div>
+            <div className="court-stat">
+              <span className="made-count">
+                {shotMarkers.filter(s => s.made && !s.isThree).length}
+              </span>
+              /
+              <span className="total-count">
+                {shotMarkers.filter(s => !s.isThree).length}
+              </span>
+              <span className="stat-label">2P</span>
+            </div>
+            <div className="court-stat">
+              <span className="made-count">
+                {shotMarkers.filter(s => s.made && s.isThree).length}
+              </span>
+              /
+              <span className="total-count">
+                {shotMarkers.filter(s => s.isThree).length}
+              </span>
+              <span className="stat-label">3P</span>
+            </div>
           </div>
         </div>
-        <div className="court-stat-divider"></div>
-        <div className="court-stat-group">
-          <div className="court-stat-label">Total</div>
-          <div className="court-stat">
-            <span className="made-count">
-              {shotMarkers.filter(s => s.made && !s.isThree).length}
-            </span>
-            /
-            <span className="total-count">
-              {shotMarkers.filter(s => !s.isThree).length}
-            </span>
-            <span className="stat-label">2PTS</span>
-          </div>
-          <div className="court-stat">
-            <span className="made-count">
-              {shotMarkers.filter(s => s.made && s.isThree).length}
-            </span>
-            /
-            <span className="total-count">
-              {shotMarkers.filter(s => s.isThree).length}
-            </span>
-            <span className="stat-label">3PTS</span>
-          </div>
-        </div>
-      </div>
 
-      {/* Action buttons */}
-      <div className="court-action-buttons">
-        {actionHistory && actionHistory.length > 0 && (
-          <button className="court-action-btn history" onClick={onShowHistory}>
-            📝 Historique ({actionHistory.length})
-          </button>
-        )}
-        {shotMarkers.length > 0 && (
-          <button className="court-action-btn replay" onClick={onShowReplay}>
-            🎬 Replay
-          </button>
-        )}
+        {/* Action buttons - RIGHT */}
+        <div className="court-action-buttons">
+          {actionHistory && actionHistory.length > 0 && (
+            <button className="court-action-btn history" onClick={onShowHistory}>
+              📝 ({actionHistory.length})
+            </button>
+          )}
+          {shotMarkers.length > 0 && (
+            <button className="court-action-btn replay" onClick={onShowReplay}>
+              🎬 Replay
+            </button>
+          )}
+        </div>
       </div>
     </div>
   )

@@ -1399,38 +1399,6 @@ const styles = `
     color: rgba(255, 255, 255, 0.8);
   }
 
-  .court-stats {
-    display: flex;
-    justify-content: center;
-    gap: 40px;
-    margin-top: 20px;
-    padding-top: 15px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-  }
-
-  .court-stat {
-    text-align: center;
-  }
-
-  .court-stat .made-count {
-    color: #2ecc71;
-    font-size: 1.5rem;
-    font-weight: bold;
-  }
-
-  .court-stat .total-count {
-    color: rgba(255, 255, 255, 0.6);
-    font-size: 1.2rem;
-  }
-
-  .court-stat .stat-label {
-    display: block;
-    color: rgba(255, 255, 255, 0.5);
-    font-size: 0.8rem;
-    margin-top: 5px;
-    text-transform: uppercase;
-  }
-
   /* Court header buttons */
   .court-header-buttons {
     display: flex;
@@ -1589,59 +1557,78 @@ const styles = `
     background: rgba(231, 76, 60, 0.4);
   }
 
-  /* Court stats groups */
-  .court-stats {
+  /* Court Bottom Row - Stats left, Buttons right */
+  .court-bottom-row {
     display: flex;
-    justify-content: center;
-    gap: 20px;
-    margin-top: 20px;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
     padding-top: 15px;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
+    gap: 15px;
+  }
+
+  .court-stats {
+    display: flex;
+    gap: 15px;
     flex-wrap: wrap;
   }
 
   .court-stat-group {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 10px;
     background: rgba(255, 255, 255, 0.05);
-    padding: 10px 20px;
-    border-radius: 10px;
+    padding: 8px 12px;
+    border-radius: 8px;
   }
 
   .court-stat-label {
     font-weight: bold;
     color: #61dafb;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     text-transform: uppercase;
   }
 
-  .court-stat-divider {
-    width: 1px;
-    height: 40px;
-    background: rgba(255, 255, 255, 0.2);
+  .court-stat {
+    text-align: center;
+    font-size: 0.85rem;
+  }
+
+  .court-stat .made-count {
+    color: #2ecc71;
+    font-weight: bold;
+  }
+
+  .court-stat .total-count {
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .court-stat .stat-label {
+    display: block;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.7rem;
+    text-transform: uppercase;
   }
 
   /* Court Action Buttons */
   .court-action-buttons {
     display: flex;
-    gap: 10px;
-    margin-top: 15px;
-    justify-content: center;
+    flex-direction: column;
+    gap: 8px;
   }
 
   .court-action-btn {
-    flex: 1;
-    max-width: 180px;
-    padding: 10px 15px;
-    border-radius: 10px;
+    padding: 8px 14px;
+    border-radius: 8px;
     border: 1px solid rgba(255, 255, 255, 0.2);
     background: rgba(255, 255, 255, 0.1);
     color: #fff;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s;
+    white-space: nowrap;
   }
 
   .court-action-btn:hover {
