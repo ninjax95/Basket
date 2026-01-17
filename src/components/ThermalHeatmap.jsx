@@ -58,13 +58,14 @@ export default function ThermalHeatmap({ history, selectedMatchId }) {
 
   const heatData = getHeatData()
 
-  // Get color based on percentage (cold = blue, hot = red)
+  // Get color based on percentage (bad = red, good = green)
   const getHeatColor = (percentage) => {
-    if (percentage < 0.25) return '#3498db'      // Cold blue
-    if (percentage < 0.40) return '#9b59b6'      // Purple
-    if (percentage < 0.50) return '#e67e22'      // Orange
-    if (percentage < 0.65) return '#f39c12'      // Yellow-orange
-    return '#e74c3c'                              // Hot red
+    if (percentage < 0.25) return '#e74c3c'      // Bad - Red
+    if (percentage < 0.35) return '#e67e22'      // Poor - Orange
+    if (percentage < 0.45) return '#f39c12'      // Below avg - Yellow-orange
+    if (percentage < 0.55) return '#f1c40f'      // Average - Yellow
+    if (percentage < 0.65) return '#a8d86e'      // Good - Light green
+    return '#2ecc71'                              // Great - Green
   }
 
   // Calculate stats
@@ -171,9 +172,9 @@ export default function ThermalHeatmap({ history, selectedMatchId }) {
 
       {/* Thermal legend */}
       <div className="thermal-legend">
-        <span className="thermal-cold">Froid</span>
-        <div className="thermal-gradient"></div>
-        <span className="thermal-hot">Chaud</span>
+        <span className="thermal-cold">Raté</span>
+        <div className="thermal-gradient red-green"></div>
+        <span className="thermal-hot">Réussi</span>
       </div>
     </div>
   )

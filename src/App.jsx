@@ -2448,7 +2448,7 @@ const styles = `
     width: 120px;
     height: 12px;
     border-radius: 6px;
-    background: linear-gradient(to right, #3498db, #9b59b6, #e67e22, #f39c12, #e74c3c);
+    background: linear-gradient(to right, #e74c3c, #e67e22, #f39c12, #f1c40f, #a8d86e, #2ecc71);
   }
 
   @media (max-width: 800px) {
