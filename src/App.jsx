@@ -3753,6 +3753,65 @@ export default function App() {
     updateStatWithTime(attemptedKey, 1)  // Record in history: "2PTS raté"
   }
 
+  // Free throw specific handlers - add markers to court map
+  const FT_POSITION = { x: 250, y: 190 } // Free throw line position
+
+  const handleFreeThrowMadeIncrement = () => {
+    handleShotMadeIncrement('ftMade', 'ftAttempted', 1)
+    // Add marker on court map
+    const marker = {
+      id: Date.now(),
+      x: FT_POSITION.x + (Math.random() - 0.5) * 20, // Slight random offset
+      y: FT_POSITION.y + (Math.random() - 0.5) * 10,
+      made: true,
+      isThreePointer: false,
+      isFreeThrow: true,
+      quarter: timer.quarter
+    }
+    setShotMarkers(prev => [...prev, marker])
+  }
+
+  const handleFreeThrowMadeDecrement = () => {
+    handleShotMadeDecrement('ftMade', 'ftAttempted', 1)
+    // Remove last FT made marker
+    setShotMarkers(prev => {
+      const idx = [...prev].reverse().findIndex(m => m.isFreeThrow && m.made)
+      if (idx !== -1) {
+        const actualIdx = prev.length - 1 - idx
+        return [...prev.slice(0, actualIdx), ...prev.slice(actualIdx + 1)]
+      }
+      return prev
+    })
+  }
+
+  const handleFreeThrowMissedIncrement = () => {
+    handleShotAttemptedIncrement('ftAttempted')
+    // Add marker on court map
+    const marker = {
+      id: Date.now(),
+      x: FT_POSITION.x + (Math.random() - 0.5) * 20,
+      y: FT_POSITION.y + (Math.random() - 0.5) * 10,
+      made: false,
+      isThreePointer: false,
+      isFreeThrow: true,
+      quarter: timer.quarter
+    }
+    setShotMarkers(prev => [...prev, marker])
+  }
+
+  const handleFreeThrowMissedDecrement = () => {
+    handleShotAttemptedDecrement('ftMade', 'ftAttempted')
+    // Remove last FT missed marker
+    setShotMarkers(prev => {
+      const idx = [...prev].reverse().findIndex(m => m.isFreeThrow && !m.made)
+      if (idx !== -1) {
+        const actualIdx = prev.length - 1 - idx
+        return [...prev.slice(0, actualIdx), ...prev.slice(actualIdx + 1)]
+      }
+      return prev
+    })
+  }
+
   const handleShotAttemptedDecrement = (madeKey, attemptedKey) => {
     // Can only decrement if attempted > made (i.e., there are misses to remove)
     if (stats[attemptedKey] > stats[madeKey]) {
@@ -4263,11 +4322,11 @@ export default function App() {
                   onIncrement={() => handleShotAttemptedIncrement('fg3Attempted')}
                   onDecrement={() => handleShotAttemptedDecrement('fg3Made', 'fg3Attempted')} />
                 <StatCounter label="LF réussis" value={stats.ftMade}
-                  onIncrement={() => handleShotMadeIncrement('ftMade', 'ftAttempted', 1)}
-                  onDecrement={() => handleShotMadeDecrement('ftMade', 'ftAttempted', 1)} />
+                  onIncrement={handleFreeThrowMadeIncrement}
+                  onDecrement={handleFreeThrowMadeDecrement} />
                 <StatCounter label="LF ratés" value={stats.ftAttempted - stats.ftMade}
-                  onIncrement={() => handleShotAttemptedIncrement('ftAttempted')}
-                  onDecrement={() => handleShotAttemptedDecrement('ftMade', 'ftAttempted')} />
+                  onIncrement={handleFreeThrowMissedIncrement}
+                  onDecrement={handleFreeThrowMissedDecrement} />
               </div>
 
               <div className="stat-card">
