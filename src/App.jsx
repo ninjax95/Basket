@@ -2818,7 +2818,10 @@ export default function App() {
   const [isUnlocked, setIsUnlocked] = useState(false)
   const [activeTab, setActiveTab] = useState('match')
   const [opponent, setOpponent] = useState('')
-  const [shotMarkers, setShotMarkers] = useState([])
+  const [shotMarkers, setShotMarkers] = useState(() => {
+    const saved = localStorage.getItem('basketShotMarkers')
+    return saved ? JSON.parse(saved) : []
+  })
   const [githubToken, setGithubToken] = useState(() => {
     const saved = localStorage.getItem('basketGithubToken')
     return saved ? atob(saved) : ''
@@ -2857,6 +2860,11 @@ export default function App() {
   useEffect(() => {
     return playingTime.trackTime(timer.isRunning)
   }, [timer.isRunning, playingTime.isOnCourt])
+
+  // Save shot markers to localStorage
+  useEffect(() => {
+    localStorage.setItem('basketShotMarkers', JSON.stringify(shotMarkers))
+  }, [shotMarkers])
 
   // Helper to update stat with current time
   const updateStatWithTime = (statName, delta, silent = false) => {
