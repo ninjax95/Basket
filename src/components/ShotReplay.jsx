@@ -6,27 +6,121 @@ export default function ShotReplay({ shotMarkers, actionHistory, onClose }) {
   const [visibleShots, setVisibleShots] = useState([])
   const [currentAction, setCurrentAction] = useState(null)
   const [speed, setSpeed] = useState(1500) // ms between shots
-  const [animatingBall, setAnimatingBall] = useState(null)
+  const [ballPosition, setBallPosition] = useState(null)
+  const [ballPhase, setBallPhase] = useState(null) // 'flying', 'ending', null
   const intervalRef = useRef(null)
+  const animationRef = useRef(null)
 
   // Basket position
   const basketX = 250
   const basketY = 50
 
-  // Generate random miss trajectory
+  // Generate random miss end position
   const getRandomMissEnd = () => {
     const missType = Math.floor(Math.random() * 4)
     switch (missType) {
-      case 0: // Rebond à gauche
-        return { x: basketX - 30 - Math.random() * 40, y: basketY + 20 + Math.random() * 30 }
-      case 1: // Rebond à droite
-        return { x: basketX + 30 + Math.random() * 40, y: basketY + 20 + Math.random() * 30 }
-      case 2: // Rebond devant (short)
-        return { x: basketX + (Math.random() - 0.5) * 40, y: basketY + 40 + Math.random() * 30 }
-      default: // Rebond sur le cercle (airball long)
-        return { x: basketX + (Math.random() - 0.5) * 60, y: basketY - 20 - Math.random() * 20 }
+      case 0: return { x: basketX - 35 - Math.random() * 30, y: basketY + 30 + Math.random() * 40 }
+      case 1: return { x: basketX + 35 + Math.random() * 30, y: basketY + 30 + Math.random() * 40 }
+      case 2: return { x: basketX + (Math.random() - 0.5) * 50, y: basketY + 50 + Math.random() * 30 }
+      default: return { x: basketX + (Math.random() - 0.5) * 40, y: basketY - 10 }
     }
   }
+
+  // Animate ball from start to end with arc
+  const animateBall = (startX, startY, endX, endY, made, onComplete) => {
+    const duration = 700
+    const startTime = Date.now()
+
+    const animate = () => {
+      const elapsed = Date.now() - startTime
+      const progress = Math.min(elapsed / duration, 1)
+
+      // Easing function for smooth arc
+      const easeOut = 1 - Math.pow(1 - progress, 3)
+
+      // Calculate current position with arc (parabola)
+      const arcHeight = Math.max(80, Math.abs(startY - endY) * 0.5)
+      const arcProgress = Math.sin(progress * Math.PI) * arcHeight
+
+      const currentX = startX + (endX - startX) * easeOut
+      const currentY = startY + (endY - startY) * easeOut - arcProgress
+
+      // Ball size decreases as it goes toward basket
+      const scale = 1 - progress * 0.4
+
+      setBallPosition({
+        x: currentX,
+        y: currentY,
+        scale,
+        made,
+        rotation: progress * (made ? 360 : 720)
+      })
+
+      if (progress < 1) {
+        animationRef.current = requestAnimationFrame(animate)
+      } else {
+        // Animation complete
+        setBallPhase('ending')
+
+        if (made) {
+          // Ball falls through basket
+          let fallProgress = 0
+          const fallAnimate = () => {
+            fallProgress += 0.1
+            setBallPosition(prev => ({
+              ...prev,
+              y: prev.y + fallProgress * 8,
+              scale: prev.scale * 0.95,
+              opacity: 1 - fallProgress * 0.5
+            }))
+            if (fallProgress < 1) {
+              animationRef.current = requestAnimationFrame(fallAnimate)
+            } else {
+              setBallPosition(null)
+              setBallPhase(null)
+              onComplete()
+            }
+          }
+          animationRef.current = requestAnimationFrame(fallAnimate)
+        } else {
+          // Ball bounces away
+          let bounceProgress = 0
+          const bounceAnimate = () => {
+            bounceProgress += 0.1
+            const bounceX = endX + (Math.random() > 0.5 ? 1 : -1) * bounceProgress * 20
+            const bounceY = endY + bounceProgress * 30
+            setBallPosition(prev => ({
+              ...prev,
+              x: bounceX,
+              y: bounceY,
+              scale: prev.scale * 0.9,
+              opacity: 1 - bounceProgress * 0.8
+            }))
+            if (bounceProgress < 1) {
+              animationRef.current = requestAnimationFrame(bounceAnimate)
+            } else {
+              setBallPosition(null)
+              setBallPhase(null)
+              onComplete()
+            }
+          }
+          animationRef.current = requestAnimationFrame(bounceAnimate)
+        }
+      }
+    }
+
+    setBallPhase('flying')
+    animationRef.current = requestAnimationFrame(animate)
+  }
+
+  // Cleanup animation on unmount
+  useEffect(() => {
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current)
+      }
+    }
+  }, [])
 
   // Combine shot markers with their timing from action history
   const allShots = [...shotMarkers].sort((a, b) => {
@@ -86,7 +180,7 @@ export default function ShotReplay({ shotMarkers, actionHistory, onClose }) {
   }
 
   useEffect(() => {
-    if (isPlaying && currentIndex < allEvents.length - 1) {
+    if (isPlaying && currentIndex < allEvents.length - 1 && !ballPhase) {
       intervalRef.current = setTimeout(() => {
         const nextIndex = currentIndex + 1
         setCurrentIndex(nextIndex)
@@ -96,23 +190,15 @@ export default function ShotReplay({ shotMarkers, actionHistory, onClose }) {
         if (event.eventType === 'shot') {
           // Start ball animation
           const missEnd = getRandomMissEnd()
-          setAnimatingBall({
-            startX: event.x,
-            startY: event.y,
-            endX: event.made ? basketX : missEnd.x,
-            endY: event.made ? basketY : missEnd.y,
-            made: event.made,
-            id: event.id
-          })
+          const endX = event.made ? basketX : missEnd.x
+          const endY = event.made ? basketY : missEnd.y
 
-          // After animation, add marker and clear ball
-          setTimeout(() => {
+          animateBall(event.x, event.y, endX, endY, event.made, () => {
             setVisibleShots(prev => [...prev, event])
-            setAnimatingBall(null)
-          }, 800)
+          })
         }
       }, speed)
-    } else if (currentIndex >= allEvents.length - 1) {
+    } else if (currentIndex >= allEvents.length - 1 && !ballPhase) {
       setIsPlaying(false)
     }
 
@@ -121,7 +207,7 @@ export default function ShotReplay({ shotMarkers, actionHistory, onClose }) {
         clearTimeout(intervalRef.current)
       }
     }
-  }, [isPlaying, currentIndex, allEvents.length, speed])
+  }, [isPlaying, currentIndex, allEvents.length, speed, ballPhase])
 
   // Stats summary
   const stats = {
@@ -270,56 +356,41 @@ export default function ShotReplay({ shotMarkers, actionHistory, onClose }) {
               ))}
 
               {/* Animated ball */}
-              {animatingBall && (
-                <g className={`ball-animation ${animatingBall.made ? 'ball-made' : 'ball-missed'}`}>
+              {ballPosition && (
+                <g style={{ opacity: ballPosition.opacity ?? 1 }}>
                   {/* Ball shadow */}
                   <ellipse
-                    className="ball-shadow"
-                    cx={animatingBall.startX}
-                    cy={animatingBall.startY + 5}
-                    rx="8"
-                    ry="4"
+                    cx={ballPosition.x}
+                    cy={ballPosition.y + 15}
+                    rx={8 * ballPosition.scale}
+                    ry={3 * ballPosition.scale}
                     fill="rgba(0,0,0,0.3)"
-                    style={{
-                      '--start-x': `${animatingBall.startX}px`,
-                      '--start-y': `${animatingBall.startY + 5}px`,
-                      '--end-x': `${animatingBall.endX}px`,
-                      '--end-y': `${animatingBall.endY + 5}px`
-                    }}
                   />
                   {/* Basketball */}
-                  <circle
-                    className="basketball"
-                    cx={animatingBall.startX}
-                    cy={animatingBall.startY}
-                    r="12"
-                    fill="#f39c12"
-                    stroke="#e67e22"
-                    strokeWidth="2"
-                    style={{
-                      '--start-x': `${animatingBall.startX}px`,
-                      '--start-y': `${animatingBall.startY}px`,
-                      '--end-x': `${animatingBall.endX}px`,
-                      '--end-y': `${animatingBall.endY}px`
-                    }}
-                  />
-                  {/* Ball lines */}
-                  <path
-                    className="ball-lines"
-                    d={`M ${animatingBall.startX - 10} ${animatingBall.startY}
-                        Q ${animatingBall.startX} ${animatingBall.startY - 8} ${animatingBall.startX + 10} ${animatingBall.startY}
-                        M ${animatingBall.startX} ${animatingBall.startY - 10}
-                        L ${animatingBall.startX} ${animatingBall.startY + 10}`}
-                    stroke="#e67e22"
-                    strokeWidth="1.5"
-                    fill="none"
-                    style={{
-                      '--start-x': `${animatingBall.startX}px`,
-                      '--start-y': `${animatingBall.startY}px`,
-                      '--end-x': `${animatingBall.endX}px`,
-                      '--end-y': `${animatingBall.endY}px`
-                    }}
-                  />
+                  <g transform={`translate(${ballPosition.x}, ${ballPosition.y}) rotate(${ballPosition.rotation || 0}) scale(${ballPosition.scale})`}>
+                    <circle
+                      cx="0"
+                      cy="0"
+                      r="14"
+                      fill="#f39c12"
+                      stroke="#e67e22"
+                      strokeWidth="2"
+                    />
+                    {/* Ball lines */}
+                    <path
+                      d="M -12 0 Q 0 -10 12 0 M 0 -12 L 0 12 M -12 0 Q 0 10 12 0"
+                      stroke="#c0792b"
+                      strokeWidth="1.5"
+                      fill="none"
+                    />
+                  </g>
+                  {/* Trail effect */}
+                  {ballPhase === 'flying' && (
+                    <>
+                      <circle cx={ballPosition.x - 8} cy={ballPosition.y + 5} r={4 * ballPosition.scale} fill="rgba(243, 156, 18, 0.3)" />
+                      <circle cx={ballPosition.x - 15} cy={ballPosition.y + 10} r={3 * ballPosition.scale} fill="rgba(243, 156, 18, 0.2)" />
+                    </>
+                  )}
                 </g>
               )}
             </svg>
