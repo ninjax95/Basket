@@ -1086,6 +1086,18 @@ const styles = `
     color: #e74c3c;
   }
 
+  .match-stat.efficiency .stat-val {
+    color: #61dafb;
+  }
+
+  .match-stat.efficiency.positive .stat-val {
+    color: #2ecc71;
+  }
+
+  .match-stat.efficiency.negative .stat-val {
+    color: #e74c3c;
+  }
+
   .match-stat .stat-name {
     font-size: 0.7rem;
     color: rgba(255, 255, 255, 0.5);
@@ -1890,6 +1902,35 @@ const styles = `
 
   .plus-minus-display.negative .pm-value {
     color: #e74c3c;
+  }
+
+  .efficiency-display {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .efficiency-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
+
+  .eff-value {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #61dafb;
+  }
+
+  .eff-label {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.6);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
   }
 
   .playing-time-section {
@@ -3152,6 +3193,303 @@ const styles = `
     flex-wrap: wrap;
     align-items: center;
   }
+
+  /* Record Notification Modal */
+  .record-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .record-modal {
+    background: linear-gradient(145deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    border: 3px solid #ffd700;
+    border-radius: 20px;
+    padding: 30px;
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 0 40px rgba(255, 215, 0, 0.4);
+    animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .record-modal h2 {
+    color: #ffd700;
+    font-size: 2rem;
+    margin-bottom: 10px;
+    text-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+  }
+
+  .record-trophy {
+    font-size: 4rem;
+    margin-bottom: 15px;
+    animation: bounce 1s infinite;
+  }
+
+  .record-subtitle {
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 20px;
+    font-size: 1.1rem;
+  }
+
+  .record-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 25px;
+  }
+
+  .record-item {
+    background: rgba(255, 215, 0, 0.15);
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    border-radius: 12px;
+    padding: 15px;
+    animation: slideIn 0.5s ease forwards;
+  }
+
+  .record-item:nth-child(2) { animation-delay: 0.1s; }
+  .record-item:nth-child(3) { animation-delay: 0.2s; }
+  .record-item:nth-child(4) { animation-delay: 0.3s; }
+  .record-item:nth-child(5) { animation-delay: 0.4s; }
+  .record-item:nth-child(6) { animation-delay: 0.5s; }
+
+  .record-stat-name {
+    color: #ffd700;
+    font-weight: bold;
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+  }
+
+  .record-values {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    font-size: 1.2rem;
+  }
+
+  .record-old {
+    color: rgba(255, 255, 255, 0.5);
+    text-decoration: line-through;
+  }
+
+  .record-arrow {
+    color: #2ecc71;
+    font-size: 1.5rem;
+  }
+
+  .record-new {
+    color: #2ecc71;
+    font-weight: bold;
+    font-size: 1.4rem;
+    text-shadow: 0 0 10px rgba(46, 204, 113, 0.5);
+  }
+
+  .record-close-btn {
+    background: linear-gradient(135deg, #ffd700 0%, #ffaa00 100%);
+    border: none;
+    border-radius: 10px;
+    padding: 12px 30px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #1a1a2e;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .record-close-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 20px rgba(255, 215, 0, 0.4);
+  }
+
+  /* Records Section in History Page */
+  .records-inline {
+    background: linear-gradient(145deg, rgba(255, 215, 0, 0.1) 0%, rgba(255, 215, 0, 0.05) 100%);
+    border: 1px solid rgba(255, 215, 0, 0.2);
+    border-radius: 10px;
+    padding: 15px;
+    margin-top: 15px;
+  }
+
+  .records-inline h4 {
+    color: #ffd700;
+    margin-bottom: 12px;
+    font-size: 1rem;
+  }
+
+  .records-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 12px;
+  }
+
+  .record-card {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 215, 0, 0.2);
+    border-radius: 10px;
+    padding: 15px 10px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.3s ease;
+  }
+
+  .record-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(255, 215, 0, 0.5);
+    box-shadow: 0 5px 15px rgba(255, 215, 0, 0.2);
+  }
+
+  .record-icon {
+    font-size: 1.5rem;
+  }
+
+  .record-value {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #ffd700;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+  }
+
+  .record-label {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.7);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .record-info {
+    font-size: 0.65rem;
+    color: rgba(255, 255, 255, 0.5);
+    font-style: italic;
+  }
+
+  /* Help Button & Modal */
+  .help-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.7);
+    padding: 12px 15px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+  }
+
+  .help-btn:hover {
+    background: rgba(97, 218, 251, 0.2);
+    border-color: #61dafb;
+    color: #61dafb;
+  }
+
+  .help-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    padding: 20px;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .help-modal {
+    background: linear-gradient(145deg, #1a1a2e 0%, #16213e 100%);
+    border: 2px solid #61dafb;
+    border-radius: 15px;
+    padding: 25px;
+    max-width: 500px;
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+    position: relative;
+    animation: popIn 0.3s ease;
+  }
+
+  .help-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+
+  .help-close:hover {
+    color: #fff;
+  }
+
+  .help-modal h2 {
+    color: #61dafb;
+    margin-bottom: 20px;
+    font-size: 1.4rem;
+  }
+
+  .help-section {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .help-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+  }
+
+  .help-section h3 {
+    color: #fff;
+    font-size: 1rem;
+    margin-bottom: 10px;
+  }
+
+  .help-item {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 8px;
+    align-items: flex-start;
+  }
+
+  .help-term {
+    background: rgba(97, 218, 251, 0.2);
+    color: #61dafb;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 0.8rem;
+    min-width: 45px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .help-def {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.85rem;
+    line-height: 1.4;
+  }
+
+  .help-text {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.85rem;
+    line-height: 1.5;
+    margin: 0;
+  }
 `
 
 export default function App() {
@@ -3179,6 +3517,8 @@ export default function App() {
   const [tempToken, setTempToken] = useState('')
   const [showActionPanel, setShowActionPanel] = useState(false)
   const [showReplay, setShowReplay] = useState(false)
+  const [recordNotification, setRecordNotification] = useState(null) // { records: [...] }
+  const [showHelpModal, setShowHelpModal] = useState(false)
 
   // Check if already unlocked this session
   useEffect(() => {
@@ -3193,15 +3533,16 @@ export default function App() {
     sessionStorage.setItem('basketAppUnlocked', 'true')
   }
 
-  const { stats, updateStat, resetStats, importStats, getSummary, actionHistory, getStatsByQuarter, undoLastAction } = useStats()
+  const { stats, updateStat, resetStats, importStats, getSummary, getEfficiency, actionHistory, getStatsByQuarter, undoLastAction } = useStats()
   const { player, updatePlayer } = usePlayer()
   const timer = useTimer()
-  const { history, saveMatch, deleteMatch, clearHistory, importHistory, getAverages } = useMatchHistory()
+  const { history, saveMatch, deleteMatch, clearHistory, importHistory, getAverages, getRecords, checkNewRecords } = useMatchHistory()
   const playingTime = usePlayingTime()
 
   const summary = getSummary()
   const averages = getAverages()
   const quarterStats = getStatsByQuarter()
+  const efficiency = getEfficiency()
 
   // Track playing time when timer is running
   useEffect(() => {
@@ -3309,13 +3650,31 @@ export default function App() {
       team: scoreTeam ? parseInt(scoreTeam) : (liveScoreTeam > 0 ? liveScoreTeam : null),
       opponent: scoreOpponent ? parseInt(scoreOpponent) : (liveScoreOpponent > 0 ? liveScoreOpponent : null)
     }
+    // Check for new records BEFORE saving
+    const tempMatch = {
+      summary: {
+        points: (stats.fg2Made * 2) + (stats.fg3Made * 3) + stats.ftMade,
+        rebounds: stats.offRebounds + stats.defRebounds,
+        assists: stats.assists,
+        steals: stats.steals,
+        blocks: stats.blocks
+      },
+      plusMinus
+    }
+    const newRecords = checkNewRecords(tempMatch)
+
     const savedMatch = saveMatch(player, stats, opponent, shotMarkers, matchScore, matchLocation, plusMinus)
 
     // Auto backup after save
     const updatedHistory = [...history, savedMatch]
     backupHistory(updatedHistory)
 
-    alert('Match sauvegardé ! Backup téléchargé.')
+    // Show records notification if any
+    if (newRecords.length > 0) {
+      setRecordNotification({ records: newRecords })
+    } else {
+      alert('Match sauvegardé ! Backup téléchargé.')
+    }
 
     // Reset for next match
     resetStats()
@@ -3599,6 +3958,13 @@ export default function App() {
           >
             📊 Historique ({history.length})
           </button>
+          <button
+            className="help-btn"
+            onClick={() => setShowHelpModal(true)}
+            title="Aide & Légende"
+          >
+            ❓
+          </button>
         </div>
 
         {activeTab === 'match' ? (
@@ -3652,6 +4018,16 @@ export default function App() {
               <div className={`plus-minus-display ${plusMinus > 0 ? 'positive' : plusMinus < 0 ? 'negative' : ''}`}>
                 <span className="pm-label">+/-</span>
                 <span className="pm-value">{plusMinus > 0 ? '+' : ''}{plusMinus}</span>
+              </div>
+              <div className="efficiency-display">
+                <div className="efficiency-stat">
+                  <span className="eff-value">{efficiency.trueShootingPct}%</span>
+                  <span className="eff-label">TS%</span>
+                </div>
+                <div className="efficiency-stat">
+                  <span className="eff-value">{efficiency.gameScore}</span>
+                  <span className="eff-label">Game Score</span>
+                </div>
               </div>
             </div>
 
@@ -3832,6 +4208,7 @@ export default function App() {
           <MatchHistory
             history={history}
             averages={averages}
+            records={getRecords()}
             onDelete={handleDeleteMatch}
             onClear={handleClearHistory}
             onImport={handleImportHistory}
@@ -3926,6 +4303,105 @@ export default function App() {
                 >
                   Annuler
                 </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Record Notification Modal */}
+        {recordNotification && (
+          <div className="record-modal-overlay" onClick={() => setRecordNotification(null)}>
+            <div className="record-modal" onClick={e => e.stopPropagation()}>
+              <div className="record-trophy">🏆</div>
+              <h2>NOUVEAU RECORD !</h2>
+              <p className="record-subtitle">
+                Tu as battu {recordNotification.records.length > 1 ? 'tes records' : 'ton record'} personnel{recordNotification.records.length > 1 ? 's' : ''} !
+              </p>
+              <div className="record-list">
+                {recordNotification.records.map((record, index) => (
+                  <div key={index} className="record-item">
+                    <div className="record-stat-name">{record.stat}</div>
+                    <div className="record-values">
+                      <span className="record-old">{record.old}</span>
+                      <span className="record-arrow">→</span>
+                      <span className="record-new">{record.value}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <button className="record-close-btn" onClick={() => setRecordNotification(null)}>
+                Super ! 🎉
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Help Modal */}
+        {showHelpModal && (
+          <div className="help-modal-overlay" onClick={() => setShowHelpModal(false)}>
+            <div className="help-modal" onClick={e => e.stopPropagation()}>
+              <button className="help-close" onClick={() => setShowHelpModal(false)}>×</button>
+              <h2>📖 Légende des Stats</h2>
+
+              <div className="help-section">
+                <h3>📊 Stats de base</h3>
+                <div className="help-item">
+                  <span className="help-term">PTS</span>
+                  <span className="help-def">Points marqués (2pts × 2 + 3pts × 3 + LF)</span>
+                </div>
+                <div className="help-item">
+                  <span className="help-term">REB</span>
+                  <span className="help-def">Rebonds (offensifs + défensifs)</span>
+                </div>
+                <div className="help-item">
+                  <span className="help-term">AST</span>
+                  <span className="help-def">Assists / Passes décisives</span>
+                </div>
+                <div className="help-item">
+                  <span className="help-term">STL</span>
+                  <span className="help-def">Steals / Interceptions</span>
+                </div>
+                <div className="help-item">
+                  <span className="help-term">BLK</span>
+                  <span className="help-def">Blocks / Contres</span>
+                </div>
+                <div className="help-item">
+                  <span className="help-term">FG%</span>
+                  <span className="help-def">Field Goal % = Tirs réussis / Tirs tentés</span>
+                </div>
+              </div>
+
+              <div className="help-section">
+                <h3>📈 Stats avancées</h3>
+                <div className="help-item">
+                  <span className="help-term">+/-</span>
+                  <span className="help-def">Plus/Minus : différentiel de points quand tu es sur le terrain. +10 = ton équipe a marqué 10 pts de plus que l'adversaire pendant ton temps de jeu.</span>
+                </div>
+                <div className="help-item">
+                  <span className="help-term">TS%</span>
+                  <span className="help-def">True Shooting % : efficacité globale au tir incluant 2pts, 3pts et LF. Formule : PTS / (2 × (Tirs + 0.44 × LF tentés)). Un bon TS% est &gt; 55%.</span>
+                </div>
+                <div className="help-item">
+                  <span className="help-term">GmSc</span>
+                  <span className="help-def">Game Score (John Hollinger) : note globale du match. 10 = match moyen, 20+ = excellent, 40+ = légendaire. Prend en compte toutes les stats positives et négatives.</span>
+                </div>
+              </div>
+
+              <div className="help-section">
+                <h3>🏆 Records</h3>
+                <p className="help-text">Tes meilleurs scores personnels sur chaque stat. Quand tu bats un record, une notification apparaît !</p>
+              </div>
+
+              <div className="help-section">
+                <h3>🎯 Cartes de tirs</h3>
+                <div className="help-item">
+                  <span className="help-term">Heatmap</span>
+                  <span className="help-def">Carte des tirs avec positions exactes (vert = réussi, rouge = raté)</span>
+                </div>
+                <div className="help-item">
+                  <span className="help-term">Zones</span>
+                  <span className="help-def">Zones chaudes/froides selon ton % de réussite par zone</span>
+                </div>
               </div>
             </div>
           </div>

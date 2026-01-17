@@ -8,6 +8,7 @@ import ShotReplay from './ShotReplay'
 export default function MatchHistory({
   history,
   averages,
+  records,
   onDelete,
   onClear,
   onImport,
@@ -186,6 +187,67 @@ export default function MatchHistory({
               </div>
             </div>
           )}
+
+          {/* Personal Records (only for all matches) */}
+          {!selectedMatch && records && (
+            <div className="records-inline">
+              <h4>🏆 Records personnels</h4>
+              <div className="records-grid">
+                <div className="record-card">
+                  <span className="record-icon">🔥</span>
+                  <span className="record-value">{records.points.value}</span>
+                  <span className="record-label">Points</span>
+                  {records.points.opponent && (
+                    <span className="record-info">vs {records.points.opponent}</span>
+                  )}
+                </div>
+                <div className="record-card">
+                  <span className="record-icon">🏀</span>
+                  <span className="record-value">{records.rebounds.value}</span>
+                  <span className="record-label">Rebonds</span>
+                  {records.rebounds.opponent && (
+                    <span className="record-info">vs {records.rebounds.opponent}</span>
+                  )}
+                </div>
+                <div className="record-card">
+                  <span className="record-icon">🎯</span>
+                  <span className="record-value">{records.assists.value}</span>
+                  <span className="record-label">Passes D.</span>
+                  {records.assists.opponent && (
+                    <span className="record-info">vs {records.assists.opponent}</span>
+                  )}
+                </div>
+                <div className="record-card">
+                  <span className="record-icon">✋</span>
+                  <span className="record-value">{records.steals.value}</span>
+                  <span className="record-label">Interc.</span>
+                  {records.steals.opponent && (
+                    <span className="record-info">vs {records.steals.opponent}</span>
+                  )}
+                </div>
+                <div className="record-card">
+                  <span className="record-icon">🛡️</span>
+                  <span className="record-value">{records.blocks.value}</span>
+                  <span className="record-label">Contres</span>
+                  {records.blocks.opponent && (
+                    <span className="record-info">vs {records.blocks.opponent}</span>
+                  )}
+                </div>
+                {records.plusMinus.value !== 0 && (
+                  <div className="record-card">
+                    <span className="record-icon">📊</span>
+                    <span className="record-value">
+                      {records.plusMinus.value > 0 ? '+' : ''}{records.plusMinus.value}
+                    </span>
+                    <span className="record-label">+/-</span>
+                    {records.plusMinus.opponent && (
+                      <span className="record-info">vs {records.plusMinus.opponent}</span>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -322,6 +384,18 @@ export default function MatchHistory({
                       <span className="stat-val">{match.plusMinus > 0 ? '+' : ''}{match.plusMinus}</span>
                       <span className="stat-name">+/-</span>
                     </div>
+                  )}
+                  {match.efficiency && (
+                    <>
+                      <div className="match-stat efficiency">
+                        <span className="stat-val">{match.efficiency.trueShootingPct}%</span>
+                        <span className="stat-name">TS%</span>
+                      </div>
+                      <div className={`match-stat efficiency ${match.efficiency.gameScore >= 10 ? 'positive' : match.efficiency.gameScore < 0 ? 'negative' : ''}`}>
+                        <span className="stat-val">{match.efficiency.gameScore}</span>
+                        <span className="stat-name">GmSc</span>
+                      </div>
+                    </>
                   )}
                 </div>
               </div>
