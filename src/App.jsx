@@ -789,6 +789,33 @@ const styles = `
     font-weight: bold;
   }
 
+  .location-toggle {
+    display: flex;
+    gap: 8px;
+  }
+
+  .location-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.6);
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+  }
+
+  .location-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+  }
+
+  .location-btn.active {
+    background: rgba(97, 218, 251, 0.2);
+    border-color: #61dafb;
+    color: #61dafb;
+  }
+
   .save-btn {
     background: #2ecc71;
     border: none;
@@ -985,6 +1012,10 @@ const styles = `
   .match-date {
     color: rgba(255, 255, 255, 0.6);
     font-size: 0.9rem;
+  }
+
+  .match-location {
+    font-size: 1.1rem;
   }
 
   .match-opponent {
@@ -3023,6 +3054,7 @@ export default function App() {
   const [opponent, setOpponent] = useState('')
   const [scoreTeam, setScoreTeam] = useState('')
   const [scoreOpponent, setScoreOpponent] = useState('')
+  const [matchLocation, setMatchLocation] = useState('home') // 'home' or 'away'
   const [shotMarkers, setShotMarkers] = useState(() => {
     const saved = localStorage.getItem('basketShotMarkers')
     return saved ? JSON.parse(saved) : []
@@ -3153,7 +3185,7 @@ export default function App() {
       team: scoreTeam ? parseInt(scoreTeam) : null,
       opponent: scoreOpponent ? parseInt(scoreOpponent) : null
     }
-    const savedMatch = saveMatch(player, stats, opponent, shotMarkers, matchScore)
+    const savedMatch = saveMatch(player, stats, opponent, shotMarkers, matchScore, matchLocation)
 
     // Auto backup after save
     const updatedHistory = [...history, savedMatch]
@@ -3168,6 +3200,7 @@ export default function App() {
     setOpponent('')
     setScoreTeam('')
     setScoreOpponent('')
+    setMatchLocation('home')
     setShotMarkers([])  // Clear shot markers
   }
 
@@ -3384,6 +3417,7 @@ export default function App() {
       setOpponent('')
       setScoreTeam('')
       setScoreOpponent('')
+      setMatchLocation('home')
     }
   }
 
@@ -3580,6 +3614,22 @@ export default function App() {
             <div className="save-match-section">
               <h3>💾 Sauvegarder le match</h3>
               <div className="save-match-form">
+                <div className="location-toggle">
+                  <button
+                    className={`location-btn ${matchLocation === 'home' ? 'active' : ''}`}
+                    onClick={() => setMatchLocation('home')}
+                    type="button"
+                  >
+                    🏠 Domicile
+                  </button>
+                  <button
+                    className={`location-btn ${matchLocation === 'away' ? 'active' : ''}`}
+                    onClick={() => setMatchLocation('away')}
+                    type="button"
+                  >
+                    ✈️ Extérieur
+                  </button>
+                </div>
                 <input
                   type="text"
                   placeholder="Adversaire (optionnel)"

@@ -263,6 +263,9 @@ export default function MatchHistory({
                 onClick={() => setSelectedMatchId(selectedMatchId === match.id ? 'all' : match.id)}
               >
                 <div className="match-header">
+                  <span className={`match-location ${match.location || 'home'}`}>
+                    {match.location === 'away' ? '✈️' : '🏠'}
+                  </span>
                   <span className="match-date">
                     {new Date(match.date).toLocaleDateString('fr-FR', {
                       day: 'numeric',
