@@ -3534,6 +3534,116 @@ const styles = `
     margin-bottom: 0;
     font-size: 0.9rem;
   }
+
+  /* Options Page */
+  .options-page {
+    animation: fadeIn 0.3s ease;
+  }
+
+  .options-page h2 {
+    color: #61dafb;
+    margin-bottom: 25px;
+    text-align: center;
+  }
+
+  .options-section {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+
+  .options-section h3 {
+    color: #fff;
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+  }
+
+  .options-description {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+  }
+
+  .gist-config {
+    margin-bottom: 15px;
+  }
+
+  .gist-status-line {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+
+  .gist-config-btn {
+    background: rgba(97, 218, 251, 0.2);
+    border: 1px solid #61dafb;
+    color: #61dafb;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+  }
+
+  .gist-config-btn:hover {
+    background: rgba(97, 218, 251, 0.3);
+  }
+
+  .gist-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .options-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .options-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+    text-align: left;
+  }
+
+  .options-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+
+  .options-btn.danger {
+    border-color: rgba(231, 76, 60, 0.3);
+    color: #e74c3c;
+  }
+
+  .options-btn.danger:hover {
+    background: rgba(231, 76, 60, 0.1);
+    border-color: #e74c3c;
+  }
+
+  /* Record highlight in match list */
+  .match-card.has-record {
+    border-left: 3px solid #ffd700;
+  }
+
+  .match-card.has-record .record-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #ffd700 0%, #ffaa00 100%);
+    color: #1a1a2e;
+    font-size: 0.65rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-left: 8px;
+    font-weight: bold;
+  }
 `
 
 export default function App() {
@@ -4017,6 +4127,12 @@ export default function App() {
             📈 Analyse
           </button>
           <button
+            className={`nav-tab ${activeTab === 'options' ? 'active' : ''}`}
+            onClick={() => setActiveTab('options')}
+          >
+            ⚙️
+          </button>
+          <button
             className="help-btn"
             onClick={() => setShowHelpModal(true)}
             title="Aide & Légende"
@@ -4056,7 +4172,7 @@ export default function App() {
               <h3>📊 Score en direct</h3>
               <div className="live-score-panel">
                 <div className="live-score-team">
-                  <span className="live-score-label">Nous</span>
+                  <span className="live-score-label">Équipe</span>
                   <div className="live-score-controls">
                     <button onClick={() => setLiveScoreTeam(Math.max(0, liveScoreTeam - 1))}>-</button>
                     <span className="live-score-value">{liveScoreTeam}</span>
@@ -4065,7 +4181,7 @@ export default function App() {
                 </div>
                 <div className="live-score-separator">-</div>
                 <div className="live-score-team">
-                  <span className="live-score-label">Eux</span>
+                  <span className="live-score-label">Adversaire</span>
                   <div className="live-score-controls">
                     <button onClick={() => setLiveScoreOpponent(Math.max(0, liveScoreOpponent - 1))}>-</button>
                     <span className="live-score-value">{liveScoreOpponent}</span>
@@ -4270,13 +4386,6 @@ export default function App() {
             averages={averages}
             records={getRecords()}
             onDelete={handleDeleteMatch}
-            onClear={handleClearHistory}
-            onImport={handleImportHistory}
-            onSaveGist={saveToGist}
-            onLoadGist={loadFromGist}
-            onOpenGistSettings={() => { setTempToken(githubToken); setShowGistSettings(true) }}
-            gistLoading={gistLoading}
-            gistConnected={!!githubToken}
           />
         )}
 
@@ -4310,6 +4419,67 @@ export default function App() {
                 </div>
               </>
             )}
+          </div>
+        )}
+
+        {activeTab === 'options' && (
+          <div className="options-page">
+            <h2>⚙️ Options</h2>
+
+            {/* GitHub Gist Sync Section */}
+            <div className="options-section">
+              <h3>☁️ Synchronisation GitHub</h3>
+              <p className="options-description">
+                Sauvegarde et synchronise tes stats sur GitHub Gist pour y accéder depuis n'importe où.
+              </p>
+              <div className="gist-config">
+                <div className="gist-status-line">
+                  {githubToken ? (
+                    <span className="gist-status connected">✓ Token configuré</span>
+                  ) : (
+                    <span className="gist-status">✗ Non configuré</span>
+                  )}
+                  <button
+                    className="gist-config-btn"
+                    onClick={() => { setTempToken(githubToken); setShowGistSettings(true) }}
+                  >
+                    {githubToken ? 'Modifier' : 'Configurer'}
+                  </button>
+                </div>
+              </div>
+              <div className="gist-actions">
+                <button
+                  className="gist-action-btn"
+                  onClick={saveToGist}
+                  disabled={gistLoading || history.length === 0 || !githubToken}
+                >
+                  {gistLoading ? '⏳' : '⬆️'} Sauvegarder sur Gist
+                </button>
+                <button
+                  className="gist-action-btn"
+                  onClick={loadFromGist}
+                  disabled={gistLoading || !githubToken}
+                >
+                  {gistLoading ? '⏳' : '⬇️'} Charger depuis Gist
+                </button>
+              </div>
+            </div>
+
+            {/* Data Management */}
+            <div className="options-section">
+              <h3>💾 Gestion des données</h3>
+              <div className="options-actions">
+                <button className="options-btn" onClick={exportData}>
+                  📥 Exporter les données (JSON)
+                </button>
+                <button className="options-btn" onClick={handleImport}>
+                  📤 Importer des données
+                </button>
+                <button className="options-btn danger" onClick={handleClearHistory}>
+                  🗑️ Effacer l'historique
+                </button>
+              </div>
+            </div>
           </div>
         )}
 

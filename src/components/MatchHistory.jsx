@@ -5,14 +5,7 @@ export default function MatchHistory({
   history,
   averages,
   records,
-  onDelete,
-  onClear,
-  onImport,
-  onSaveGist,
-  onLoadGist,
-  onOpenGistSettings,
-  gistLoading,
-  gistConnected
+  onDelete
 }) {
   const [selectedMatchId, setSelectedMatchId] = useState('all') // 'all' or match id
   const [showReplay, setShowReplay] = useState(false)
@@ -43,6 +36,31 @@ export default function MatchHistory({
 
   const totals = getTotals()
   const selectedMatch = selectedMatchId === 'all' ? null : history.find(m => m.id === selectedMatchId)
+
+  // Check if a match contains any records
+  const getMatchRecords = (match) => {
+    if (!records) return []
+    const matchRecords = []
+    if (records.points.value === match.summary.points && match.summary.points > 0) {
+      matchRecords.push('PTS')
+    }
+    if (records.rebounds.value === match.summary.rebounds && match.summary.rebounds > 0) {
+      matchRecords.push('REB')
+    }
+    if (records.assists.value === match.summary.assists && match.summary.assists > 0) {
+      matchRecords.push('AST')
+    }
+    if (records.steals.value === match.summary.steals && match.summary.steals > 0) {
+      matchRecords.push('STL')
+    }
+    if (records.blocks.value === match.summary.blocks && match.summary.blocks > 0) {
+      matchRecords.push('BLK')
+    }
+    if (match.plusMinus !== undefined && records.plusMinus.value === match.plusMinus && match.plusMinus !== 0) {
+      matchRecords.push('+/-')
+    }
+    return matchRecords
+  }
 
   // Get stats to display based on selection
   const displayStats = selectedMatch ? {
@@ -246,52 +264,10 @@ export default function MatchHistory({
         </div>
       )}
 
-      {/* GitHub Gist Sync Section */}
-      <div className="gist-section">
-        <div className="gist-header">
-          <h3>☁️ Synchronisation GitHub</h3>
-          <button
-            className="gist-settings-btn"
-            onClick={onOpenGistSettings}
-            title="Configurer GitHub"
-          >
-            ⚙️ Config
-          </button>
-        </div>
-        <div className="gist-buttons">
-          <button
-            className="gist-action-btn"
-            onClick={onSaveGist}
-            disabled={gistLoading || history.length === 0}
-          >
-            {gistLoading ? '⏳' : '⬆️'} Sauvegarder sur Gist
-          </button>
-          <button
-            className="gist-action-btn"
-            onClick={onLoadGist}
-            disabled={gistLoading}
-          >
-            {gistLoading ? '⏳' : '⬇️'} Charger depuis Gist
-          </button>
-          {gistConnected && <span className="gist-status connected">● Token configuré</span>}
-          {!gistConnected && <span className="gist-status">● Non configuré</span>}
-        </div>
-      </div>
-
       {/* Match List */}
       <div className="match-list">
         <div className="match-list-header">
           <h3>📋 Liste des matchs</h3>
-          <div className="match-list-actions">
-            <button className="import-btn" onClick={onImport}>
-              📥 Backup local
-            </button>
-            {history.length > 0 && (
-              <button className="clear-btn" onClick={onClear}>
-                Tout effacer
-              </button>
-            )}
-          </div>
         </div>
 
         {history.length === 0 ? (
@@ -301,10 +277,12 @@ export default function MatchHistory({
           </div>
         ) : (
           <div className="matches">
-            {[...history].reverse().map((match) => (
+            {[...history].reverse().map((match) => {
+              const matchRecords = getMatchRecords(match)
+              return (
               <div
                 key={match.id}
-                className={`match-card ${selectedMatchId === match.id ? 'selected' : ''}`}
+                className={`match-card ${selectedMatchId === match.id ? 'selected' : ''} ${matchRecords.length > 0 ? 'has-record' : ''}`}
                 onClick={() => setSelectedMatchId(selectedMatchId === match.id ? 'all' : match.id)}
               >
                 <div className="match-header">
@@ -320,6 +298,9 @@ export default function MatchHistory({
                   </span>
                   {match.opponent && (
                     <span className="match-opponent">vs {match.opponent}</span>
+                  )}
+                  {matchRecords.length > 0 && (
+                    <span className="record-badge">🏆 {matchRecords.join(', ')}</span>
                   )}
                   {match.score && (match.score.team !== null || match.score.opponent !== null) && (
                     <span className={`match-score ${
@@ -382,7 +363,7 @@ export default function MatchHistory({
                   )}
                 </div>
               </div>
-            ))}
+            )})}
           </div>
         )}
       </div>
