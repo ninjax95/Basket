@@ -2637,6 +2637,52 @@ const styles = `
     color: #61dafb;
   }
 
+  .quarter-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+
+  .quarter-nav-label {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+    margin-right: 5px;
+  }
+
+  .quarter-btn {
+    background: rgba(97, 218, 251, 0.15);
+    border: 2px solid rgba(97, 218, 251, 0.3);
+    color: #61dafb;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: bold;
+    transition: all 0.2s;
+  }
+
+  .quarter-btn:hover:not(:disabled) {
+    background: rgba(97, 218, 251, 0.3);
+    border-color: #61dafb;
+    transform: translateY(-2px);
+  }
+
+  .quarter-btn.active {
+    background: #61dafb;
+    color: #1a1a2e;
+    border-color: #61dafb;
+  }
+
+  .quarter-btn.disabled,
+  .quarter-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    border-color: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.4);
+  }
+
   .replay-controls {
     display: flex;
     align-items: center;

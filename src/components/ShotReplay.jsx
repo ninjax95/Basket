@@ -190,6 +190,33 @@ export default function ShotReplay({ shotMarkers, actionHistory, onClose }) {
     setCurrentAction(null)
   }
 
+  // Get available quarters from events
+  const availableQuarters = [...new Set(allEvents.map(e => e.quarter))].sort((a, b) => a - b)
+
+  // Go to specific quarter
+  const goToQuarter = (quarterNum) => {
+    stopReplay()
+    if (animationRef.current) {
+      cancelAnimationFrame(animationRef.current)
+    }
+    setBallPosition(null)
+    setBallPhase(null)
+
+    // Find first event of this quarter
+    const quarterStartIndex = allEvents.findIndex(e => e.quarter === quarterNum)
+
+    if (quarterStartIndex === -1) return
+
+    // Show all shots before this quarter
+    const shotsBeforeQuarter = allEvents
+      .slice(0, quarterStartIndex)
+      .filter(e => e.eventType === 'shot')
+
+    setVisibleShots(shotsBeforeQuarter)
+    setCurrentIndex(quarterStartIndex - 1)
+    setCurrentAction(quarterStartIndex > 0 ? allEvents[quarterStartIndex - 1] : null)
+  }
+
   useEffect(() => {
     if (isPlaying && currentIndex < allEvents.length - 1 && !ballPhase) {
       intervalRef.current = setTimeout(() => {
@@ -460,6 +487,23 @@ export default function ShotReplay({ shotMarkers, actionHistory, onClose }) {
               <span className="stat-value">{stats.ftMade}/{stats.ftTotal}</span>
             </div>
           </div>
+
+          {/* Quarter navigation */}
+          {availableQuarters.length > 0 && (
+            <div className="quarter-nav">
+              <span className="quarter-nav-label">Aller à :</span>
+              {[1, 2, 3, 4].map(q => (
+                <button
+                  key={q}
+                  className={`quarter-btn ${availableQuarters.includes(q) ? '' : 'disabled'} ${currentAction?.quarter === q ? 'active' : ''}`}
+                  onClick={() => goToQuarter(q)}
+                  disabled={!availableQuarters.includes(q)}
+                >
+                  Q{q}
+                </button>
+              ))}
+            </div>
+          )}
 
           {/* Controls */}
           <div className="replay-controls">
