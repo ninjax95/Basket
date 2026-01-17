@@ -757,6 +757,38 @@ const styles = `
     border-color: #2ecc71;
   }
 
+  .opponent-input {
+    min-width: 180px !important;
+  }
+
+  .score-inputs {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .score-input {
+    width: 90px !important;
+    min-width: 90px !important;
+    text-align: center;
+  }
+
+  .score-input::-webkit-inner-spin-button,
+  .score-input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  .score-input[type=number] {
+    -moz-appearance: textfield;
+  }
+
+  .score-separator {
+    color: #fff;
+    font-size: 1.2rem;
+    font-weight: bold;
+  }
+
   .save-btn {
     background: #2ecc71;
     border: none;
@@ -958,6 +990,28 @@ const styles = `
   .match-opponent {
     color: #61dafb;
     font-weight: bold;
+  }
+
+  .match-score {
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-weight: bold;
+    font-size: 0.95rem;
+  }
+
+  .match-score.win {
+    background: rgba(46, 204, 113, 0.2);
+    color: #2ecc71;
+  }
+
+  .match-score.loss {
+    background: rgba(231, 76, 60, 0.2);
+    color: #e74c3c;
+  }
+
+  .match-score.draw {
+    background: rgba(241, 196, 15, 0.2);
+    color: #f1c40f;
   }
 
   .delete-btn {
@@ -2967,6 +3021,8 @@ export default function App() {
   const [isUnlocked, setIsUnlocked] = useState(false)
   const [activeTab, setActiveTab] = useState('match')
   const [opponent, setOpponent] = useState('')
+  const [scoreTeam, setScoreTeam] = useState('')
+  const [scoreOpponent, setScoreOpponent] = useState('')
   const [shotMarkers, setShotMarkers] = useState(() => {
     const saved = localStorage.getItem('basketShotMarkers')
     return saved ? JSON.parse(saved) : []
@@ -3093,7 +3149,11 @@ export default function App() {
       return
     }
 
-    const savedMatch = saveMatch(player, stats, opponent, shotMarkers)
+    const matchScore = {
+      team: scoreTeam ? parseInt(scoreTeam) : null,
+      opponent: scoreOpponent ? parseInt(scoreOpponent) : null
+    }
+    const savedMatch = saveMatch(player, stats, opponent, shotMarkers, matchScore)
 
     // Auto backup after save
     const updatedHistory = [...history, savedMatch]
@@ -3106,6 +3166,8 @@ export default function App() {
     timer.resetTimer()
     playingTime.resetPlayingTime()
     setOpponent('')
+    setScoreTeam('')
+    setScoreOpponent('')
     setShotMarkers([])  // Clear shot markers
   }
 
@@ -3320,6 +3382,8 @@ export default function App() {
       setShotMarkers([])
       localStorage.setItem('basketShotMarkers', JSON.stringify([]))
       setOpponent('')
+      setScoreTeam('')
+      setScoreOpponent('')
     }
   }
 
@@ -3521,7 +3585,27 @@ export default function App() {
                   placeholder="Adversaire (optionnel)"
                   value={opponent}
                   onChange={(e) => setOpponent(e.target.value)}
+                  className="opponent-input"
                 />
+                <div className="score-inputs">
+                  <input
+                    type="number"
+                    placeholder="Notre score"
+                    value={scoreTeam}
+                    onChange={(e) => setScoreTeam(e.target.value)}
+                    className="score-input"
+                    min="0"
+                  />
+                  <span className="score-separator">-</span>
+                  <input
+                    type="number"
+                    placeholder="Score adv."
+                    value={scoreOpponent}
+                    onChange={(e) => setScoreOpponent(e.target.value)}
+                    className="score-input"
+                    min="0"
+                  />
+                </div>
                 <button className="save-btn" onClick={handleSaveMatch}>
                   Sauvegarder et terminer
                 </button>

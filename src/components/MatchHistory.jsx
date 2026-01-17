@@ -273,6 +273,14 @@ export default function MatchHistory({
                   {match.opponent && (
                     <span className="match-opponent">vs {match.opponent}</span>
                   )}
+                  {match.score && (match.score.team !== null || match.score.opponent !== null) && (
+                    <span className={`match-score ${
+                      match.score.team > match.score.opponent ? 'win' :
+                      match.score.team < match.score.opponent ? 'loss' : 'draw'
+                    }`}>
+                      {match.score.team ?? '-'} - {match.score.opponent ?? '-'}
+                    </span>
+                  )}
                   <button
                     className="delete-btn"
                     onClick={(e) => { e.stopPropagation(); onDelete(match.id); }}
