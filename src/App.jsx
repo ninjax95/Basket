@@ -4631,6 +4631,281 @@ const styles = `
     color: #e74c3c;
   }
 
+  /* Light theme - Additional fixes for contrast */
+  [data-theme="light"] .quick-stats-section,
+  [data-theme="light"] .more-options-section,
+  [data-theme="light"] .action-history-panel,
+  [data-theme="light"] .analysis-section,
+  [data-theme="light"] .summary {
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+  }
+
+  [data-theme="light"] .stats-category-title {
+    color: #1a4a8f;
+    border-color: rgba(26, 74, 143, 0.3);
+  }
+
+  [data-theme="light"] .quick-stat-box {
+    background: rgba(0, 0, 0, 0.05);
+  }
+
+  [data-theme="light"] .qs-label {
+    color: #1a1a2e;
+  }
+
+  [data-theme="light"] .qs-value {
+    color: #1a4a8f;
+  }
+
+  [data-theme="light"] .qs-btn {
+    background: rgba(0, 0, 0, 0.08);
+    color: #1a1a2e;
+  }
+
+  [data-theme="light"] .qs-btn:hover {
+    background: rgba(0, 0, 0, 0.15);
+  }
+
+  [data-theme="light"] .points-total-display {
+    background: rgba(26, 74, 143, 0.1);
+    border-color: rgba(26, 74, 143, 0.3);
+  }
+
+  [data-theme="light"] .pts-label,
+  [data-theme="light"] .pts-breakdown {
+    color: rgba(0, 0, 0, 0.6);
+  }
+
+  [data-theme="light"] .pts-value {
+    color: #1a4a8f;
+  }
+
+  [data-theme="light"] .streak-display.hot {
+    background: linear-gradient(135deg, rgba(255, 107, 0, 0.15), rgba(255, 61, 0, 0.1));
+    border-color: rgba(255, 107, 0, 0.4);
+  }
+
+  [data-theme="light"] .streak-display.best {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 165, 0, 0.1));
+  }
+
+  [data-theme="light"] .streak-text {
+    color: #1a1a2e;
+  }
+
+  [data-theme="light"] .streak-points {
+    color: rgba(0, 0, 0, 0.6);
+  }
+
+  [data-theme="light"] .more-options-toggle {
+    background: rgba(0, 0, 0, 0.05);
+    border-color: rgba(0, 0, 0, 0.2);
+    color: rgba(0, 0, 0, 0.7);
+  }
+
+  [data-theme="light"] .more-options-toggle:hover {
+    background: rgba(0, 0, 0, 0.1);
+  }
+
+  [data-theme="light"] .quarter-display {
+    color: #1a4a8f;
+  }
+
+  [data-theme="light"] .time-adjust-btn {
+    background: rgba(0, 0, 0, 0.08);
+    border-color: rgba(0, 0, 0, 0.15);
+    color: #1a1a2e;
+  }
+
+  [data-theme="light"] .time-adjust-btn:hover {
+    background: rgba(26, 74, 143, 0.15);
+    border-color: #1a4a8f;
+    color: #1a4a8f;
+  }
+
+  [data-theme="light"] .action-history-panel {
+    background: rgba(255, 255, 255, 0.95);
+  }
+
+  [data-theme="light"] .action-history-panel h4 {
+    color: #1a1a2e;
+    border-color: rgba(0, 0, 0, 0.1);
+  }
+
+  [data-theme="light"] .action-item {
+    background: rgba(0, 0, 0, 0.03);
+    color: #1a1a2e;
+  }
+
+  [data-theme="light"] .action-item:hover {
+    background: rgba(231, 76, 60, 0.1);
+  }
+
+  [data-theme="light"] .action-time {
+    color: rgba(0, 0, 0, 0.5);
+  }
+
+  [data-theme="light"] .advanced-stats-grid {
+    background: transparent;
+  }
+
+  [data-theme="light"] .advanced-stat {
+    background: rgba(0, 0, 0, 0.05);
+  }
+
+  [data-theme="light"] .advanced-stat:hover {
+    background: rgba(0, 0, 0, 0.08);
+  }
+
+  [data-theme="light"] .advanced-stat.positive {
+    background: rgba(46, 204, 113, 0.1);
+    border-color: rgba(46, 204, 113, 0.3);
+  }
+
+  [data-theme="light"] .advanced-stat.negative {
+    background: rgba(231, 76, 60, 0.1);
+    border-color: rgba(231, 76, 60, 0.3);
+  }
+
+  [data-theme="light"] .advanced-stat.streak {
+    background: linear-gradient(135deg, rgba(255, 107, 0, 0.1), rgba(255, 61, 0, 0.05));
+    border-color: rgba(255, 107, 0, 0.3);
+  }
+
+  [data-theme="light"] .adv-value {
+    color: #1a4a8f;
+  }
+
+  [data-theme="light"] .advanced-stat.positive .adv-value {
+    color: #27ae60;
+  }
+
+  [data-theme="light"] .advanced-stat.negative .adv-value {
+    color: #e74c3c;
+  }
+
+  [data-theme="light"] .advanced-stat.streak .adv-value {
+    color: #e67e22;
+  }
+
+  [data-theme="light"] .adv-label {
+    color: #1a1a2e;
+  }
+
+  [data-theme="light"] .adv-desc {
+    color: rgba(0, 0, 0, 0.5);
+  }
+
+  [data-theme="light"] .shooting-stats {
+    background: rgba(0, 0, 0, 0.03);
+  }
+
+  [data-theme="light"] .shooting-stats h4 {
+    color: #1a1a2e;
+  }
+
+  [data-theme="light"] .shooting-label {
+    color: rgba(0, 0, 0, 0.6);
+  }
+
+  [data-theme="light"] .shooting-value {
+    color: #1a1a2e;
+  }
+
+  [data-theme="light"] .shooting-pct {
+    color: rgba(0, 0, 0, 0.5);
+  }
+
+  [data-theme="light"] .averages-inline,
+  [data-theme="light"] .records-inline {
+    background: rgba(0, 0, 0, 0.03);
+  }
+
+  [data-theme="light"] .averages-inline h4,
+  [data-theme="light"] .records-inline h4 {
+    color: #1a1a2e;
+  }
+
+  [data-theme="light"] .averages-inline-grid span {
+    color: #1a4a8f;
+  }
+
+  [data-theme="light"] .record-card {
+    background: rgba(0, 0, 0, 0.05);
+  }
+
+  [data-theme="light"] .record-value {
+    color: #1a4a8f;
+  }
+
+  [data-theme="light"] .record-label {
+    color: #1a1a2e;
+  }
+
+  [data-theme="light"] .record-info {
+    color: rgba(0, 0, 0, 0.5);
+  }
+
+  [data-theme="light"] .no-data-message {
+    background: rgba(0, 0, 0, 0.05);
+    color: rgba(0, 0, 0, 0.6);
+  }
+
+  [data-theme="light"] .summary {
+    color: #1a1a2e;
+  }
+
+  [data-theme="light"] .summary-value {
+    color: #1a4a8f;
+  }
+
+  [data-theme="light"] .summary-label {
+    color: rgba(0, 0, 0, 0.6);
+  }
+
+  [data-theme="light"] .duration-selector {
+    background: rgba(0, 0, 0, 0.05);
+  }
+
+  [data-theme="light"] .duration-selector p {
+    color: #1a1a2e;
+  }
+
+  [data-theme="light"] .duration-btn {
+    background: rgba(0, 0, 0, 0.08);
+    color: #1a1a2e;
+  }
+
+  [data-theme="light"] .duration-btn.active {
+    background: #1a4a8f;
+    color: white;
+  }
+
+  [data-theme="light"] .settings-btn {
+    color: rgba(0, 0, 0, 0.6);
+  }
+
+  [data-theme="light"] .settings-btn:hover,
+  [data-theme="light"] .settings-btn.active {
+    color: #1a4a8f;
+    background: rgba(26, 74, 143, 0.1);
+  }
+
+  [data-theme="light"] .confirm-overlay {
+    background: rgba(0, 0, 0, 0.6);
+  }
+
+  [data-theme="light"] .confirm-modal {
+    background: #fff;
+    color: #1a1a2e;
+  }
+
+  [data-theme="light"] .confirm-warning {
+    color: rgba(0, 0, 0, 0.6);
+  }
+
   /* ========== MOBILE RESPONSIVE STYLES ========== */
 
   /* Viewport meta handling */
