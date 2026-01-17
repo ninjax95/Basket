@@ -169,24 +169,18 @@ export default function MatchHistory({
               <span className="ds-value">{displayStats.fouls}</span>
               <span className="ds-label">FAUTES</span>
             </div>
-            {displayStats.plusMinus !== undefined && displayStats.plusMinus !== 0 && (
-              <div className={`detailed-stat ${displayStats.plusMinus > 0 ? 'positive' : 'negative'}`}>
-                <span className="ds-value">{displayStats.plusMinus > 0 ? '+' : ''}{displayStats.plusMinus}</span>
-                <span className="ds-label">+/-</span>
-              </div>
-            )}
-            {displayStats.trueShootingPct !== undefined && (
-              <div className="detailed-stat efficiency">
-                <span className="ds-value">{displayStats.trueShootingPct}%</span>
-                <span className="ds-label">TS%</span>
-              </div>
-            )}
-            {displayStats.gameScore !== undefined && displayStats.gameScore !== null && (
-              <div className={`detailed-stat efficiency ${parseFloat(displayStats.gameScore) >= 10 ? 'positive' : parseFloat(displayStats.gameScore) < 0 ? 'negative' : ''}`}>
-                <span className="ds-value">{displayStats.gameScore}</span>
-                <span className="ds-label">{selectedMatch ? 'GmSc' : 'GmSc moy.'}</span>
-              </div>
-            )}
+            <div className={`detailed-stat ${(displayStats.plusMinus || 0) > 0 ? 'positive' : (displayStats.plusMinus || 0) < 0 ? 'negative' : ''}`}>
+              <span className="ds-value">{(displayStats.plusMinus || 0) > 0 ? '+' : ''}{displayStats.plusMinus || 0}</span>
+              <span className="ds-label">+/-</span>
+            </div>
+            <div className="detailed-stat efficiency">
+              <span className="ds-value">{displayStats.trueShootingPct || 0}%</span>
+              <span className="ds-label">TS%</span>
+            </div>
+            <div className={`detailed-stat efficiency ${parseFloat(displayStats.gameScore || 0) >= 10 ? 'positive' : parseFloat(displayStats.gameScore || 0) < 0 ? 'negative' : ''}`}>
+              <span className="ds-value">{displayStats.gameScore || 0}</span>
+              <span className="ds-label">{selectedMatch ? 'GmSc' : 'GmSc moy.'}</span>
+            </div>
           </div>
 
           {/* Shooting Stats */}
