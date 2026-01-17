@@ -3,6 +3,7 @@ import EvolutionChart from './EvolutionChart'
 import PerformanceRadar from './PerformanceRadar'
 import ShotHeatmap from './ShotHeatmap'
 import ThermalHeatmap from './ThermalHeatmap'
+import ShotReplay from './ShotReplay'
 
 export default function MatchHistory({
   history,
@@ -17,6 +18,7 @@ export default function MatchHistory({
   gistConnected
 }) {
   const [selectedMatchId, setSelectedMatchId] = useState('all') // 'all' or match id
+  const [showReplay, setShowReplay] = useState(false)
   const lastMatch = history.length > 0 ? history[history.length - 1] : null
 
   // Calculate totals across all matches
@@ -82,12 +84,22 @@ export default function MatchHistory({
       {/* Detailed Stats Display */}
       {displayStats && (
         <div className="detailed-stats-section">
-          <h3>
-            {selectedMatch
-              ? `📋 ${selectedMatch.opponent ? `vs ${selectedMatch.opponent}` : 'Match'} - ${new Date(selectedMatch.date).toLocaleDateString('fr-FR')}`
-              : `📊 Total sur ${displayStats.matchCount} match${displayStats.matchCount > 1 ? 's' : ''}`
-            }
-          </h3>
+          <div className="detailed-stats-header">
+            <h3>
+              {selectedMatch
+                ? `📋 ${selectedMatch.opponent ? `vs ${selectedMatch.opponent}` : 'Match'} - ${new Date(selectedMatch.date).toLocaleDateString('fr-FR')}`
+                : `📊 Total sur ${displayStats.matchCount} match${displayStats.matchCount > 1 ? 's' : ''}`
+              }
+            </h3>
+            {selectedMatch && selectedMatch.shotMarkers && selectedMatch.shotMarkers.length > 0 && (
+              <button
+                className="replay-btn-history"
+                onClick={() => setShowReplay(true)}
+              >
+                🎬 Replay
+              </button>
+            )}
+          </div>
 
           {/* Main Stats */}
           <div className="detailed-stats-grid">
@@ -300,6 +312,15 @@ export default function MatchHistory({
           </div>
         )}
       </div>
+
+      {/* Replay modal */}
+      {showReplay && selectedMatch && (
+        <ShotReplay
+          shotMarkers={selectedMatch.shotMarkers || []}
+          actionHistory={selectedMatch.actionHistory || []}
+          onClose={() => setShowReplay(false)}
+        />
+      )}
     </div>
   )
 }

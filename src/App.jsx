@@ -1060,10 +1060,37 @@ const styles = `
     margin-bottom: 20px;
   }
 
+  .detailed-stats-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 15px;
+  }
+
   .detailed-stats-section h3 {
     color: #61dafb;
-    margin-bottom: 20px;
+    margin: 0;
     text-align: center;
+    flex: 1;
+  }
+
+  .replay-btn-history {
+    background: linear-gradient(135deg, #9b59b6, #8e44ad);
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: bold;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .replay-btn-history:hover {
+    background: linear-gradient(135deg, #a66bbe, #9b59b6);
+    transform: scale(1.05);
   }
 
   .detailed-stats-grid {
