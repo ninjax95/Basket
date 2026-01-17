@@ -1078,6 +1078,14 @@ const styles = `
     display: block;
   }
 
+  .match-stat.positive .stat-val {
+    color: #2ecc71;
+  }
+
+  .match-stat.negative .stat-val {
+    color: #e74c3c;
+  }
+
   .match-stat .stat-name {
     font-size: 0.7rem;
     color: rgba(255, 255, 255, 0.5);
@@ -1786,6 +1794,104 @@ const styles = `
   }
 
   /* Playing Time Section */
+  /* Live Score Section */
+  .live-score-section {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 15px 20px;
+    margin-bottom: 20px;
+  }
+
+  .live-score-section h3 {
+    margin: 0 0 15px 0;
+    text-align: center;
+    font-size: 1rem;
+    color: #61dafb;
+  }
+
+  .live-score-panel {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .live-score-team {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .live-score-label {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .live-score-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .live-score-controls button {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .live-score-controls button:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+
+  .live-score-value {
+    font-size: 2rem;
+    font-weight: bold;
+    min-width: 50px;
+    text-align: center;
+  }
+
+  .live-score-separator {
+    font-size: 2rem;
+    font-weight: bold;
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  .plus-minus-display {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: 15px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+  }
+
+  .pm-label {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .pm-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+  }
+
+  .plus-minus-display.positive .pm-value {
+    color: #2ecc71;
+  }
+
+  .plus-minus-display.negative .pm-value {
+    color: #e74c3c;
+  }
+
   .playing-time-section {
     background: rgba(255, 255, 255, 0.1);
     border-radius: 12px;
@@ -3055,6 +3161,10 @@ export default function App() {
   const [scoreTeam, setScoreTeam] = useState('')
   const [scoreOpponent, setScoreOpponent] = useState('')
   const [matchLocation, setMatchLocation] = useState('home') // 'home' or 'away'
+  const [liveScoreTeam, setLiveScoreTeam] = useState(0)
+  const [liveScoreOpponent, setLiveScoreOpponent] = useState(0)
+  const [plusMinus, setPlusMinus] = useState(0)
+  const [lastPlusMinusScore, setLastPlusMinusScore] = useState({ team: 0, opponent: 0 })
   const [shotMarkers, setShotMarkers] = useState(() => {
     const saved = localStorage.getItem('basketShotMarkers')
     return saved ? JSON.parse(saved) : []
@@ -3102,6 +3212,19 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem('basketShotMarkers', JSON.stringify(shotMarkers))
   }, [shotMarkers])
+
+  // Calculate +/- when player is on court and score changes
+  useEffect(() => {
+    if (playingTime.isOnCourt) {
+      const teamDiff = liveScoreTeam - lastPlusMinusScore.team
+      const oppDiff = liveScoreOpponent - lastPlusMinusScore.opponent
+      const diff = teamDiff - oppDiff
+      if (diff !== 0) {
+        setPlusMinus(prev => prev + diff)
+      }
+    }
+    setLastPlusMinusScore({ team: liveScoreTeam, opponent: liveScoreOpponent })
+  }, [liveScoreTeam, liveScoreOpponent])
 
   // Helper to update stat with current time
   const updateStatWithTime = (statName, delta, silent = false) => {
@@ -3181,11 +3304,12 @@ export default function App() {
       return
     }
 
+    // Use live score if manual score not entered
     const matchScore = {
-      team: scoreTeam ? parseInt(scoreTeam) : null,
-      opponent: scoreOpponent ? parseInt(scoreOpponent) : null
+      team: scoreTeam ? parseInt(scoreTeam) : (liveScoreTeam > 0 ? liveScoreTeam : null),
+      opponent: scoreOpponent ? parseInt(scoreOpponent) : (liveScoreOpponent > 0 ? liveScoreOpponent : null)
     }
-    const savedMatch = saveMatch(player, stats, opponent, shotMarkers, matchScore, matchLocation)
+    const savedMatch = saveMatch(player, stats, opponent, shotMarkers, matchScore, matchLocation, plusMinus)
 
     // Auto backup after save
     const updatedHistory = [...history, savedMatch]
@@ -3197,6 +3321,10 @@ export default function App() {
     resetStats()
     timer.resetTimer()
     playingTime.resetPlayingTime()
+    setLiveScoreTeam(0)
+    setLiveScoreOpponent(0)
+    setPlusMinus(0)
+    setLastPlusMinusScore({ team: 0, opponent: 0 })
     setOpponent('')
     setScoreTeam('')
     setScoreOpponent('')
@@ -3418,6 +3546,10 @@ export default function App() {
       setScoreTeam('')
       setScoreOpponent('')
       setMatchLocation('home')
+      setLiveScoreTeam(0)
+      setLiveScoreOpponent(0)
+      setPlusMinus(0)
+      setLastPlusMinusScore({ team: 0, opponent: 0 })
     }
   }
 
@@ -3494,6 +3626,34 @@ export default function App() {
               }}
               onAdjustTime={timer.adjustTime}
             />
+
+            {/* Live Score & +/- */}
+            <div className="live-score-section">
+              <h3>📊 Score en direct</h3>
+              <div className="live-score-panel">
+                <div className="live-score-team">
+                  <span className="live-score-label">Nous</span>
+                  <div className="live-score-controls">
+                    <button onClick={() => setLiveScoreTeam(Math.max(0, liveScoreTeam - 1))}>-</button>
+                    <span className="live-score-value">{liveScoreTeam}</span>
+                    <button onClick={() => setLiveScoreTeam(liveScoreTeam + 1)}>+</button>
+                  </div>
+                </div>
+                <div className="live-score-separator">-</div>
+                <div className="live-score-team">
+                  <span className="live-score-label">Eux</span>
+                  <div className="live-score-controls">
+                    <button onClick={() => setLiveScoreOpponent(Math.max(0, liveScoreOpponent - 1))}>-</button>
+                    <span className="live-score-value">{liveScoreOpponent}</span>
+                    <button onClick={() => setLiveScoreOpponent(liveScoreOpponent + 1)}>+</button>
+                  </div>
+                </div>
+              </div>
+              <div className={`plus-minus-display ${plusMinus > 0 ? 'positive' : plusMinus < 0 ? 'negative' : ''}`}>
+                <span className="pm-label">+/-</span>
+                <span className="pm-value">{plusMinus > 0 ? '+' : ''}{plusMinus}</span>
+              </div>
+            </div>
 
             {/* Playing Time Toggle */}
             <div className="playing-time-section">

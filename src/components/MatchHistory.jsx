@@ -317,6 +317,12 @@ export default function MatchHistory({
                     <span className="stat-val">{match.summary.fgPercentage}%</span>
                     <span className="stat-name">FG%</span>
                   </div>
+                  {match.plusMinus !== undefined && match.plusMinus !== 0 && (
+                    <div className={`match-stat ${match.plusMinus > 0 ? 'positive' : 'negative'}`}>
+                      <span className="stat-val">{match.plusMinus > 0 ? '+' : ''}{match.plusMinus}</span>
+                      <span className="stat-name">+/-</span>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}

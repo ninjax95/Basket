@@ -387,7 +387,7 @@ export function useMatchHistory() {
     localStorage.setItem('basketMatchHistory', JSON.stringify(history))
   }, [history])
 
-  const saveMatch = (player, stats, opponent = '', shotMarkers = [], score = null, location = 'home') => {
+  const saveMatch = (player, stats, opponent = '', shotMarkers = [], score = null, location = 'home', plusMinus = 0) => {
     const totalPoints = (stats.fg2Made * 2) + (stats.fg3Made * 3) + stats.ftMade
     const totalRebounds = stats.offRebounds + stats.defRebounds
     const fgMade = stats.fg2Made + stats.fg3Made
@@ -400,6 +400,7 @@ export function useMatchHistory() {
       opponent,
       location,  // 'home' or 'away'
       score: score || null,  // { team: number, opponent: number }
+      plusMinus,  // +/- differential when on court
       stats: { ...stats },
       shotMarkers: [...shotMarkers],  // Save shot positions
       summary: {
