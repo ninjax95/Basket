@@ -3581,6 +3581,21 @@ const styles = `
     text-align: center;
   }
 
+  .analysis-filter {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .analysis-filter label {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+  }
+
   .analysis-section {
     margin-bottom: 25px;
   }
@@ -3746,6 +3761,7 @@ export default function App() {
   const [showReplay, setShowReplay] = useState(false)
   const [recordNotification, setRecordNotification] = useState(null) // { records: [...] }
   const [showHelpModal, setShowHelpModal] = useState(false)
+  const [analysisSelectedMatchId, setAnalysisSelectedMatchId] = useState('all')
 
   // Check if already unlocked this session
   useEffect(() => {
@@ -4505,12 +4521,31 @@ export default function App() {
               </div>
             ) : (
               <>
+                {/* Filter Section */}
+                <div className="analysis-filter">
+                  <label>Afficher :</label>
+                  <select
+                    value={analysisSelectedMatchId}
+                    onChange={(e) => setAnalysisSelectedMatchId(e.target.value === 'all' ? 'all' : Number(e.target.value))}
+                    className="match-select"
+                  >
+                    <option value="all">📊 Tous les matchs</option>
+                    {[...history].reverse().map((match, index) => (
+                      <option key={match.id} value={match.id}>
+                        {new Date(match.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}
+                        {match.opponent ? ` vs ${match.opponent}` : ` - Match ${history.length - index}`}
+                        {' '}({match.summary.points} pts)
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
                 {/* Shot Charts */}
                 <div className="analysis-section">
                   <h3>🎯 Cartes des tirs</h3>
                   <div className="shot-charts-grid">
-                    <ShotHeatmap history={history} selectedMatchId="all" />
-                    <ThermalHeatmap history={history} selectedMatchId="all" />
+                    <ShotHeatmap history={history} selectedMatchId={analysisSelectedMatchId} />
+                    <ThermalHeatmap history={history} selectedMatchId={analysisSelectedMatchId} />
                   </div>
                 </div>
 
