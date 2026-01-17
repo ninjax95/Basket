@@ -793,6 +793,27 @@ const styles = `
     font-weight: bold;
   }
 
+  .score-inputs.auto-score {
+    background: rgba(97, 218, 251, 0.1);
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: 1px solid rgba(97, 218, 251, 0.3);
+  }
+
+  .auto-score-label {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+    margin-right: 5px;
+  }
+
+  .auto-score-value {
+    color: #61dafb;
+    font-size: 1.3rem;
+    font-weight: bold;
+    min-width: 30px;
+    text-align: center;
+  }
+
   .location-toggle {
     display: flex;
     gap: 8px;
@@ -3704,8 +3725,6 @@ export default function App() {
   const [isUnlocked, setIsUnlocked] = useState(false)
   const [activeTab, setActiveTab] = useState('match')
   const [opponent, setOpponent] = useState('')
-  const [scoreTeam, setScoreTeam] = useState('')
-  const [scoreOpponent, setScoreOpponent] = useState('')
   const [matchLocation, setMatchLocation] = useState('home') // 'home' or 'away'
   const [liveScoreTeam, setLiveScoreTeam] = useState(0)
   const [liveScoreOpponent, setLiveScoreOpponent] = useState(0)
@@ -3920,10 +3939,10 @@ export default function App() {
       return
     }
 
-    // Use live score if manual score not entered
+    // Use live score directly
     const matchScore = {
-      team: scoreTeam ? parseInt(scoreTeam) : (liveScoreTeam > 0 ? liveScoreTeam : null),
-      opponent: scoreOpponent ? parseInt(scoreOpponent) : (liveScoreOpponent > 0 ? liveScoreOpponent : null)
+      team: liveScoreTeam,
+      opponent: liveScoreOpponent
     }
     // Check for new records BEFORE saving
     const tempMatch = {
@@ -4446,24 +4465,11 @@ export default function App() {
                   onChange={(e) => setOpponent(e.target.value)}
                   className="opponent-input"
                 />
-                <div className="score-inputs">
-                  <input
-                    type="number"
-                    placeholder="Notre score"
-                    value={scoreTeam}
-                    onChange={(e) => setScoreTeam(e.target.value)}
-                    className="score-input"
-                    min="0"
-                  />
+                <div className="score-inputs auto-score">
+                  <span className="auto-score-label">Score :</span>
+                  <span className="auto-score-value">{liveScoreTeam}</span>
                   <span className="score-separator">-</span>
-                  <input
-                    type="number"
-                    placeholder="Score adv."
-                    value={scoreOpponent}
-                    onChange={(e) => setScoreOpponent(e.target.value)}
-                    className="score-input"
-                    min="0"
-                  />
+                  <span className="auto-score-value">{liveScoreOpponent}</span>
                 </div>
                 <button className="save-btn" onClick={handleSaveMatch}>
                   Sauvegarder et terminer
