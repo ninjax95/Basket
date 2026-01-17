@@ -31,6 +31,17 @@ export default function ShotReplay({ shotMarkers, actionHistory, onClose }) {
     const duration = 700
     const startTime = Date.now()
 
+    // Set initial position immediately
+    setBallPosition({
+      x: startX,
+      y: startY,
+      scale: 1,
+      made,
+      rotation: 0,
+      opacity: 1
+    })
+    setBallPhase('flying')
+
     const animate = () => {
       const elapsed = Date.now() - startTime
       const progress = Math.min(elapsed / duration, 1)
@@ -39,21 +50,22 @@ export default function ShotReplay({ shotMarkers, actionHistory, onClose }) {
       const easeOut = 1 - Math.pow(1 - progress, 3)
 
       // Calculate current position with arc (parabola)
-      const arcHeight = Math.max(80, Math.abs(startY - endY) * 0.5)
+      const arcHeight = Math.max(60, Math.abs(startY - endY) * 0.4)
       const arcProgress = Math.sin(progress * Math.PI) * arcHeight
 
       const currentX = startX + (endX - startX) * easeOut
       const currentY = startY + (endY - startY) * easeOut - arcProgress
 
       // Ball size decreases as it goes toward basket
-      const scale = 1 - progress * 0.4
+      const scale = 1 - progress * 0.3
 
       setBallPosition({
         x: currentX,
         y: currentY,
         scale,
         made,
-        rotation: progress * (made ? 360 : 720)
+        rotation: progress * (made ? 360 : 720),
+        opacity: 1
       })
 
       if (progress < 1) {
@@ -109,7 +121,6 @@ export default function ShotReplay({ shotMarkers, actionHistory, onClose }) {
       }
     }
 
-    setBallPhase('flying')
     animationRef.current = requestAnimationFrame(animate)
   }
 
