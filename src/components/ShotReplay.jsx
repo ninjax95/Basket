@@ -496,19 +496,16 @@ export default function ShotReplay({ shotMarkers, actionHistory, onClose }) {
           {availableQuarters.length > 0 && (
             <div className="quarter-nav">
               <span className="quarter-nav-label">Aller à :</span>
-              {[1, 2, 3, 4].map(q => {
-                const activeQuarter = selectedQuarter || currentAction?.quarter
-                return (
-                  <button
-                    key={q}
-                    className={`quarter-btn ${availableQuarters.includes(q) ? '' : 'disabled'} ${activeQuarter === q ? 'active' : ''}`}
-                    onClick={() => goToQuarter(q)}
-                    disabled={!availableQuarters.includes(q)}
-                  >
-                    Q{q}
-                  </button>
-                )
-              })}
+              {[1, 2, 3, 4].map(q => (
+                <button
+                  key={q}
+                  className={`quarter-btn ${availableQuarters.includes(q) ? '' : 'disabled'} ${selectedQuarter === q || (!selectedQuarter && currentAction?.quarter === q) ? 'active' : ''}`}
+                  onClick={() => goToQuarter(q)}
+                  disabled={!availableQuarters.includes(q)}
+                >
+                  Q{q}
+                </button>
+              ))}
             </div>
           )}
 
