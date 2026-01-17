@@ -223,6 +223,25 @@ export default function MatchHistory({
             </div>
           </div>
 
+          {/* Match Notes (only for selected match) */}
+          {selectedMatch && selectedMatch.notes && (selectedMatch.notes.strengths || selectedMatch.notes.improvements) && (
+            <div className="match-notes-display">
+              <h4>📝 Notes du match</h4>
+              {selectedMatch.notes.strengths && (
+                <div className="note-item strengths">
+                  <span className="note-icon">💪</span>
+                  <span className="note-text">{selectedMatch.notes.strengths}</span>
+                </div>
+              )}
+              {selectedMatch.notes.improvements && (
+                <div className="note-item improvements">
+                  <span className="note-icon">📈</span>
+                  <span className="note-text">{selectedMatch.notes.improvements}</span>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Averages (only for all matches) */}
           {!selectedMatch && averages && (
             <div className="averages-inline">

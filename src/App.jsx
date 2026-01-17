@@ -814,6 +814,34 @@ const styles = `
     text-align: center;
   }
 
+  .match-notes-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .match-notes-input {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    padding: 10px 12px;
+    color: #fff;
+    font-size: 0.9rem;
+    resize: none;
+    font-family: inherit;
+    width: 100%;
+  }
+
+  .match-notes-input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  .match-notes-input:focus {
+    outline: none;
+    border-color: #61dafb;
+  }
+
   .location-toggle {
     display: flex;
     gap: 8px;
@@ -1314,6 +1342,54 @@ const styles = `
   .shooting-pct {
     color: #2ecc71;
     font-size: 0.9rem;
+  }
+
+  /* Match Notes Display */
+  .match-notes-display {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    padding: 15px;
+    margin-top: 15px;
+  }
+
+  .match-notes-display h4 {
+    color: #61dafb;
+    margin-bottom: 12px;
+    font-size: 0.95rem;
+  }
+
+  .note-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+  }
+
+  .note-item:last-child {
+    margin-bottom: 0;
+  }
+
+  .note-item.strengths {
+    background: rgba(46, 204, 113, 0.1);
+    border-left: 3px solid #2ecc71;
+  }
+
+  .note-item.improvements {
+    background: rgba(241, 196, 15, 0.1);
+    border-left: 3px solid #f1c40f;
+  }
+
+  .note-icon {
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+
+  .note-text {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.9rem;
+    line-height: 1.4;
   }
 
   /* Averages Inline */
@@ -3655,6 +3731,33 @@ const styles = `
     margin-bottom: 15px;
   }
 
+  .theme-toggle {
+    display: flex;
+    gap: 10px;
+  }
+
+  .theme-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.7);
+    padding: 12px 24px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.2s;
+  }
+
+  .theme-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+
+  .theme-btn.active {
+    background: rgba(97, 218, 251, 0.2);
+    border-color: #61dafb;
+    color: #61dafb;
+  }
+
   .gist-config {
     margin-bottom: 15px;
   }
@@ -3734,6 +3837,191 @@ const styles = `
     margin-left: 8px;
     font-weight: bold;
   }
+
+  /* Light Theme */
+  body[data-theme="light"] {
+    background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
+    color: #1a1a2e;
+  }
+
+  [data-theme="light"] .container {
+    color: #1a1a2e;
+  }
+
+  [data-theme="light"] h1 {
+    color: #ff6b35;
+  }
+
+  [data-theme="light"] .nav-tab {
+    background: rgba(0, 0, 0, 0.05);
+    color: rgba(0, 0, 0, 0.6);
+  }
+
+  [data-theme="light"] .nav-tab:hover {
+    background: rgba(0, 0, 0, 0.1);
+    color: #1a1a2e;
+  }
+
+  [data-theme="light"] .nav-tab.active {
+    background: rgba(26, 74, 143, 0.15);
+    border-color: #1a4a8f;
+    color: #1a4a8f;
+    box-shadow: 0 0 10px rgba(26, 74, 143, 0.3);
+  }
+
+  [data-theme="light"] .stat-card,
+  [data-theme="light"] .player-info,
+  [data-theme="light"] .timer-section,
+  [data-theme="light"] .save-section,
+  [data-theme="light"] .options-section,
+  [data-theme="light"] .analysis-filter,
+  [data-theme="light"] .detailed-stats-section,
+  [data-theme="light"] .chart-container,
+  [data-theme="light"] .quarter-stats-section,
+  [data-theme="light"] .playing-time-section {
+    background: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  [data-theme="light"] .stat-card h3,
+  [data-theme="light"] h2,
+  [data-theme="light"] h3 {
+    color: #1a1a2e;
+  }
+
+  [data-theme="light"] .counter-btn {
+    background: rgba(0, 0, 0, 0.08);
+    color: #1a1a2e;
+  }
+
+  [data-theme="light"] .counter-btn:hover {
+    background: rgba(0, 0, 0, 0.15);
+  }
+
+  [data-theme="light"] .counter-value {
+    color: #1a4a8f;
+  }
+
+  [data-theme="light"] .player-info input,
+  [data-theme="light"] .opponent-input,
+  [data-theme="light"] .match-notes-input {
+    background: rgba(0, 0, 0, 0.05);
+    border-color: rgba(0, 0, 0, 0.15);
+    color: #1a1a2e;
+  }
+
+  [data-theme="light"] .player-info input::placeholder,
+  [data-theme="light"] .opponent-input::placeholder,
+  [data-theme="light"] .match-notes-input::placeholder {
+    color: rgba(0, 0, 0, 0.4);
+  }
+
+  [data-theme="light"] .timer-display {
+    color: #1a4a8f;
+  }
+
+  [data-theme="light"] .timer-btn,
+  [data-theme="light"] .action-btn {
+    background: rgba(0, 0, 0, 0.08);
+    border-color: rgba(0, 0, 0, 0.15);
+    color: #1a1a2e;
+  }
+
+  [data-theme="light"] .timer-btn:hover,
+  [data-theme="light"] .action-btn:hover {
+    background: rgba(0, 0, 0, 0.15);
+  }
+
+  [data-theme="light"] .live-score-section {
+    background: rgba(26, 74, 143, 0.1);
+    border-color: rgba(26, 74, 143, 0.3);
+  }
+
+  [data-theme="light"] .live-score-value {
+    color: #1a4a8f;
+  }
+
+  [data-theme="light"] .score-inputs.auto-score {
+    background: rgba(26, 74, 143, 0.1);
+    border-color: rgba(26, 74, 143, 0.3);
+  }
+
+  [data-theme="light"] .auto-score-value {
+    color: #1a4a8f;
+  }
+
+  [data-theme="light"] .match-card {
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  [data-theme="light"] .match-card:hover {
+    background: rgba(255, 255, 255, 1);
+  }
+
+  [data-theme="light"] .match-date,
+  [data-theme="light"] .match-opponent {
+    color: #1a1a2e;
+  }
+
+  [data-theme="light"] .stat-val {
+    color: #1a4a8f;
+  }
+
+  [data-theme="light"] .ds-value {
+    color: #1a1a2e;
+  }
+
+  [data-theme="light"] .ds-label,
+  [data-theme="light"] .stat-name {
+    color: rgba(0, 0, 0, 0.6);
+  }
+
+  [data-theme="light"] .options-description,
+  [data-theme="light"] .history-filter label,
+  [data-theme="light"] .analysis-filter label {
+    color: rgba(0, 0, 0, 0.6);
+  }
+
+  [data-theme="light"] .match-select {
+    background: rgba(0, 0, 0, 0.05);
+    border-color: rgba(0, 0, 0, 0.15);
+    color: #1a1a2e;
+  }
+
+  [data-theme="light"] .theme-btn {
+    background: rgba(0, 0, 0, 0.05);
+    border-color: rgba(0, 0, 0, 0.15);
+    color: rgba(0, 0, 0, 0.7);
+  }
+
+  [data-theme="light"] .theme-btn:hover {
+    background: rgba(0, 0, 0, 0.1);
+  }
+
+  [data-theme="light"] .theme-btn.active {
+    background: rgba(26, 74, 143, 0.15);
+    border-color: #1a4a8f;
+    color: #1a4a8f;
+  }
+
+  [data-theme="light"] .court-toggle.on-court {
+    background: linear-gradient(135deg, #27ae60, #2ecc71);
+  }
+
+  [data-theme="light"] .gist-action-btn {
+    background: rgba(0, 0, 0, 0.05);
+    border-color: rgba(0, 0, 0, 0.15);
+    color: #1a1a2e;
+  }
+
+  [data-theme="light"] .delete-btn {
+    color: rgba(0, 0, 0, 0.4);
+  }
+
+  [data-theme="light"] .delete-btn:hover {
+    color: #e74c3c;
+  }
 `
 
 export default function App() {
@@ -3761,6 +4049,11 @@ export default function App() {
     const saved = localStorage.getItem('basketShotMarkers')
     return saved ? JSON.parse(saved) : []
   })
+  const [matchNotes, setMatchNotes] = useState(() => {
+    const saved = localStorage.getItem('basketMatchNotes')
+    return saved ? JSON.parse(saved) : { strengths: '', improvements: '' }
+  })
+  const [theme, setTheme] = useState(() => localStorage.getItem('basketTheme') || 'dark')
   const [githubToken, setGithubToken] = useState(() => {
     const saved = localStorage.getItem('basketGithubToken')
     return saved ? atob(saved) : ''
@@ -3833,6 +4126,15 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem('basketMatchLocation', matchLocation)
   }, [matchLocation])
+
+  useEffect(() => {
+    localStorage.setItem('basketMatchNotes', JSON.stringify(matchNotes))
+  }, [matchNotes])
+
+  useEffect(() => {
+    localStorage.setItem('basketTheme', theme)
+    document.body.setAttribute('data-theme', theme)
+  }, [theme])
 
   // Calculate +/- when player is on court and score changes
   useEffect(() => {
@@ -4010,7 +4312,7 @@ export default function App() {
     }
     const newRecords = checkNewRecords(tempMatch)
 
-    const savedMatch = saveMatch(player, stats, opponent, shotMarkers, matchScore, matchLocation, plusMinus)
+    const savedMatch = saveMatch(player, stats, opponent, shotMarkers, matchScore, matchLocation, plusMinus, matchNotes)
 
     // Auto backup after save
     const updatedHistory = [...history, savedMatch]
@@ -4034,6 +4336,7 @@ export default function App() {
     setOpponent('')
     setMatchLocation('home')
     setShotMarkers([])  // Clear shot markers
+    setMatchNotes({ strengths: '', improvements: '' })
   }
 
   const handleDeleteMatch = (matchId) => {
@@ -4252,6 +4555,7 @@ export default function App() {
       setLiveScoreOpponent(0)
       setPlusMinus(0)
       setLastPlusMinusScore({ team: 0, opponent: 0 })
+      setMatchNotes({ strengths: '', improvements: '' })
     }
   }
 
@@ -4520,6 +4824,22 @@ export default function App() {
                   <span className="score-separator">-</span>
                   <span className="auto-score-value">{liveScoreOpponent}</span>
                 </div>
+                <div className="match-notes-section">
+                  <textarea
+                    placeholder="💪 Points forts du match..."
+                    value={matchNotes.strengths}
+                    onChange={(e) => setMatchNotes(prev => ({ ...prev, strengths: e.target.value }))}
+                    className="match-notes-input"
+                    rows="2"
+                  />
+                  <textarea
+                    placeholder="📈 Points à améliorer..."
+                    value={matchNotes.improvements}
+                    onChange={(e) => setMatchNotes(prev => ({ ...prev, improvements: e.target.value }))}
+                    className="match-notes-input"
+                    rows="2"
+                  />
+                </div>
                 <button className="save-btn" onClick={handleSaveMatch}>
                   Sauvegarder et terminer
                 </button>
@@ -4598,6 +4918,28 @@ export default function App() {
         {activeTab === 'options' && (
           <div className="options-page">
             <h2>⚙️ Options</h2>
+
+            {/* Theme Section */}
+            <div className="options-section">
+              <h3>🎨 Apparence</h3>
+              <p className="options-description">
+                Change le thème pour une meilleure visibilité selon l'environnement.
+              </p>
+              <div className="theme-toggle">
+                <button
+                  className={`theme-btn ${theme === 'dark' ? 'active' : ''}`}
+                  onClick={() => setTheme('dark')}
+                >
+                  🌙 Sombre
+                </button>
+                <button
+                  className={`theme-btn ${theme === 'light' ? 'active' : ''}`}
+                  onClick={() => setTheme('light')}
+                >
+                  ☀️ Clair
+                </button>
+              </div>
+            </div>
 
             {/* GitHub Gist Sync Section */}
             <div className="options-section">
