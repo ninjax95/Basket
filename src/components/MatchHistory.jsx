@@ -14,7 +14,7 @@ export default function MatchHistory({
   const getTotals = () => {
     if (history.length === 0) return null
 
-    return history.reduce((acc, match) => ({
+    const totals = history.reduce((acc, match) => ({
       points: acc.points + match.summary.points,
       rebounds: acc.rebounds + match.summary.rebounds,
       assists: acc.assists + match.summary.assists,
@@ -28,10 +28,30 @@ export default function MatchHistory({
       fg3Attempted: acc.fg3Attempted + (match.stats?.fg3Attempted || 0),
       ftMade: acc.ftMade + (match.stats?.ftMade || 0),
       ftAttempted: acc.ftAttempted + (match.stats?.ftAttempted || 0),
+      plusMinus: acc.plusMinus + (match.plusMinus || 0),
+      gameScoreSum: acc.gameScoreSum + (match.efficiency?.gameScore || 0),
+      gameScoreCount: acc.gameScoreCount + (match.efficiency?.gameScore !== undefined ? 1 : 0),
     }), {
       points: 0, rebounds: 0, assists: 0, steals: 0, blocks: 0, fouls: 0, turnovers: 0,
-      fg2Made: 0, fg2Attempted: 0, fg3Made: 0, fg3Attempted: 0, ftMade: 0, ftAttempted: 0
+      fg2Made: 0, fg2Attempted: 0, fg3Made: 0, fg3Attempted: 0, ftMade: 0, ftAttempted: 0,
+      plusMinus: 0, gameScoreSum: 0, gameScoreCount: 0
     })
+
+    // Calculate True Shooting % for all shots combined
+    const fga = totals.fg2Attempted + totals.fg3Attempted
+    const tsa = fga + 0.44 * totals.ftAttempted
+    const trueShootingPct = tsa > 0 ? Math.round(totals.points / (2 * tsa) * 100) : 0
+
+    // Average Game Score
+    const avgGameScore = totals.gameScoreCount > 0
+      ? (totals.gameScoreSum / totals.gameScoreCount).toFixed(1)
+      : null
+
+    return {
+      ...totals,
+      trueShootingPct,
+      avgGameScore
+    }
   }
 
   const totals = getTotals()
@@ -66,10 +86,14 @@ export default function MatchHistory({
   const displayStats = selectedMatch ? {
     ...selectedMatch.summary,
     ...selectedMatch.stats,
-    matchCount: 1
+    matchCount: 1,
+    plusMinus: selectedMatch.plusMinus,
+    trueShootingPct: selectedMatch.efficiency?.trueShootingPct,
+    gameScore: selectedMatch.efficiency?.gameScore
   } : totals ? {
     ...totals,
-    matchCount: history.length
+    matchCount: history.length,
+    gameScore: totals.avgGameScore
   } : null
 
   return (
@@ -145,6 +169,24 @@ export default function MatchHistory({
               <span className="ds-value">{displayStats.fouls}</span>
               <span className="ds-label">FAUTES</span>
             </div>
+            {displayStats.plusMinus !== undefined && displayStats.plusMinus !== 0 && (
+              <div className={`detailed-stat ${displayStats.plusMinus > 0 ? 'positive' : 'negative'}`}>
+                <span className="ds-value">{displayStats.plusMinus > 0 ? '+' : ''}{displayStats.plusMinus}</span>
+                <span className="ds-label">+/-</span>
+              </div>
+            )}
+            {displayStats.trueShootingPct !== undefined && (
+              <div className="detailed-stat efficiency">
+                <span className="ds-value">{displayStats.trueShootingPct}%</span>
+                <span className="ds-label">TS%</span>
+              </div>
+            )}
+            {displayStats.gameScore !== undefined && displayStats.gameScore !== null && (
+              <div className={`detailed-stat efficiency ${parseFloat(displayStats.gameScore) >= 10 ? 'positive' : parseFloat(displayStats.gameScore) < 0 ? 'negative' : ''}`}>
+                <span className="ds-value">{displayStats.gameScore}</span>
+                <span className="ds-label">{selectedMatch ? 'GmSc' : 'GmSc moy.'}</span>
+              </div>
+            )}
           </div>
 
           {/* Shooting Stats */}

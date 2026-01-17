@@ -1231,6 +1231,14 @@ const styles = `
     color: #e74c3c;
   }
 
+  .detailed-stat.positive .ds-value {
+    color: #2ecc71;
+  }
+
+  .detailed-stat.efficiency .ds-value {
+    color: #61dafb;
+  }
+
   .ds-value {
     display: block;
     font-size: 1.8rem;
