@@ -88,6 +88,8 @@ export function useStats() {
   const resetStats = () => {
     setStats(initialStats)
     setActionHistory([])
+    localStorage.setItem('basketStats', JSON.stringify(initialStats))
+    localStorage.setItem('basketActionHistory', JSON.stringify([]))
   }
 
   const importStats = (newStats) => {
@@ -220,6 +222,9 @@ export function usePlayingTime() {
     setPlayingTime(0)
     setBenchTime(0)
     setIsOnCourt(false)
+    localStorage.setItem('basketPlayingTime', JSON.stringify(0))
+    localStorage.setItem('basketBenchTime', JSON.stringify(0))
+    localStorage.setItem('basketIsOnCourt', JSON.stringify(false))
   }
 
   const formatPlayingTime = (seconds) => {
@@ -335,7 +340,9 @@ export function useTimer() {
   }
 
   const resetTimer = () => {
-    setTimerState({ quarter: 1, timeLeft: quarterDuration, isRunning: false })
+    const newState = { quarter: 1, timeLeft: quarterDuration, isRunning: false }
+    setTimerState(newState)
+    localStorage.setItem('basketTimer', JSON.stringify({ quarter: 1, timeLeft: quarterDuration }))
   }
 
   const updateQuarterDuration = (minutes) => {

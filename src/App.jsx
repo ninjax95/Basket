@@ -3169,6 +3169,7 @@ export default function App() {
       timer.resetTimer()
       playingTime.resetPlayingTime()
       setShotMarkers([])
+      localStorage.setItem('basketShotMarkers', JSON.stringify([]))
       setOpponent('')
     }
   }
