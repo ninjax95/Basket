@@ -3166,6 +3166,10 @@ export default function App() {
   const handleReset = () => {
     if (confirm('Voulez-vous vraiment réinitialiser toutes les statistiques ?')) {
       resetStats()
+      timer.resetTimer()
+      playingTime.resetPlayingTime()
+      setShotMarkers([])
+      setOpponent('')
     }
   }
 
