@@ -5,6 +5,7 @@ export default function ShotReplay({ shotMarkers, actionHistory, onClose }) {
   const [isPlaying, setIsPlaying] = useState(false)
   const [visibleShots, setVisibleShots] = useState([])
   const [currentAction, setCurrentAction] = useState(null)
+  const [selectedQuarter, setSelectedQuarter] = useState(null)
   const [speed, setSpeed] = useState(1500) // ms between shots
   const [ballPosition, setBallPosition] = useState(null)
   const [ballPhase, setBallPhase] = useState(null) // 'flying', 'ending', null
@@ -188,6 +189,7 @@ export default function ShotReplay({ shotMarkers, actionHistory, onClose }) {
     setCurrentIndex(-1)
     setVisibleShots([])
     setCurrentAction(null)
+    setSelectedQuarter(null)
   }
 
   // Get available quarters from events
@@ -214,7 +216,8 @@ export default function ShotReplay({ shotMarkers, actionHistory, onClose }) {
 
     setVisibleShots(shotsBeforeQuarter)
     setCurrentIndex(quarterStartIndex - 1)
-    setCurrentAction(quarterStartIndex > 0 ? allEvents[quarterStartIndex - 1] : null)
+    setCurrentAction(null)
+    setSelectedQuarter(quarterNum)
   }
 
   useEffect(() => {
@@ -224,6 +227,7 @@ export default function ShotReplay({ shotMarkers, actionHistory, onClose }) {
         setCurrentIndex(nextIndex)
         const event = allEvents[nextIndex]
         setCurrentAction(event)
+        setSelectedQuarter(null) // Clear manual selection when playing
 
         if (event.eventType === 'shot') {
           // Start ball animation
@@ -492,16 +496,19 @@ export default function ShotReplay({ shotMarkers, actionHistory, onClose }) {
           {availableQuarters.length > 0 && (
             <div className="quarter-nav">
               <span className="quarter-nav-label">Aller à :</span>
-              {[1, 2, 3, 4].map(q => (
-                <button
-                  key={q}
-                  className={`quarter-btn ${availableQuarters.includes(q) ? '' : 'disabled'} ${currentAction?.quarter === q ? 'active' : ''}`}
-                  onClick={() => goToQuarter(q)}
-                  disabled={!availableQuarters.includes(q)}
-                >
-                  Q{q}
-                </button>
-              ))}
+              {[1, 2, 3, 4].map(q => {
+                const activeQuarter = selectedQuarter || currentAction?.quarter
+                return (
+                  <button
+                    key={q}
+                    className={`quarter-btn ${availableQuarters.includes(q) ? '' : 'disabled'} ${activeQuarter === q ? 'active' : ''}`}
+                    onClick={() => goToQuarter(q)}
+                    disabled={!availableQuarters.includes(q)}
+                  >
+                    Q{q}
+                  </button>
+                )
+              })}
             </div>
           )}
 
