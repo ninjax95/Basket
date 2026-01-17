@@ -1,0 +1,16 @@
+{
+  "appId": "com.ninjax.statsbasket",
+  "appName": "Stats Basket",
+  "webDir": "dist",
+  "android": {
+    "backgroundColor": "#1a1a2e",
+    "allowMixedContent": true
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 1000,
+      "backgroundColor": "#1a1a2e",
+      "showSpinner": false
+    }
+  }
+}

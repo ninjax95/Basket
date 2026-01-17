@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Stats Basket</string>
+    <string name="title_activity_main">Stats Basket</string>
+    <string name="package_name">com.ninjax.statsbasket</string>
+    <string name="custom_url_scheme">com.ninjax.statsbasket</string>
+</resources>
