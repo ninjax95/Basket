@@ -6,7 +6,27 @@ export default function ShotReplay({ shotMarkers, actionHistory, onClose }) {
   const [visibleShots, setVisibleShots] = useState([])
   const [currentAction, setCurrentAction] = useState(null)
   const [speed, setSpeed] = useState(1500) // ms between shots
+  const [animatingBall, setAnimatingBall] = useState(null)
   const intervalRef = useRef(null)
+
+  // Basket position
+  const basketX = 250
+  const basketY = 50
+
+  // Generate random miss trajectory
+  const getRandomMissEnd = () => {
+    const missType = Math.floor(Math.random() * 4)
+    switch (missType) {
+      case 0: // Rebond à gauche
+        return { x: basketX - 30 - Math.random() * 40, y: basketY + 20 + Math.random() * 30 }
+      case 1: // Rebond à droite
+        return { x: basketX + 30 + Math.random() * 40, y: basketY + 20 + Math.random() * 30 }
+      case 2: // Rebond devant (short)
+        return { x: basketX + (Math.random() - 0.5) * 40, y: basketY + 40 + Math.random() * 30 }
+      default: // Rebond sur le cercle (airball long)
+        return { x: basketX + (Math.random() - 0.5) * 60, y: basketY - 20 - Math.random() * 20 }
+    }
+  }
 
   // Combine shot markers with their timing from action history
   const allShots = [...shotMarkers].sort((a, b) => {
@@ -74,7 +94,22 @@ export default function ShotReplay({ shotMarkers, actionHistory, onClose }) {
         setCurrentAction(event)
 
         if (event.eventType === 'shot') {
-          setVisibleShots(prev => [...prev, event])
+          // Start ball animation
+          const missEnd = getRandomMissEnd()
+          setAnimatingBall({
+            startX: event.x,
+            startY: event.y,
+            endX: event.made ? basketX : missEnd.x,
+            endY: event.made ? basketY : missEnd.y,
+            made: event.made,
+            id: event.id
+          })
+
+          // After animation, add marker and clear ball
+          setTimeout(() => {
+            setVisibleShots(prev => [...prev, event])
+            setAnimatingBall(null)
+          }, 800)
         }
       }, speed)
     } else if (currentIndex >= allEvents.length - 1) {
@@ -233,6 +268,60 @@ export default function ShotReplay({ shotMarkers, actionHistory, onClose }) {
                   </text>
                 </g>
               ))}
+
+              {/* Animated ball */}
+              {animatingBall && (
+                <g className={`ball-animation ${animatingBall.made ? 'ball-made' : 'ball-missed'}`}>
+                  {/* Ball shadow */}
+                  <ellipse
+                    className="ball-shadow"
+                    cx={animatingBall.startX}
+                    cy={animatingBall.startY + 5}
+                    rx="8"
+                    ry="4"
+                    fill="rgba(0,0,0,0.3)"
+                    style={{
+                      '--start-x': `${animatingBall.startX}px`,
+                      '--start-y': `${animatingBall.startY + 5}px`,
+                      '--end-x': `${animatingBall.endX}px`,
+                      '--end-y': `${animatingBall.endY + 5}px`
+                    }}
+                  />
+                  {/* Basketball */}
+                  <circle
+                    className="basketball"
+                    cx={animatingBall.startX}
+                    cy={animatingBall.startY}
+                    r="12"
+                    fill="#f39c12"
+                    stroke="#e67e22"
+                    strokeWidth="2"
+                    style={{
+                      '--start-x': `${animatingBall.startX}px`,
+                      '--start-y': `${animatingBall.startY}px`,
+                      '--end-x': `${animatingBall.endX}px`,
+                      '--end-y': `${animatingBall.endY}px`
+                    }}
+                  />
+                  {/* Ball lines */}
+                  <path
+                    className="ball-lines"
+                    d={`M ${animatingBall.startX - 10} ${animatingBall.startY}
+                        Q ${animatingBall.startX} ${animatingBall.startY - 8} ${animatingBall.startX + 10} ${animatingBall.startY}
+                        M ${animatingBall.startX} ${animatingBall.startY - 10}
+                        L ${animatingBall.startX} ${animatingBall.startY + 10}`}
+                    stroke="#e67e22"
+                    strokeWidth="1.5"
+                    fill="none"
+                    style={{
+                      '--start-x': `${animatingBall.startX}px`,
+                      '--start-y': `${animatingBall.startY}px`,
+                      '--end-x': `${animatingBall.endX}px`,
+                      '--end-y': `${animatingBall.endY}px`
+                    }}
+                  />
+                </g>
+              )}
             </svg>
 
             {/* Free throw zone indicator */}

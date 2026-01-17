@@ -2149,6 +2149,128 @@ const styles = `
     100% { r: 30; opacity: 0; }
   }
 
+  /* Ball animation */
+  .ball-animation .basketball,
+  .ball-animation .ball-shadow,
+  .ball-animation .ball-lines {
+    animation: ballFly 0.8s ease-out forwards;
+  }
+
+  .ball-made .basketball {
+    animation: ballFlyMade 0.8s ease-out forwards;
+  }
+
+  .ball-missed .basketball {
+    animation: ballFlyMissed 0.8s ease-out forwards;
+  }
+
+  @keyframes ballFly {
+    0% {
+      transform: translate(0, 0) scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: translate(
+        calc((var(--end-x) - var(--start-x)) * 0.5),
+        calc((var(--end-y) - var(--start-y)) * 0.5 - 50px)
+      ) scale(0.8);
+      opacity: 1;
+    }
+    100% {
+      transform: translate(
+        calc(var(--end-x) - var(--start-x)),
+        calc(var(--end-y) - var(--start-y))
+      ) scale(0.6);
+      opacity: 0.8;
+    }
+  }
+
+  @keyframes ballFlyMade {
+    0% {
+      transform: translate(0, 0) scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: translate(
+        calc((var(--end-x) - var(--start-x)) * 0.5),
+        calc((var(--end-y) - var(--start-y)) * 0.5 - 60px)
+      ) scale(0.7);
+      opacity: 1;
+    }
+    80% {
+      transform: translate(
+        calc(var(--end-x) - var(--start-x)),
+        calc(var(--end-y) - var(--start-y))
+      ) scale(0.5);
+      opacity: 1;
+    }
+    100% {
+      transform: translate(
+        calc(var(--end-x) - var(--start-x)),
+        calc(var(--end-y) - var(--start-y) + 30px)
+      ) scale(0.4);
+      opacity: 0;
+    }
+  }
+
+  @keyframes ballFlyMissed {
+    0% {
+      transform: translate(0, 0) scale(1) rotate(0deg);
+      opacity: 1;
+    }
+    40% {
+      transform: translate(
+        calc((var(--end-x) - var(--start-x)) * 0.4),
+        calc((var(--end-y) - var(--start-y)) * 0.4 - 50px)
+      ) scale(0.75) rotate(180deg);
+      opacity: 1;
+    }
+    70% {
+      transform: translate(
+        calc((var(--end-x) - var(--start-x)) * 0.85),
+        calc((var(--end-y) - var(--start-y)) * 0.7)
+      ) scale(0.6) rotate(360deg);
+      opacity: 1;
+    }
+    100% {
+      transform: translate(
+        calc(var(--end-x) - var(--start-x)),
+        calc(var(--end-y) - var(--start-y) + 40px)
+      ) scale(0.5) rotate(540deg);
+      opacity: 0.3;
+    }
+  }
+
+  .ball-animation .ball-shadow {
+    animation: shadowMove 0.8s ease-out forwards;
+    opacity: 0.3;
+  }
+
+  @keyframes shadowMove {
+    0% {
+      transform: translate(0, 0) scale(1);
+      opacity: 0.3;
+    }
+    50% {
+      transform: translate(
+        calc((var(--end-x) - var(--start-x)) * 0.5),
+        calc((var(--end-y) - var(--start-y)) * 0.5)
+      ) scale(0.5);
+      opacity: 0.15;
+    }
+    100% {
+      transform: translate(
+        calc(var(--end-x) - var(--start-x)),
+        calc(var(--end-y) - var(--start-y))
+      ) scale(0.8);
+      opacity: 0.2;
+    }
+  }
+
+  .ball-animation .ball-lines {
+    animation: ballFly 0.8s ease-out forwards;
+  }
+
   .ft-indicator {
     position: absolute;
     bottom: 20px;
@@ -2462,12 +2584,12 @@ const styles = `
   }
 
   .thermal-cold {
-    color: #3498db;
+    color: #e74c3c;
     font-weight: bold;
   }
 
   .thermal-hot {
-    color: #e74c3c;
+    color: #2ecc71;
     font-weight: bold;
   }
 
