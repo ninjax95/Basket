@@ -4302,20 +4302,6 @@ export default function App() {
                   </div>
                 </div>
               </div>
-              <div className={`plus-minus-display ${plusMinus > 0 ? 'positive' : plusMinus < 0 ? 'negative' : ''}`}>
-                <span className="pm-label">+/-</span>
-                <span className="pm-value">{plusMinus > 0 ? '+' : ''}{plusMinus}</span>
-              </div>
-              <div className="efficiency-display">
-                <div className="efficiency-stat">
-                  <span className="eff-value">{efficiency.trueShootingPct}%</span>
-                  <span className="eff-label">TS%</span>
-                </div>
-                <div className="efficiency-stat">
-                  <span className="eff-value">{efficiency.gameScore}</span>
-                  <span className="eff-label">Game Score</span>
-                </div>
-              </div>
             </div>
 
             {/* Playing Time Toggle */}
