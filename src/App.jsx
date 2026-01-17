@@ -8,6 +8,10 @@ import MatchHistory from './components/MatchHistory'
 import CourtMap from './components/CourtMap'
 import PinLock from './components/PinLock'
 import ShotReplay from './components/ShotReplay'
+import EvolutionChart from './components/EvolutionChart'
+import PerformanceRadar from './components/PerformanceRadar'
+import ShotHeatmap from './components/ShotHeatmap'
+import ThermalHeatmap from './components/ThermalHeatmap'
 
 const styles = `
   * {
@@ -3490,6 +3494,46 @@ const styles = `
     line-height: 1.5;
     margin: 0;
   }
+
+  /* Analysis Page */
+  .analysis-page {
+    animation: fadeIn 0.3s ease;
+  }
+
+  .analysis-page h2 {
+    color: #61dafb;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  .analysis-section {
+    margin-bottom: 25px;
+  }
+
+  .analysis-section h3 {
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .no-data-message {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 40px 20px;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .no-data-message p {
+    margin-bottom: 10px;
+  }
+
+  .no-data-message p:last-child {
+    margin-bottom: 0;
+    font-size: 0.9rem;
+  }
 `
 
 export default function App() {
@@ -3950,13 +3994,19 @@ export default function App() {
             className={`nav-tab ${activeTab === 'match' ? 'active' : ''}`}
             onClick={() => setActiveTab('match')}
           >
-            🎮 Match en cours
+            🎮 Match
           </button>
           <button
             className={`nav-tab ${activeTab === 'history' ? 'active' : ''}`}
             onClick={() => setActiveTab('history')}
           >
-            📊 Historique ({history.length})
+            📋 Historique ({history.length})
+          </button>
+          <button
+            className={`nav-tab ${activeTab === 'analysis' ? 'active' : ''}`}
+            onClick={() => setActiveTab('analysis')}
+          >
+            📈 Analyse
           </button>
           <button
             className="help-btn"
@@ -4204,7 +4254,9 @@ export default function App() {
               <button className="action-btn danger" onClick={handleReset}>🗑 Réinitialiser</button>
             </div>
           </>
-        ) : (
+        ) : null}
+
+        {activeTab === 'history' && (
           <MatchHistory
             history={history}
             averages={averages}
@@ -4218,6 +4270,39 @@ export default function App() {
             gistLoading={gistLoading}
             gistConnected={!!githubToken}
           />
+        )}
+
+        {activeTab === 'analysis' && (
+          <div className="analysis-page">
+            <h2>📈 Analyse des performances</h2>
+
+            {history.length === 0 ? (
+              <div className="no-data-message">
+                <p>Aucune donnée à analyser.</p>
+                <p>Sauvegarde des matchs pour voir tes statistiques ici !</p>
+              </div>
+            ) : (
+              <>
+                {/* Shot Charts */}
+                <div className="analysis-section">
+                  <h3>🎯 Cartes des tirs</h3>
+                  <div className="shot-charts-grid">
+                    <ShotHeatmap history={history} selectedMatchId="all" />
+                    <ThermalHeatmap history={history} selectedMatchId="all" />
+                  </div>
+                </div>
+
+                {/* Performance Charts */}
+                <div className="analysis-section">
+                  <h3>📊 Graphiques de performance</h3>
+                  <div className="charts-grid">
+                    <EvolutionChart history={history} />
+                    <PerformanceRadar averages={averages} lastMatch={history[history.length - 1]} />
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
         )}
 
         {/* Shot Replay */}

@@ -1,8 +1,4 @@
 import { useState } from 'react'
-import EvolutionChart from './EvolutionChart'
-import PerformanceRadar from './PerformanceRadar'
-import ShotHeatmap from './ShotHeatmap'
-import ThermalHeatmap from './ThermalHeatmap'
 import ShotReplay from './ShotReplay'
 
 export default function MatchHistory({
@@ -20,7 +16,6 @@ export default function MatchHistory({
 }) {
   const [selectedMatchId, setSelectedMatchId] = useState('all') // 'all' or match id
   const [showReplay, setShowReplay] = useState(false)
-  const lastMatch = history.length > 0 ? history[history.length - 1] : null
 
   // Calculate totals across all matches
   const getTotals = () => {
@@ -250,18 +245,6 @@ export default function MatchHistory({
           )}
         </div>
       )}
-
-      {/* Shot Charts Section */}
-      <div className="shot-charts-grid">
-        <ShotHeatmap history={history} selectedMatchId={selectedMatchId} />
-        <ThermalHeatmap history={history} selectedMatchId={selectedMatchId} />
-      </div>
-
-      {/* Charts Section */}
-      <div className="charts-grid">
-        <EvolutionChart history={history} />
-        <PerformanceRadar averages={averages} lastMatch={lastMatch} />
-      </div>
 
       {/* GitHub Gist Sync Section */}
       <div className="gist-section">
