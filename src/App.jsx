@@ -419,7 +419,7 @@ const styles = `
 
   /* Confirmation Modal */
   .confirm-overlay {
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     right: 0;
@@ -428,8 +428,7 @@ const styles = `
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 12px;
-    z-index: 10;
+    z-index: 2000;
     animation: fadeIn 0.2s ease;
   }
 
@@ -1455,12 +1454,404 @@ const styles = `
     }
   }
 
+  /* Match Header Compact - Responsive */
+  .match-header-compact {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: clamp(8px, 2vw, 15px) clamp(10px, 3vw, 20px);
+    margin-bottom: 10px;
+  }
+
+  .player-timer-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: clamp(5px, 2vw, 15px);
+    flex-wrap: wrap;
+  }
+
+  .player-compact {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .player-name-compact {
+    font-size: clamp(0.8rem, 2.5vw, 1.1rem);
+    font-weight: bold;
+    color: #fff;
+  }
+
+  .player-number-compact {
+    font-size: clamp(0.65rem, 2vw, 0.85rem);
+    color: #61dafb;
+  }
+
+  .timer-compact {
+    display: flex;
+    align-items: center;
+    gap: clamp(4px, 1.5vw, 12px);
+  }
+
+  .quarter-compact {
+    background: rgba(97, 218, 251, 0.2);
+    color: #61dafb;
+    padding: clamp(3px, 1vw, 6px) clamp(6px, 2vw, 12px);
+    border-radius: 6px;
+    font-size: clamp(0.7rem, 2vw, 0.95rem);
+    font-weight: bold;
+  }
+
+  .time-compact {
+    font-size: clamp(1.1rem, 4vw, 1.8rem);
+    font-weight: bold;
+    font-family: 'Courier New', monospace;
+    color: #fff;
+  }
+
+  .time-compact.running {
+    color: #2ecc71;
+  }
+
+  .timer-toggle-compact {
+    background: rgba(97, 218, 251, 0.2);
+    border: none;
+    color: #61dafb;
+    width: clamp(30px, 8vw, 44px);
+    height: clamp(30px, 8vw, 44px);
+    border-radius: 50%;
+    font-size: clamp(0.85rem, 2.5vw, 1.2rem);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .score-compact {
+    display: flex;
+    align-items: center;
+    gap: clamp(3px, 1vw, 8px);
+    font-size: clamp(1rem, 3.5vw, 1.5rem);
+    font-weight: bold;
+  }
+
+  .score-compact .score-sep {
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  .playing-time-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(10px, 3vw, 20px);
+    margin-top: clamp(8px, 2vw, 12px);
+    padding-top: clamp(8px, 2vw, 12px);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .court-toggle-compact {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: rgba(255, 255, 255, 0.8);
+    padding: clamp(6px, 1.5vw, 10px) clamp(12px, 3vw, 20px);
+    border-radius: 20px;
+    font-size: clamp(0.7rem, 2vw, 0.95rem);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .court-toggle-compact.on-court {
+    background: linear-gradient(135deg, #27ae60, #2ecc71);
+    color: #fff;
+  }
+
+  .court-toggle-compact.on-bench {
+    background: rgba(231, 76, 60, 0.3);
+    color: #e74c3c;
+  }
+
+  .playing-time-compact {
+    font-size: clamp(0.75rem, 2vw, 1rem);
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  /* Live Score Row - in header */
+  .live-score-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(15px, 4vw, 30px);
+    margin-top: clamp(8px, 2vw, 12px);
+    padding-top: clamp(8px, 2vw, 12px);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .score-team {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .score-label {
+    font-size: clamp(0.6rem, 1.8vw, 0.8rem);
+    color: rgba(255, 255, 255, 0.5);
+    text-transform: uppercase;
+  }
+
+  .score-controls {
+    display: flex;
+    align-items: center;
+    gap: clamp(6px, 2vw, 12px);
+  }
+
+  .score-controls button {
+    background: rgba(97, 218, 251, 0.2);
+    border: none;
+    color: #61dafb;
+    width: clamp(28px, 8vw, 40px);
+    height: clamp(28px, 8vw, 40px);
+    border-radius: 50%;
+    font-size: clamp(1rem, 3vw, 1.4rem);
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .score-controls button:active {
+    background: rgba(97, 218, 251, 0.4);
+    transform: scale(0.95);
+  }
+
+  .score-value {
+    font-size: clamp(1.5rem, 5vw, 2.5rem);
+    font-weight: bold;
+    color: #fff;
+    min-width: clamp(35px, 10vw, 60px);
+    text-align: center;
+  }
+
+  .score-vs {
+    font-size: clamp(1.2rem, 4vw, 2rem);
+    color: rgba(255, 255, 255, 0.4);
+    font-weight: bold;
+  }
+
+  /* Stats Categories */
+  .stats-category {
+    margin-bottom: clamp(4px, 1vw, 8px);
+  }
+
+  .stats-category-title {
+    font-size: clamp(0.6rem, 2vw, 0.75rem);
+    color: #61dafb;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0 0 clamp(2px, 0.5vw, 4px) 0;
+    padding: clamp(2px, 0.5vw, 4px) clamp(6px, 1.5vw, 10px);
+    background: rgba(97, 218, 251, 0.15);
+    border-left: 2px solid #61dafb;
+    border-radius: 0 3px 3px 0;
+    display: inline-block;
+  }
+
+  .qs-positive .qs-value {
+    color: #2ecc71;
+  }
+
+  /* Quick Stats Grid - Responsive */
+  .quick-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: clamp(3px, 1vw, 8px);
+    margin-bottom: 4px;
+    padding: 0;
+  }
+
+  .quick-stat {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 6px;
+    padding: clamp(4px, 1.5vw, 10px) clamp(2px, 0.8vw, 8px);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 0;
+  }
+
+  .quick-stat .qs-label {
+    display: block;
+    font-size: clamp(0.5rem, 1.8vw, 0.7rem);
+    color: rgba(255, 255, 255, 0.6);
+    text-transform: uppercase;
+    margin-bottom: clamp(2px, 0.5vw, 4px);
+    white-space: nowrap;
+  }
+
+  .quick-stat .qs-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: clamp(1px, 0.5vw, 6px);
+    width: 100%;
+  }
+
+  .quick-stat .qs-controls button {
+    background: rgba(97, 218, 251, 0.25);
+    border: none;
+    color: #61dafb;
+    width: clamp(22px, 7vw, 34px);
+    height: clamp(22px, 7vw, 34px);
+    border-radius: 50%;
+    font-size: clamp(0.75rem, 2.5vw, 1.1rem);
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    padding: 0;
+  }
+
+  .quick-stat .qs-controls button:active {
+    background: rgba(97, 218, 251, 0.5);
+    transform: scale(0.95);
+  }
+
+  .quick-stat .qs-value {
+    font-size: clamp(0.65rem, 2.5vw, 1rem);
+    font-weight: bold;
+    color: #fff;
+    min-width: 0;
+    flex: 1;
+    text-align: center;
+  }
+
+  /* Tablet: 6 columns (one row per category) */
+  @media screen and (min-width: 500px) {
+    .quick-stats-grid {
+      grid-template-columns: repeat(6, 1fr);
+    }
+  }
+
+  /* Large tablet / Desktop */
+  @media screen and (min-width: 800px) {
+    .quick-stats-grid {
+      grid-template-columns: repeat(6, 1fr);
+    }
+  }
+
+  /* Points Total Display - Responsive */
+  .points-total-display {
+    background: linear-gradient(135deg, rgba(97, 218, 251, 0.2), rgba(97, 218, 251, 0.1));
+    border-radius: 12px;
+    padding: clamp(10px, 2.5vw, 20px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(10px, 3vw, 20px);
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+  }
+
+  .points-total-display .pts-label {
+    font-size: clamp(0.7rem, 2vw, 0.95rem);
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .points-total-display .pts-value {
+    font-size: clamp(1.5rem, 5vw, 2.5rem);
+    font-weight: bold;
+    color: #61dafb;
+  }
+
+  .points-total-display .pts-breakdown {
+    font-size: clamp(0.65rem, 1.8vw, 0.85rem);
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  /* Streak Display */
+  .streak-display {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    animation: streakPulse 1.5s ease-in-out infinite;
+  }
+
+  .streak-display.hot {
+    background: linear-gradient(135deg, rgba(255, 107, 0, 0.25), rgba(255, 61, 0, 0.15));
+    border: 2px solid rgba(255, 107, 0, 0.5);
+  }
+
+  .streak-display.best {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 165, 0, 0.1));
+    border: 1px solid rgba(255, 215, 0, 0.4);
+    animation: none;
+  }
+
+  .streak-icon {
+    font-size: 1.3rem;
+  }
+
+  .streak-text {
+    font-weight: bold;
+    font-size: 0.95rem;
+    color: #fff;
+  }
+
+  .streak-display.hot .streak-text {
+    color: #ff6b00;
+  }
+
+  .streak-display.best .streak-text {
+    color: #ffd700;
+  }
+
+  .streak-points {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  @keyframes streakPulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.02); opacity: 0.9; }
+  }
+
+  /* More Options Toggle */
+  .more-options-toggle {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px dashed rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.7);
+    padding: 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    margin-bottom: 15px;
+    transition: all 0.2s;
+  }
+
+  .more-options-toggle:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+
+  .more-options-section {
+    animation: fadeIn 0.3s ease;
+  }
+
   /* Court Map Styles */
   .court-container {
     background: rgba(255, 255, 255, 0.1);
     border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 20px;
+    padding: 10px 5px;
+    margin-bottom: 10px;
   }
 
   .court-header {
@@ -1803,6 +2194,41 @@ const styles = `
     display: flex;
     align-items: center;
     gap: 10px;
+  }
+
+  .court-layout-full {
+    display: block;
+  }
+
+  .court-layout-full .court-wrapper {
+    width: 100%;
+  }
+
+  .court-layout-full .court-svg {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .court-action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  .court-action-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.8);
+    padding: 8px 15px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .court-action-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
   }
 
   /* Side Stats (LEFT) */
@@ -2362,6 +2788,48 @@ const styles = `
     text-align: center;
     color: rgba(255, 255, 255, 0.5);
     padding: 30px;
+  }
+
+  .action-panel-hint {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.8rem;
+    padding: 0 20px 10px;
+    margin: 0;
+  }
+
+  .action-item.clickable {
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+  }
+
+  .action-item.clickable:hover {
+    background: rgba(255, 255, 255, 0.12);
+  }
+
+  .action-item.clickable:active {
+    transform: scale(0.98);
+    background: rgba(231, 76, 60, 0.2);
+  }
+
+  .action-delete-hint {
+    margin-left: auto;
+    opacity: 0.3;
+    font-size: 0.9rem;
+    transition: opacity 0.2s;
+  }
+
+  .action-item.clickable:hover .action-delete-hint {
+    opacity: 0.8;
+  }
+
+  .confirm-action-detail {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+    margin: 10px 0;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
   }
 
   /* Action Buttons Row */
@@ -3684,6 +4152,73 @@ const styles = `
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   }
 
+  /* Advanced Stats Grid */
+  .advanced-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+  }
+
+  .advanced-stat {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 15px 10px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    transition: all 0.2s;
+  }
+
+  .advanced-stat:hover {
+    background: rgba(255, 255, 255, 0.12);
+    transform: translateY(-2px);
+  }
+
+  .advanced-stat.positive {
+    background: rgba(46, 204, 113, 0.15);
+    border: 1px solid rgba(46, 204, 113, 0.3);
+  }
+
+  .advanced-stat.negative {
+    background: rgba(231, 76, 60, 0.15);
+    border: 1px solid rgba(231, 76, 60, 0.3);
+  }
+
+  .adv-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #61dafb;
+  }
+
+  .advanced-stat.positive .adv-value {
+    color: #2ecc71;
+  }
+
+  .advanced-stat.negative .adv-value {
+    color: #e74c3c;
+  }
+
+  .adv-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  .adv-desc {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  .advanced-stat.streak {
+    background: linear-gradient(135deg, rgba(255, 107, 0, 0.2), rgba(255, 61, 0, 0.1));
+    border: 1px solid rgba(255, 107, 0, 0.4);
+  }
+
+  .advanced-stat.streak .adv-value {
+    color: #ff6b00;
+  }
+
   .no-data-message {
     background: rgba(255, 255, 255, 0.05);
     border-radius: 12px;
@@ -4022,6 +4557,519 @@ const styles = `
   [data-theme="light"] .delete-btn:hover {
     color: #e74c3c;
   }
+
+  /* ========== MOBILE RESPONSIVE STYLES ========== */
+
+  /* Viewport meta handling */
+  @media screen and (max-width: 480px) {
+    body {
+      padding: 5px;
+      font-size: 14px;
+    }
+
+    .container {
+      padding: 0;
+    }
+
+    .match-header-compact,
+    .court-container,
+    .quick-stats-grid,
+    .points-total-display,
+    .more-options-toggle {
+      margin-left: 0;
+      margin-right: 0;
+    }
+
+    h1 {
+      font-size: 1.3rem;
+      margin-bottom: 15px;
+    }
+
+    .badge {
+      font-size: 0.6rem;
+      padding: 2px 6px;
+    }
+
+    /* Navigation Tabs */
+    .nav-tabs {
+      gap: 5px;
+      flex-wrap: wrap;
+      margin-bottom: 15px;
+    }
+
+    .nav-tab {
+      padding: 8px 12px;
+      font-size: 0.8rem;
+      flex: 1;
+      min-width: 80px;
+      text-align: center;
+    }
+
+    /* Player Info */
+    .player-info {
+      padding: 12px;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .player-info input {
+      min-width: 100%;
+      padding: 8px 12px;
+      font-size: 0.9rem;
+    }
+
+    /* Timer Section */
+    .timer-section {
+      padding: 12px;
+      margin-bottom: 15px;
+    }
+
+    .timer-header {
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .timer-display {
+      font-size: 2.5rem !important;
+    }
+
+    .quarter-display {
+      font-size: 0.85rem;
+    }
+
+    .timer-controls {
+      gap: 6px;
+    }
+
+    /* Timer buttons reorganization for mobile */
+    .timer-buttons {
+      display: grid !important;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .timer-btn {
+      padding: 14px 10px;
+      font-size: 0.85rem;
+      white-space: nowrap;
+      text-align: center;
+    }
+
+    .timer-btn.primary {
+      grid-column: span 2;
+      padding: 16px;
+      font-size: 1.1rem;
+    }
+
+    .timer-btn.quarter-nav {
+      font-size: 0.8rem;
+      padding: 12px 10px;
+    }
+
+    /* Time adjust buttons - tous sur une ligne */
+    .timer-display-wrapper {
+      flex-direction: row;
+      gap: 8px;
+      flex-wrap: nowrap;
+    }
+
+    .time-adjust-group {
+      display: flex;
+      flex-direction: row;
+      gap: 4px;
+    }
+
+    .time-adjust-btn {
+      padding: 6px 10px;
+      font-size: 0.75rem;
+      min-width: 40px;
+    }
+
+    .timer-display {
+      font-size: 2.2rem;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      grid-template-columns: repeat(2, 1fr) !important;
+      gap: 8px;
+    }
+
+    .stat-card {
+      padding: 10px;
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+    }
+
+    .stat-value {
+      font-size: 1.3rem;
+    }
+
+    .stat-buttons {
+      gap: 5px;
+      margin-top: 8px;
+    }
+
+    .stat-btn {
+      width: 32px;
+      height: 32px;
+      font-size: 1rem;
+    }
+
+    /* Summary Section */
+    .summary-grid {
+      grid-template-columns: repeat(2, 1fr) !important;
+      gap: 10px;
+    }
+
+    .summary-card {
+      padding: 12px;
+    }
+
+    .summary-value {
+      font-size: 1.3rem !important;
+    }
+
+    .summary-label {
+      font-size: 0.7rem;
+    }
+
+    /* Court Map */
+    .court-container {
+      padding: 10px;
+      margin-bottom: 15px;
+    }
+
+    .court-header {
+      flex-direction: column;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .court-header h3 {
+      font-size: 1rem;
+    }
+
+    .court-svg {
+      max-width: 100%;
+    }
+
+    .shot-modal {
+      min-width: 200px;
+      padding: 15px;
+      width: 90%;
+    }
+
+    .shot-type-badge {
+      font-size: 1rem;
+      padding: 6px 15px;
+    }
+
+    .shot-modal p {
+      font-size: 0.95rem;
+    }
+
+    .shot-modal-buttons {
+      gap: 10px;
+    }
+
+    .shot-btn {
+      padding: 10px 20px;
+      font-size: 0.9rem;
+    }
+
+    /* Detailed Stats */
+    .detailed-stats-grid {
+      grid-template-columns: repeat(2, 1fr) !important;
+      gap: 8px;
+    }
+
+    .detailed-stat {
+      padding: 10px;
+    }
+
+    .detailed-stat.big {
+      grid-column: span 2;
+    }
+
+    .detailed-stat-value {
+      font-size: 1.2rem;
+    }
+
+    .detailed-stat-label {
+      font-size: 0.65rem;
+    }
+
+    /* Shooting Stats */
+    .shooting-grid {
+      grid-template-columns: 1fr !important;
+      gap: 8px;
+    }
+
+    .shooting-card {
+      padding: 12px;
+    }
+
+    /* Playing Time */
+    .playing-time-section {
+      padding: 12px;
+    }
+
+    .court-toggle {
+      padding: 10px 20px;
+      font-size: 0.9rem;
+    }
+
+    .playing-time-display {
+      flex-direction: column !important;
+      gap: 10px;
+      align-items: stretch !important;
+    }
+
+    .time-stat {
+      text-align: center;
+    }
+
+    .per-minute-stats {
+      flex-wrap: wrap;
+      justify-content: center !important;
+      gap: 8px;
+      margin-left: 0 !important;
+    }
+
+    .per-minute-stat {
+      font-size: 0.75rem;
+    }
+
+    /* Quarter Stats */
+    .quarter-stats-grid {
+      grid-template-columns: repeat(2, 1fr) !important;
+      gap: 8px;
+    }
+
+    .quarter-stat-card {
+      padding: 10px;
+    }
+
+    /* Action History */
+    .action-panel {
+      padding: 12px;
+    }
+
+    .action-list {
+      max-height: 200px;
+    }
+
+    .action-item {
+      padding: 8px;
+      font-size: 0.8rem;
+    }
+
+    /* Match History */
+    .history-section {
+      padding: 12px;
+    }
+
+    .match-card {
+      padding: 12px;
+    }
+
+    .match-header {
+      flex-direction: column;
+      gap: 8px;
+      align-items: flex-start;
+    }
+
+    .match-stats-grid {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    /* Charts */
+    .charts-grid {
+      grid-template-columns: 1fr !important;
+    }
+
+    .chart-container {
+      padding: 12px;
+    }
+
+    /* Shot Charts */
+    .shot-charts-grid {
+      grid-template-columns: 1fr !important;
+      gap: 15px;
+    }
+
+    .heatmap-stats {
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    /* Gist Section */
+    .gist-section {
+      padding: 12px;
+    }
+
+    .gist-modal {
+      width: 95%;
+      padding: 15px;
+    }
+
+    .gist-input-group input {
+      font-size: 0.9rem;
+    }
+
+    .gist-actions {
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .gist-action-btn {
+      width: 100%;
+      padding: 12px;
+    }
+
+    /* Buttons general */
+    .btn, button {
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+
+    /* Live Score */
+    .live-score-section {
+      padding: 12px;
+    }
+
+    .live-score-display {
+      font-size: 1.5rem;
+    }
+
+    /* Options/Settings */
+    .options-card {
+      padding: 12px;
+    }
+
+    .theme-selector {
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .theme-btn {
+      flex: 1;
+      min-width: 80px;
+      padding: 8px 12px;
+      font-size: 0.8rem;
+    }
+
+    /* Analysis Tab */
+    .analysis-section {
+      padding: 12px;
+    }
+
+    .analysis-filter {
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .match-select {
+      width: 100%;
+    }
+
+    /* Advanced Stats Grid Mobile */
+    .advanced-stats-grid {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .advanced-stat {
+      padding: 10px 6px;
+    }
+
+    .adv-value {
+      font-size: 1.2rem;
+    }
+
+    .adv-label {
+      font-size: 0.75rem;
+    }
+
+    .adv-desc {
+      font-size: 0.6rem;
+    }
+
+    /* Modals */
+    .modal-overlay {
+      padding: 10px;
+    }
+
+    .modal-content {
+      width: 95%;
+      max-height: 90vh;
+      padding: 15px;
+    }
+
+    /* Help Modal */
+    .help-modal {
+      width: 95%;
+      padding: 15px;
+    }
+
+    /* Record Notification */
+    .record-notification {
+      width: 95%;
+      padding: 15px;
+    }
+  }
+
+  /* Tablet adjustments */
+  @media screen and (min-width: 481px) and (max-width: 768px) {
+    body {
+      padding: 15px;
+    }
+
+    .nav-tab {
+      padding: 10px 18px;
+      font-size: 0.9rem;
+    }
+
+    .stats-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .summary-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .detailed-stats-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  /* Ensure touch targets are large enough */
+  @media (pointer: coarse) {
+    .stat-btn,
+    .timer-btn,
+    .nav-tab,
+    .shot-btn,
+    .gist-action-btn,
+    .theme-btn,
+    button {
+      min-height: 44px;
+      min-width: 44px;
+    }
+  }
+
+  /* Safe area for notched phones */
+  @supports (padding: max(0px)) {
+    body {
+      padding-left: max(10px, env(safe-area-inset-left));
+      padding-right: max(10px, env(safe-area-inset-right));
+      padding-bottom: max(10px, env(safe-area-inset-bottom));
+    }
+  }
 `
 
 export default function App() {
@@ -4063,6 +5111,8 @@ export default function App() {
   const [gistLoading, setGistLoading] = useState(false)
   const [tempToken, setTempToken] = useState('')
   const [showActionPanel, setShowActionPanel] = useState(false)
+  const [actionToDelete, setActionToDelete] = useState(null) // Action pending deletion confirmation
+  const [showMoreOptions, setShowMoreOptions] = useState(false)
   const [showReplay, setShowReplay] = useState(false)
   const [recordNotification, setRecordNotification] = useState(null) // { records: [...] }
   const [showHelpModal, setShowHelpModal] = useState(false)
@@ -4081,7 +5131,7 @@ export default function App() {
     sessionStorage.setItem('basketAppUnlocked', 'true')
   }
 
-  const { stats, updateStat, resetStats, importStats, getSummary, getEfficiency, actionHistory, getStatsByQuarter, undoLastAction } = useStats()
+  const { stats, updateStat, resetStats, importStats, getSummary, getEfficiency, getStreaks, actionHistory, getStatsByQuarter, undoLastAction, deleteAction } = useStats()
   const { player, updatePlayer } = usePlayer()
   const timer = useTimer()
   const { history, saveMatch, deleteMatch, clearHistory, importHistory, getAverages, getRecords, checkNewRecords } = useMatchHistory()
@@ -4091,6 +5141,7 @@ export default function App() {
   const averages = getAverages()
   const quarterStats = getStatsByQuarter()
   const efficiency = getEfficiency()
+  const streaks = getStreaks()
 
   // Track playing time when timer is running
   useEffect(() => {
@@ -4312,7 +5363,8 @@ export default function App() {
     }
     const newRecords = checkNewRecords(tempMatch)
 
-    const savedMatch = saveMatch(player, stats, opponent, shotMarkers, matchScore, matchLocation, plusMinus, matchNotes)
+    const matchStreaks = { bestStreak: streaks.bestStreak, bestPointsStreak: streaks.bestPointsStreak }
+    const savedMatch = saveMatch(player, stats, opponent, shotMarkers, matchScore, matchLocation, plusMinus, matchNotes, matchStreaks)
 
     // Auto backup after save
     const updatedHistory = [...history, savedMatch]
@@ -4477,11 +5529,18 @@ export default function App() {
         if (fileContent) {
           const backupData = JSON.parse(fileContent)
           if (backupData.history && Array.isArray(backupData.history)) {
-            if (confirm(`Restaurer ${backupData.history.length} match(s) depuis le Gist ?\nBackup du ${new Date(backupData.exportDate).toLocaleDateString('fr-FR')}`)) {
+            const playerInfo = backupData.player ? ` (${backupData.player.name || 'Joueur'} #${backupData.player.number || '0'})` : ''
+            if (confirm(`Restaurer ${backupData.history.length} match(s)${playerInfo} depuis le Gist ?\nBackup du ${new Date(backupData.exportDate).toLocaleDateString('fr-FR')}`)) {
+              // Restore player info
+              if (backupData.player) {
+                if (backupData.player.name) updatePlayer('name', backupData.player.name)
+                if (backupData.player.number) updatePlayer('number', backupData.player.number)
+              }
+              // Restore match history
               importHistory(backupData.history)
               setGistId(inputGistId)
               localStorage.setItem('basketGistId', inputGistId)
-              alert('Historique restauré depuis GitHub Gist !')
+              alert('Données joueur et historique restaurés depuis GitHub Gist !')
             }
           } else {
             alert('Fichier de backup invalide dans le Gist.')
@@ -4575,6 +5634,100 @@ export default function App() {
     }
   }
 
+  // Called when a shot marker is removed from the court map
+  const handleShotRemoved = (marker) => {
+    if (marker.isFreeThrow) {
+      // Free throw
+      if (marker.made) {
+        updateStatWithTime('ftMade', -1)
+        updateStatWithTime('ftAttempted', -1, true)
+        setLiveScoreTeam(prev => Math.max(0, prev - 1))
+      } else {
+        updateStatWithTime('ftAttempted', -1)
+      }
+    } else if (marker.isThree) {
+      // 3-pointer
+      if (marker.made) {
+        updateStatWithTime('fg3Made', -1)
+        updateStatWithTime('fg3Attempted', -1, true)
+        setLiveScoreTeam(prev => Math.max(0, prev - 3))
+      } else {
+        updateStatWithTime('fg3Attempted', -1)
+      }
+    } else {
+      // 2-pointer
+      if (marker.made) {
+        updateStatWithTime('fg2Made', -1)
+        updateStatWithTime('fg2Attempted', -1, true)
+        setLiveScoreTeam(prev => Math.max(0, prev - 2))
+      } else {
+        updateStatWithTime('fg2Attempted', -1)
+      }
+    }
+  }
+
+  // Handle deletion of an action from history
+  const handleDeleteAction = (action) => {
+    // For made shots, we need to also decrement attempted and update score
+    if (action.type === 'fg2Made') {
+      deleteAction(action.id) // This decrements fg2Made
+      updateStatWithTime('fg2Attempted', -1, true) // Also decrement attempted (silent)
+      setLiveScoreTeam(prev => Math.max(0, prev - 2))
+      // Also remove corresponding marker from court
+      setShotMarkers(prev => {
+        const idx = [...prev].reverse().findIndex(m => !m.isThree && !m.isFreeThrow && m.made)
+        if (idx !== -1) return [...prev.slice(0, prev.length - 1 - idx), ...prev.slice(prev.length - idx)]
+        return prev
+      })
+    } else if (action.type === 'fg3Made') {
+      deleteAction(action.id)
+      updateStatWithTime('fg3Attempted', -1, true)
+      setLiveScoreTeam(prev => Math.max(0, prev - 3))
+      setShotMarkers(prev => {
+        const idx = [...prev].reverse().findIndex(m => m.isThree && m.made)
+        if (idx !== -1) return [...prev.slice(0, prev.length - 1 - idx), ...prev.slice(prev.length - idx)]
+        return prev
+      })
+    } else if (action.type === 'ftMade') {
+      deleteAction(action.id)
+      updateStatWithTime('ftAttempted', -1, true)
+      setLiveScoreTeam(prev => Math.max(0, prev - 1))
+      setShotMarkers(prev => {
+        const idx = [...prev].reverse().findIndex(m => m.isFreeThrow && m.made)
+        if (idx !== -1) return [...prev.slice(0, prev.length - 1 - idx), ...prev.slice(prev.length - idx)]
+        return prev
+      })
+    } else if (action.type === 'fg2Attempted') {
+      // Missed 2pt shot
+      deleteAction(action.id)
+      setShotMarkers(prev => {
+        const idx = [...prev].reverse().findIndex(m => !m.isThree && !m.isFreeThrow && !m.made)
+        if (idx !== -1) return [...prev.slice(0, prev.length - 1 - idx), ...prev.slice(prev.length - idx)]
+        return prev
+      })
+    } else if (action.type === 'fg3Attempted') {
+      // Missed 3pt shot
+      deleteAction(action.id)
+      setShotMarkers(prev => {
+        const idx = [...prev].reverse().findIndex(m => m.isThree && !m.made)
+        if (idx !== -1) return [...prev.slice(0, prev.length - 1 - idx), ...prev.slice(prev.length - idx)]
+        return prev
+      })
+    } else if (action.type === 'ftAttempted') {
+      // Missed free throw
+      deleteAction(action.id)
+      setShotMarkers(prev => {
+        const idx = [...prev].reverse().findIndex(m => m.isFreeThrow && !m.made)
+        if (idx !== -1) return [...prev.slice(0, prev.length - 1 - idx), ...prev.slice(prev.length - idx)]
+        return prev
+      })
+    } else {
+      // Other stats (rebounds, assists, etc.) - just delete the action
+      deleteAction(action.id)
+    }
+    setActionToDelete(null)
+  }
+
   // Show PIN lock if not unlocked
   if (!isUnlocked) {
     return (
@@ -4628,87 +5781,53 @@ export default function App() {
 
         {activeTab === 'match' ? (
           <>
-            <PlayerInfo
-              name={player.name}
-              number={player.number}
-              onNameChange={(v) => updatePlayer('name', v)}
-              onNumberChange={(v) => updatePlayer('number', v)}
-            />
-
-            <Timer
-              quarter={timer.quarter}
-              formattedTime={timer.formatTime()}
-              isRunning={timer.isRunning}
-              quarterDuration={timer.quarterDuration}
-              onToggle={timer.toggleTimer}
-              onReset={timer.resetQuarter}
-              onNext={timer.nextQuarter}
-              onPrev={timer.prevQuarter}
-              onDurationChange={timer.updateQuarterDuration}
-              onEndMatch={() => {
-                if (timer.isRunning) timer.toggleTimer() // Stop timer if running
-                document.querySelector('.save-match-section')?.scrollIntoView({ behavior: 'smooth' })
-              }}
-              onAdjustTime={timer.adjustTime}
-            />
-
-            {/* Live Score & +/- */}
-            <div className="live-score-section">
-              <h3>📊 Score en direct</h3>
-              <div className="live-score-panel">
-                <div className="live-score-team">
-                  <span className="live-score-label">Équipe</span>
-                  <div className="live-score-controls">
+            {/* Compact header with timer */}
+            <div className="match-header-compact">
+              <div className="player-timer-row">
+                <div className="player-compact">
+                  <span className="player-name-compact">{player.name || 'Joueur'}</span>
+                  <span className="player-number-compact">#{player.number || '0'}</span>
+                </div>
+                <div className="timer-compact">
+                  <span className="quarter-compact">Q{timer.quarter}</span>
+                  <span className={`time-compact ${timer.isRunning ? 'running' : ''}`}>{timer.formatTime()}</span>
+                  <button className="timer-toggle-compact" onClick={timer.toggleTimer}>
+                    {timer.isRunning ? '⏸' : '▶'}
+                  </button>
+                </div>
+                <button
+                  className={`court-toggle-compact ${playingTime.isOnCourt ? 'on-court' : 'on-bench'}`}
+                  onClick={playingTime.toggleOnCourt}
+                >
+                  {playingTime.isOnCourt ? '🏃' : '🪑'} {playingTime.formatPlayingTime(playingTime.playingTime)}
+                </button>
+              </div>
+              {/* Score en direct avec boutons +/- */}
+              <div className="live-score-row">
+                <div className="score-team">
+                  <span className="score-label">Équipe</span>
+                  <div className="score-controls">
                     <button onClick={() => setLiveScoreTeam(Math.max(0, liveScoreTeam - 1))}>-</button>
-                    <span className="live-score-value">{liveScoreTeam}</span>
+                    <span className="score-value">{liveScoreTeam}</span>
                     <button onClick={() => setLiveScoreTeam(liveScoreTeam + 1)}>+</button>
                   </div>
                 </div>
-                <div className="live-score-separator">-</div>
-                <div className="live-score-team">
-                  <span className="live-score-label">Adversaire</span>
-                  <div className="live-score-controls">
+                <span className="score-vs">-</span>
+                <div className="score-team">
+                  <span className="score-label">Adversaire</span>
+                  <div className="score-controls">
                     <button onClick={() => setLiveScoreOpponent(Math.max(0, liveScoreOpponent - 1))}>-</button>
-                    <span className="live-score-value">{liveScoreOpponent}</span>
+                    <span className="score-value">{liveScoreOpponent}</span>
                     <button onClick={() => setLiveScoreOpponent(liveScoreOpponent + 1)}>+</button>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Playing Time Toggle */}
-            <div className="playing-time-section">
-              <div className="playing-time-header">
-                <h3>⏱️ Temps de jeu</h3>
-                <button
-                  className={`court-toggle ${playingTime.isOnCourt ? 'on-court' : 'on-bench'}`}
-                  onClick={playingTime.toggleOnCourt}
-                >
-                  {playingTime.isOnCourt ? '🏃 Sur le terrain' : '🪑 Sur le banc'}
-                </button>
-              </div>
-              <div className="playing-time-display">
-                <div className="time-stat">
-                  <span className="time-value">{playingTime.formatPlayingTime(playingTime.playingTime)}</span>
-                  <span className="time-label">Temps de jeu</span>
-                </div>
-                <div className="time-stat">
-                  <span className="time-value bench">{playingTime.formatPlayingTime(playingTime.benchTime)}</span>
-                  <span className="time-label">Temps banc</span>
-                </div>
-                {perMinuteStats && (
-                  <div className="per-minute-stats">
-                    <span className="pm-label">Par minute:</span>
-                    <span className="pm-stat">{perMinuteStats.points} pts</span>
-                    <span className="pm-stat">{perMinuteStats.rebounds} reb</span>
-                    <span className="pm-stat">{perMinuteStats.assists} ast</span>
-                  </div>
-                )}
-              </div>
-            </div>
-
+            {/* Court Map - Full Width */}
             <CourtMap
               onShotRecorded={handleShotRecorded}
+              onShotRemoved={handleShotRemoved}
               quarter={timer.quarter}
               timeLeft={timer.timeLeft}
               shotMarkers={shotMarkers}
@@ -4718,78 +5837,200 @@ export default function App() {
               onShowHistory={() => setShowActionPanel(true)}
             />
 
-            <div className="stats-grid">
-              <div className="stat-card">
-                <h3>🎯 Points</h3>
-                <StatCounter label="Tirs 2pts réussis" value={stats.fg2Made}
-                  onIncrement={() => handleShotMadeIncrement('fg2Made', 'fg2Attempted', 2)}
-                  onDecrement={() => handleShotMadeDecrement('fg2Made', 'fg2Attempted', 2)} />
-                <StatCounter label="Tirs 2pts ratés" value={stats.fg2Attempted - stats.fg2Made}
-                  onIncrement={() => handleShotAttemptedIncrement('fg2Attempted')}
-                  onDecrement={() => handleShotAttemptedDecrement('fg2Made', 'fg2Attempted')} />
-                <StatCounter label="Tirs 3pts réussis" value={stats.fg3Made}
-                  onIncrement={() => handleShotMadeIncrement('fg3Made', 'fg3Attempted', 3)}
-                  onDecrement={() => handleShotMadeDecrement('fg3Made', 'fg3Attempted', 3)} />
-                <StatCounter label="Tirs 3pts ratés" value={stats.fg3Attempted - stats.fg3Made}
-                  onIncrement={() => handleShotAttemptedIncrement('fg3Attempted')}
-                  onDecrement={() => handleShotAttemptedDecrement('fg3Made', 'fg3Attempted')} />
-                <StatCounter label="LF réussis" value={stats.ftMade}
-                  onIncrement={handleFreeThrowMadeIncrement}
-                  onDecrement={handleFreeThrowMadeDecrement} />
-                <StatCounter label="LF ratés" value={stats.ftAttempted - stats.ftMade}
-                  onIncrement={handleFreeThrowMissedIncrement}
-                  onDecrement={handleFreeThrowMissedDecrement} />
-              </div>
-
-              <div className="stat-card">
-                <h3>📊 Rebonds</h3>
-                <StatCounter label="Rebonds offensifs" value={stats.offRebounds}
-                  onIncrement={() => updateStatWithTime('offRebounds', 1)}
-                  onDecrement={() => updateStatWithTime('offRebounds', -1)} />
-                <StatCounter label="Rebonds défensifs" value={stats.defRebounds}
-                  onIncrement={() => updateStatWithTime('defRebounds', 1)}
-                  onDecrement={() => updateStatWithTime('defRebounds', -1)} />
-              </div>
-
-              <div className="stat-card">
-                <h3>⚡ Autres</h3>
-                <StatCounter label="Passes décisives" value={stats.assists}
-                  onIncrement={() => updateStatWithTime('assists', 1)}
-                  onDecrement={() => updateStatWithTime('assists', -1)} />
-                <StatCounter label="Interceptions" value={stats.steals}
-                  onIncrement={() => updateStatWithTime('steals', 1)}
-                  onDecrement={() => updateStatWithTime('steals', -1)} />
-                <StatCounter label="Contres" value={stats.blocks}
-                  onIncrement={() => updateStatWithTime('blocks', 1)}
-                  onDecrement={() => updateStatWithTime('blocks', -1)} />
-                <StatCounter label="Fautes" value={stats.fouls}
-                  onIncrement={() => updateStatWithTime('fouls', 1)}
-                  onDecrement={() => updateStatWithTime('fouls', -1)} />
-                <StatCounter label="Pertes de balle" value={stats.turnovers}
-                  onIncrement={() => updateStatWithTime('turnovers', 1)}
-                  onDecrement={() => updateStatWithTime('turnovers', -1)} />
+            {/* Quick Stats Grid - Compact for mobile */}
+            {/* ATTAQUE */}
+            <div className="stats-category">
+              <h4 className="stats-category-title">ATTAQUE</h4>
+              <div className="quick-stats-grid">
+                <div className="quick-stat">
+                  <span className="qs-label">2PTS</span>
+                  <div className="qs-controls">
+                    <button onClick={() => handleShotMadeDecrement('fg2Made', 'fg2Attempted', 2)}>-</button>
+                    <span className="qs-value">{stats.fg2Made}/{stats.fg2Attempted}</span>
+                    <button onClick={() => handleShotMadeIncrement('fg2Made', 'fg2Attempted', 2)}>+</button>
+                  </div>
+                </div>
+                <div className="quick-stat">
+                  <span className="qs-label">3PTS</span>
+                  <div className="qs-controls">
+                    <button onClick={() => handleShotMadeDecrement('fg3Made', 'fg3Attempted', 3)}>-</button>
+                    <span className="qs-value">{stats.fg3Made}/{stats.fg3Attempted}</span>
+                    <button onClick={() => handleShotMadeIncrement('fg3Made', 'fg3Attempted', 3)}>+</button>
+                  </div>
+                </div>
+                <div className="quick-stat qs-positive">
+                  <span className="qs-label">LF +</span>
+                  <div className="qs-controls">
+                    <button onClick={handleFreeThrowMadeDecrement}>-</button>
+                    <span className="qs-value">{stats.ftMade}</span>
+                    <button onClick={handleFreeThrowMadeIncrement}>+</button>
+                  </div>
+                </div>
+                <div className="quick-stat qs-negative">
+                  <span className="qs-label">LF -</span>
+                  <div className="qs-controls">
+                    <button onClick={handleFreeThrowMissedDecrement}>-</button>
+                    <span className="qs-value">{stats.ftAttempted - stats.ftMade}</span>
+                    <button onClick={handleFreeThrowMissedIncrement}>+</button>
+                  </div>
+                </div>
+                <div className="quick-stat">
+                  <span className="qs-label">REB OFF</span>
+                  <div className="qs-controls">
+                    <button onClick={() => updateStatWithTime('offRebounds', -1)}>-</button>
+                    <span className="qs-value">{stats.offRebounds}</span>
+                    <button onClick={() => updateStatWithTime('offRebounds', 1)}>+</button>
+                  </div>
+                </div>
+                <div className="quick-stat">
+                  <span className="qs-label">Passes</span>
+                  <div className="qs-controls">
+                    <button onClick={() => updateStatWithTime('assists', -1)}>-</button>
+                    <span className="qs-value">{stats.assists}</span>
+                    <button onClick={() => updateStatWithTime('assists', 1)}>+</button>
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Stats by Quarter */}
-            <div className="quarter-stats-section">
-              <h3>📊 Stats par quart-temps</h3>
-              <div className="quarter-stats-grid">
-                {quarterStats.map(qs => (
-                  <div key={qs.quarter} className={`quarter-stat-card ${timer.quarter === qs.quarter ? 'current' : ''}`}>
-                    <div className="qs-header">Q{qs.quarter}</div>
-                    <div className="qs-points">{qs.points} pts</div>
-                    <div className="qs-details">
-                      <span>{qs.fg} FG</span>
-                      <span>{qs.rebounds} reb</span>
-                      <span>{qs.assists} ast</span>
+            {/* DÉFENSE */}
+            <div className="stats-category">
+              <h4 className="stats-category-title">DÉFENSE</h4>
+              <div className="quick-stats-grid">
+                <div className="quick-stat">
+                  <span className="qs-label">REB DEF</span>
+                  <div className="qs-controls">
+                    <button onClick={() => updateStatWithTime('defRebounds', -1)}>-</button>
+                    <span className="qs-value">{stats.defRebounds}</span>
+                    <button onClick={() => updateStatWithTime('defRebounds', 1)}>+</button>
+                  </div>
+                </div>
+                <div className="quick-stat">
+                  <span className="qs-label">Inter</span>
+                  <div className="qs-controls">
+                    <button onClick={() => updateStatWithTime('steals', -1)}>-</button>
+                    <span className="qs-value">{stats.steals}</span>
+                    <button onClick={() => updateStatWithTime('steals', 1)}>+</button>
+                  </div>
+                </div>
+                <div className="quick-stat">
+                  <span className="qs-label">Contres</span>
+                  <div className="qs-controls">
+                    <button onClick={() => updateStatWithTime('blocks', -1)}>-</button>
+                    <span className="qs-value">{stats.blocks}</span>
+                    <button onClick={() => updateStatWithTime('blocks', 1)}>+</button>
+                  </div>
+                </div>
+                <div className="quick-stat qs-negative">
+                  <span className="qs-label">Pertes</span>
+                  <div className="qs-controls">
+                    <button onClick={() => updateStatWithTime('turnovers', -1)}>-</button>
+                    <span className="qs-value">{stats.turnovers}</span>
+                    <button onClick={() => updateStatWithTime('turnovers', 1)}>+</button>
+                  </div>
+                </div>
+                <div className="quick-stat qs-negative">
+                  <span className="qs-label">Fautes</span>
+                  <div className="qs-controls">
+                    <button onClick={() => updateStatWithTime('fouls', -1)}>-</button>
+                    <span className="qs-value">{stats.fouls}</span>
+                    <button onClick={() => updateStatWithTime('fouls', 1)}>+</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Points Total Display */}
+            <div className="points-total-display">
+              <span className="pts-label">TOTAL</span>
+              <span className="pts-value">{summary.points} PTS</span>
+              <span className="pts-breakdown">({stats.fg2Made * 2} + {stats.fg3Made * 3} + {stats.ftMade})</span>
+            </div>
+
+            {/* Streak Display */}
+            {streaks.currentStreak >= 2 && (
+              <div className="streak-display hot">
+                <span className="streak-icon">🔥</span>
+                <span className="streak-text">{streaks.currentStreak} tirs d'affilée!</span>
+                <span className="streak-points">({streaks.currentPoints} pts)</span>
+              </div>
+            )}
+            {streaks.bestStreak >= 3 && streaks.currentStreak < 2 && (
+              <div className="streak-display best">
+                <span className="streak-icon">⭐</span>
+                <span className="streak-text">Meilleure série: {streaks.bestStreak}</span>
+                <span className="streak-points">({streaks.bestPointsStreak} pts)</span>
+              </div>
+            )}
+
+            {/* Toggle More Options */}
+            <button className="more-options-toggle" onClick={() => setShowMoreOptions(!showMoreOptions)}>
+              {showMoreOptions ? '▲ Masquer options' : '▼ Plus d\'options (Timer, Score, Stats...)'}
+            </button>
+
+            {showMoreOptions && (
+              <div className="more-options-section">
+                <Timer
+                  quarter={timer.quarter}
+                  formattedTime={timer.formatTime()}
+                  isRunning={timer.isRunning}
+                  quarterDuration={timer.quarterDuration}
+                  onToggle={timer.toggleTimer}
+                  onReset={timer.resetQuarter}
+                  onNext={timer.nextQuarter}
+                  onPrev={timer.prevQuarter}
+                  onDurationChange={timer.updateQuarterDuration}
+                  onEndMatch={() => {
+                    if (timer.isRunning) timer.toggleTimer()
+                    document.querySelector('.save-match-section')?.scrollIntoView({ behavior: 'smooth' })
+                  }}
+                  onAdjustTime={timer.adjustTime}
+                />
+
+                {/* Playing Time */}
+                <div className="playing-time-section">
+                  <div className="playing-time-header">
+                    <h3>⏱️ Temps de jeu</h3>
+                    <button
+                      className={`court-toggle ${playingTime.isOnCourt ? 'on-court' : 'on-bench'}`}
+                      onClick={playingTime.toggleOnCourt}
+                    >
+                      {playingTime.isOnCourt ? '🏃 Sur le terrain' : '🪑 Sur le banc'}
+                    </button>
+                  </div>
+                  <div className="playing-time-display">
+                    <div className="time-stat">
+                      <span className="time-value">{playingTime.formatPlayingTime(playingTime.playingTime)}</span>
+                      <span className="time-label">Temps de jeu</span>
+                    </div>
+                    <div className="time-stat">
+                      <span className="time-value bench">{playingTime.formatPlayingTime(playingTime.benchTime)}</span>
+                      <span className="time-label">Temps banc</span>
                     </div>
                   </div>
-                ))}
-              </div>
-            </div>
+                </div>
 
-            <StatsDisplay summary={summary} />
+                {/* Stats by Quarter */}
+                <div className="quarter-stats-section">
+                  <h3>📊 Stats par quart-temps</h3>
+                  <div className="quarter-stats-grid">
+                    {quarterStats.map(qs => (
+                      <div key={qs.quarter} className={`quarter-stat-card ${timer.quarter === qs.quarter ? 'current' : ''}`}>
+                        <div className="qs-header">Q{qs.quarter}</div>
+                        <div className="qs-points">{qs.points} pts</div>
+                        <div className="qs-details">
+                          <span>{qs.fg} FG</span>
+                          <span>{qs.rebounds} reb</span>
+                          <span>{qs.assists} ast</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <StatsDisplay summary={summary} />
+              </div>
+            )}
 
             {/* Save Match Section */}
             <div className="save-match-section">
@@ -4910,6 +6151,120 @@ export default function App() {
                     <PerformanceRadar averages={averages} lastMatch={history[history.length - 1]} />
                   </div>
                 </div>
+
+                {/* Advanced Stats Section */}
+                <div className="analysis-section">
+                  <h3>📈 Stats avancées</h3>
+                  {(() => {
+                    // Calculate stats for selected match or all matches
+                    const selectedMatch = analysisSelectedMatchId === 'all'
+                      ? null
+                      : history.find(m => m.id === analysisSelectedMatchId)
+
+                    if (selectedMatch) {
+                      // Single match stats
+                      const eff = selectedMatch.efficiency || {}
+                      return (
+                        <div className="advanced-stats-grid">
+                          <div className="advanced-stat">
+                            <span className="adv-value">{eff.trueShootingPct || 0}%</span>
+                            <span className="adv-label">TS%</span>
+                            <span className="adv-desc">True Shooting</span>
+                          </div>
+                          <div className={`advanced-stat ${(eff.gameScore || 0) >= 10 ? 'positive' : (eff.gameScore || 0) < 0 ? 'negative' : ''}`}>
+                            <span className="adv-value">{eff.gameScore || 0}</span>
+                            <span className="adv-label">GmSc</span>
+                            <span className="adv-desc">Game Score</span>
+                          </div>
+                          <div className={`advanced-stat ${(eff.per || 0) >= 15 ? 'positive' : (eff.per || 0) < 10 ? 'negative' : ''}`}>
+                            <span className="adv-value">{eff.per || 0}</span>
+                            <span className="adv-label">PER</span>
+                            <span className="adv-desc">Player Efficiency</span>
+                          </div>
+                          <div className="advanced-stat">
+                            <span className="adv-value">{eff.usageRate || 0}%</span>
+                            <span className="adv-label">USG%</span>
+                            <span className="adv-desc">Usage Rate</span>
+                          </div>
+                          <div className={`advanced-stat ${(selectedMatch.plusMinus || 0) > 0 ? 'positive' : (selectedMatch.plusMinus || 0) < 0 ? 'negative' : ''}`}>
+                            <span className="adv-value">{(selectedMatch.plusMinus || 0) > 0 ? '+' : ''}{selectedMatch.plusMinus || 0}</span>
+                            <span className="adv-label">+/-</span>
+                            <span className="adv-desc">Plus/Minus</span>
+                          </div>
+                          {selectedMatch.streaks && selectedMatch.streaks.bestStreak > 0 && (
+                            <div className="advanced-stat streak">
+                              <span className="adv-value">🔥 {selectedMatch.streaks.bestStreak}</span>
+                              <span className="adv-label">Série</span>
+                              <span className="adv-desc">{selectedMatch.streaks.bestPointsStreak} pts</span>
+                            </div>
+                          )}
+                        </div>
+                      )
+                    } else {
+                      // All matches - calculate averages
+                      const totals = history.reduce((acc, m) => ({
+                        points: acc.points + m.summary.points,
+                        fg2Made: acc.fg2Made + (m.stats?.fg2Made || 0),
+                        fg2Attempted: acc.fg2Attempted + (m.stats?.fg2Attempted || 0),
+                        fg3Made: acc.fg3Made + (m.stats?.fg3Made || 0),
+                        fg3Attempted: acc.fg3Attempted + (m.stats?.fg3Attempted || 0),
+                        ftAttempted: acc.ftAttempted + (m.stats?.ftAttempted || 0),
+                        gameScoreSum: acc.gameScoreSum + (m.efficiency?.gameScore || 0),
+                        perSum: acc.perSum + (m.efficiency?.per || 0),
+                        usageSum: acc.usageSum + (m.efficiency?.usageRate || 0),
+                        plusMinusSum: acc.plusMinusSum + (m.plusMinus || 0),
+                        bestStreak: Math.max(acc.bestStreak, m.streaks?.bestStreak || 0),
+                        bestPointsStreak: Math.max(acc.bestPointsStreak, m.streaks?.bestPointsStreak || 0),
+                        count: acc.count + 1
+                      }), { points: 0, fg2Made: 0, fg2Attempted: 0, fg3Made: 0, fg3Attempted: 0, ftAttempted: 0, gameScoreSum: 0, perSum: 0, usageSum: 0, plusMinusSum: 0, bestStreak: 0, bestPointsStreak: 0, count: 0 })
+
+                      const fga = totals.fg2Attempted + totals.fg3Attempted
+                      const tsa = fga + 0.44 * totals.ftAttempted
+                      const avgTS = tsa > 0 ? Math.round(totals.points / (2 * tsa) * 100) : 0
+                      const avgGmSc = totals.count > 0 ? (totals.gameScoreSum / totals.count).toFixed(1) : 0
+                      const avgPER = totals.count > 0 ? (totals.perSum / totals.count).toFixed(1) : 0
+                      const avgUSG = totals.count > 0 ? Math.round(totals.usageSum / totals.count) : 0
+                      const avgPM = totals.count > 0 ? (totals.plusMinusSum / totals.count).toFixed(1) : 0
+
+                      return (
+                        <div className="advanced-stats-grid">
+                          <div className="advanced-stat">
+                            <span className="adv-value">{avgTS}%</span>
+                            <span className="adv-label">TS%</span>
+                            <span className="adv-desc">True Shooting</span>
+                          </div>
+                          <div className={`advanced-stat ${parseFloat(avgGmSc) >= 10 ? 'positive' : parseFloat(avgGmSc) < 0 ? 'negative' : ''}`}>
+                            <span className="adv-value">{avgGmSc}</span>
+                            <span className="adv-label">GmSc moy.</span>
+                            <span className="adv-desc">Game Score</span>
+                          </div>
+                          <div className={`advanced-stat ${parseFloat(avgPER) >= 15 ? 'positive' : parseFloat(avgPER) < 10 ? 'negative' : ''}`}>
+                            <span className="adv-value">{avgPER}</span>
+                            <span className="adv-label">PER moy.</span>
+                            <span className="adv-desc">Player Efficiency</span>
+                          </div>
+                          <div className="advanced-stat">
+                            <span className="adv-value">{avgUSG}%</span>
+                            <span className="adv-label">USG% moy.</span>
+                            <span className="adv-desc">Usage Rate</span>
+                          </div>
+                          <div className={`advanced-stat ${parseFloat(avgPM) > 0 ? 'positive' : parseFloat(avgPM) < 0 ? 'negative' : ''}`}>
+                            <span className="adv-value">{parseFloat(avgPM) > 0 ? '+' : ''}{avgPM}</span>
+                            <span className="adv-label">+/- moy.</span>
+                            <span className="adv-desc">Plus/Minus</span>
+                          </div>
+                          {totals.bestStreak > 0 && (
+                            <div className="advanced-stat streak">
+                              <span className="adv-value">🔥 {totals.bestStreak}</span>
+                              <span className="adv-label">Record série</span>
+                              <span className="adv-desc">{totals.bestPointsStreak} pts</span>
+                            </div>
+                          )}
+                        </div>
+                      )
+                    }
+                  })()}
+                </div>
               </>
             )}
           </div>
@@ -4918,6 +6273,17 @@ export default function App() {
         {activeTab === 'options' && (
           <div className="options-page">
             <h2>⚙️ Options</h2>
+
+            {/* Player Info Section */}
+            <div className="options-section">
+              <h3>👤 Joueur</h3>
+              <PlayerInfo
+                name={player.name}
+                number={player.number}
+                onNameChange={(v) => updatePlayer('name', v)}
+                onNumberChange={(v) => updatePlayer('number', v)}
+              />
+            </div>
 
             {/* Theme Section */}
             <div className="options-section">
@@ -5015,22 +6381,46 @@ export default function App() {
                 <h3>📝 Historique des actions</h3>
                 <button className="action-panel-close" onClick={() => setShowActionPanel(false)}>×</button>
               </div>
-              <div className="action-panel-actions">
-                <button className="undo-action-btn" onClick={undoLastAction} disabled={actionHistory.length === 0}>
-                  ↩ Annuler dernière action
-                </button>
-              </div>
+              <p className="action-panel-hint">Cliquer sur une action pour la supprimer</p>
               <div className="action-panel-list">
                 {actionHistory.length === 0 ? (
                   <div className="action-empty">Aucune action enregistrée</div>
                 ) : (
                   actionHistory.map(action => (
-                    <div key={action.id} className="action-item">
+                    <div
+                      key={action.id}
+                      className="action-item clickable"
+                      onClick={() => setActionToDelete(action)}
+                    >
                       <span className="action-time">Q{action.quarter} {Math.floor(action.timeLeft / 60)}:{(action.timeLeft % 60).toString().padStart(2, '0')}</span>
                       <span className="action-label">{action.label}</span>
+                      <span className="action-delete-hint">🗑</span>
                     </div>
                   ))
                 )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Action Delete Confirmation Modal */}
+        {actionToDelete && (
+          <div className="confirm-overlay" onClick={() => setActionToDelete(null)}>
+            <div className="confirm-modal" onClick={e => e.stopPropagation()}>
+              <div className="confirm-icon">🗑</div>
+              <p>Supprimer cette action ?</p>
+              <p className="confirm-action-detail">
+                <strong>{actionToDelete.label}</strong><br/>
+                Q{actionToDelete.quarter} - {Math.floor(actionToDelete.timeLeft / 60)}:{(actionToDelete.timeLeft % 60).toString().padStart(2, '0')}
+              </p>
+              <p className="confirm-warning">Les stats seront mises à jour.</p>
+              <div className="confirm-buttons">
+                <button className="confirm-btn yes" onClick={() => handleDeleteAction(actionToDelete)}>
+                  Oui, supprimer
+                </button>
+                <button className="confirm-btn no" onClick={() => setActionToDelete(null)}>
+                  Annuler
+                </button>
               </div>
             </div>
           </div>
@@ -5128,8 +6518,20 @@ export default function App() {
                   <span className="help-def">Points marqués (2pts × 2 + 3pts × 3 + LF)</span>
                 </div>
                 <div className="help-item">
-                  <span className="help-term">REB</span>
-                  <span className="help-def">Rebonds (offensifs + défensifs)</span>
+                  <span className="help-term">LF +</span>
+                  <span className="help-def">Lancers francs réussis</span>
+                </div>
+                <div className="help-item">
+                  <span className="help-term">LF -</span>
+                  <span className="help-def">Lancers francs ratés</span>
+                </div>
+                <div className="help-item">
+                  <span className="help-term">REB OFF</span>
+                  <span className="help-def">Rebonds offensifs (sur tir manqué de ton équipe)</span>
+                </div>
+                <div className="help-item">
+                  <span className="help-term">REB DEF</span>
+                  <span className="help-def">Rebonds défensifs (sur tir manqué adverse)</span>
                 </div>
                 <div className="help-item">
                   <span className="help-term">AST</span>

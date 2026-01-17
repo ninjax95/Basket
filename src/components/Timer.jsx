@@ -115,19 +115,19 @@ export default function Timer({
           onClick={handlePrevClick}
           disabled={quarter === 1}
         >
-          ← QT Préc.
+          ← QT Préc
         </button>
-        <button className="timer-btn primary" onClick={onToggle}>
-          {isRunning ? '⏸ Pause' : '▶ Démarrer'}
-        </button>
-        <button className="timer-btn secondary" onClick={onReset}>↺ Reset</button>
         <button
           className={`timer-btn quarter-nav ${quarter === 4 ? 'disabled' : ''}`}
           onClick={handleNextClick}
           disabled={quarter === 4}
         >
-          QT Suiv. →
+          QT Suiv →
         </button>
+        <button className="timer-btn primary" onClick={onToggle}>
+          {isRunning ? '⏸ Pause' : '▶ Démarrer'}
+        </button>
+        <button className="timer-btn secondary" onClick={onReset}>↺ Reset</button>
         <button
           className="timer-btn end-match"
           onClick={handleEndMatchClick}

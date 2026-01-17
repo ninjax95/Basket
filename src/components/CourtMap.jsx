@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-export default function CourtMap({ onShotRecorded, quarter, timeLeft, shotMarkers, setShotMarkers, actionHistory, onShowReplay, onShowHistory }) {
+export default function CourtMap({ onShotRecorded, onShotRemoved, quarter, timeLeft, shotMarkers, setShotMarkers, actionHistory, onShowReplay, onShowHistory }) {
   const [pendingShot, setPendingShot] = useState(null)
   const [showMarkerMenu, setShowMarkerMenu] = useState(false)
 
@@ -74,16 +74,28 @@ export default function CourtMap({ onShotRecorded, quarter, timeLeft, shotMarker
   }
 
   const clearMarkersForQuarter = (q) => {
+    // Update stats for each removed marker
+    const markersToRemove = shotMarkers.filter(m => m.quarter === q)
+    markersToRemove.forEach(marker => {
+      if (onShotRemoved) onShotRemoved(marker)
+    })
     setShotMarkers(prev => prev.filter(m => m.quarter !== q))
     setShowMarkerMenu(false)
   }
 
   const clearAllMarkers = () => {
+    // Update stats for each removed marker
+    shotMarkers.forEach(marker => {
+      if (onShotRemoved) onShotRemoved(marker)
+    })
     setShotMarkers([])
     setShowMarkerMenu(false)
   }
 
   const undoLastMarker = () => {
+    if (shotMarkers.length === 0) return
+    const lastMarker = shotMarkers[shotMarkers.length - 1]
+    if (onShotRemoved) onShotRemoved(lastMarker)
     setShotMarkers(prev => prev.slice(0, -1))
   }
 
@@ -157,42 +169,8 @@ export default function CourtMap({ onShotRecorded, quarter, timeLeft, shotMarker
         </div>
       )}
 
-      <div className="court-layout">
-        {/* Stats LEFT */}
-        <div className="court-side-stats">
-          <div className="side-stat-group">
-            <div className="side-stat-label">Q{quarter}</div>
-            <div className="side-stat-row">
-              <span className="side-made">{currentQuarterMarkers.filter(s => s.made && !s.isThree).length}</span>
-              <span className="side-sep">/</span>
-              <span className="side-total">{currentQuarterMarkers.filter(s => !s.isThree).length}</span>
-              <span className="side-type">2P</span>
-            </div>
-            <div className="side-stat-row">
-              <span className="side-made">{currentQuarterMarkers.filter(s => s.made && s.isThree).length}</span>
-              <span className="side-sep">/</span>
-              <span className="side-total">{currentQuarterMarkers.filter(s => s.isThree).length}</span>
-              <span className="side-type">3P</span>
-            </div>
-          </div>
-          <div className="side-stat-group">
-            <div className="side-stat-label">Total</div>
-            <div className="side-stat-row">
-              <span className="side-made">{shotMarkers.filter(s => s.made && !s.isThree).length}</span>
-              <span className="side-sep">/</span>
-              <span className="side-total">{shotMarkers.filter(s => !s.isThree).length}</span>
-              <span className="side-type">2P</span>
-            </div>
-            <div className="side-stat-row">
-              <span className="side-made">{shotMarkers.filter(s => s.made && s.isThree).length}</span>
-              <span className="side-sep">/</span>
-              <span className="side-total">{shotMarkers.filter(s => s.isThree).length}</span>
-              <span className="side-type">3P</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Court CENTER */}
+      <div className="court-layout court-layout-full">
+        {/* Court FULL WIDTH */}
         <div className="court-wrapper">
           <svg
             viewBox={`0 0 ${courtWidth} ${courtHeight}`}
@@ -438,20 +416,20 @@ export default function CourtMap({ onShotRecorded, quarter, timeLeft, shotMarker
           </div>
         )}
         </div>
+      </div>
 
-        {/* Buttons RIGHT */}
-        <div className="court-side-buttons">
-          {actionHistory && actionHistory.length > 0 && (
-            <button className="court-side-btn history" onClick={onShowHistory}>
-              📝<span>{actionHistory.length}</span>
-            </button>
-          )}
-          {shotMarkers.length > 0 && (
-            <button className="court-side-btn replay" onClick={onShowReplay}>
-              🎬
-            </button>
-          )}
-        </div>
+      {/* Action buttons below court */}
+      <div className="court-action-buttons">
+        {actionHistory && actionHistory.length > 0 && (
+          <button className="court-action-btn" onClick={onShowHistory}>
+            📝 Historique ({actionHistory.length})
+          </button>
+        )}
+        {shotMarkers.length > 0 && (
+          <button className="court-action-btn" onClick={onShowReplay}>
+            🎬 Replay
+          </button>
+        )}
       </div>
     </div>
   )

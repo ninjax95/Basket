@@ -2,158 +2,139 @@
 
 ## Overview
 
-Application React pour tracker les statistiques d'un joueur de basketball pendant un match. Déployée sur Vercel.
+Application React/Capacitor pour tracker les statistiques d'un joueur de basketball pendant un match. Disponible en web (PWA) et Android (APK).
 
 - **Repo GitHub** : https://github.com/ninjax95/Basket
-- **Hébergement** : Vercel (auto-deploy depuis GitHub)
+- **Hébergement Web** : Vercel (auto-deploy depuis GitHub)
 - **URL Production** : https://basket-roan.vercel.app
-
-## Configuration Git & Déploiement
-
-### GitHub
-- **Username** : ninjax95
-- **Email** : jaxmaj@gmail.com
-- **Repo** : Basket (https://github.com/ninjax95/Basket)
-
-### Vercel
-- **Framework Preset** : Vite
-- **Build Command** : `npm run build` (auto-détecté)
-- **Output Directory** : `dist` (auto-détecté)
-- **Déploiement** : Automatique à chaque push sur `main`
-
-### Workflow de déploiement
-1. Faire les modifications localement
-2. `git add .`
-3. `git commit -m "message"`
-4. `git push` (peut nécessiter un token GitHub)
-5. Vercel redéploie automatiquement
-
-## Stack technique
-
-- **Framework** : React 18 avec Vite
-- **Graphiques** : Recharts (LineChart, RadarChart)
-- **Persistance** : localStorage
-- **Style** : CSS-in-JS (styles dans App.jsx)
+- **Gist ID (sync)** : bf483a09e37ffa5ffe84cb46109c6890
 
 ## Structure du projet
 
 ```
-react/
+Score kaiji/
 ├── src/
 │   ├── App.jsx              # Composant principal + tous les styles CSS
 │   ├── main.jsx             # Point d'entrée React
 │   ├── components/
 │   │   ├── CourtMap.jsx     # Carte interactive du terrain (SVG)
 │   │   ├── Timer.jsx        # Timer avec gestion des quart-temps
-│   │   ├── StatCounter.jsx  # Compteur +/- pour chaque stat
 │   │   ├── PlayerInfo.jsx   # Infos joueur (nom, numéro)
 │   │   ├── StatsDisplay.jsx # Affichage résumé des stats
 │   │   ├── MatchHistory.jsx # Historique des matchs avec filtres
-│   │   ├── EvolutionChart.jsx    # Graphique d'évolution
-│   │   ├── PerformanceRadar.jsx  # Graphique radar
-│   │   ├── ShotHeatmap.jsx       # Carte des tirs historique (parquet)
+│   │   ├── EvolutionChart.jsx    # Graphique d'évolution (Recharts)
+│   │   ├── PerformanceRadar.jsx  # Graphique radar (Recharts)
+│   │   ├── ShotHeatmap.jsx       # Carte des tirs historique
 │   │   ├── ThermalHeatmap.jsx    # Carte thermique zones chaudes/froides
+│   │   ├── ShotReplay.jsx        # Replay des tirs du match
 │   │   └── PinLock.jsx           # Écran de verrouillage PIN
 │   └── hooks/
-│       └── useStats.js      # Hooks personnalisés (stats, timer, playing time, history)
-├── index.html
+│       └── useStats.js      # Hooks: useStats, usePlayer, useTimer, usePlayingTime, useMatchHistory
+├── public/
+│   ├── pwa-192x192.png      # Icône PWA 192px
+│   └── pwa-512x512.png      # Icône PWA 512px
+├── android/                 # Projet Capacitor Android
+│   ├── app/
+│   │   └── build.gradle
+│   └── local.properties     # sdk.dir=/home/ninjax/Android/Sdk
+├── capacitor.config.ts
 ├── package.json
-└── vite.config.js
+├── vite.config.js           # Config Vite + PWA
+└── StatsBasket.apk          # APK générée
 ```
-
-## Fonctionnalités
-
-### Authentification PIN
-- Code PIN 4-6 chiffres pour protéger l'accès
-- Première visite : création du PIN avec confirmation
-- Visites suivantes : saisie du PIN pour déverrouiller
-- Clavier numérique tactile
-- Session persistante (reste déverrouillé jusqu'à fermeture du navigateur)
-
-### Stats trackées
-- **Points** : tirs 2pts, 3pts, lancers francs (réussis/ratés)
-- **Rebonds** : offensifs, défensifs
-- **Autres** : passes décisives, interceptions, contres, fautes, pertes de balle
-
-### Timer
-- 4 quart-temps configurables (5, 8, 10, 12, 15 min)
-- Navigation entre QT avec confirmation
-- Boutons +/- pour ajuster le temps
-- Bouton "Fin de match"
-
-### Carte des tirs (CourtMap)
-- Terrain SVG avec parquet réaliste
-- Clic = enregistre un tir (2pts/3pts auto-détecté)
-- Modal de confirmation (réussi/raté)
-- Marqueurs par quart-temps
-- Menu "Gérer" pour effacer les marqueurs
-
-### Temps de jeu
-- Toggle "Sur le terrain" / "Sur le banc"
-- Compteur temps de jeu et temps banc
-- Stats par minute (pts/min, reb/min, ast/min)
-
-### Historique
-- Sauvegarde des matchs (stats + positions des tirs)
-- Filtre par match ou total
-- Stats détaillées avec pourcentages de tirs
-- Graphiques d'évolution et radar
-
-### Cartes de tirs (Historique)
-- **ShotHeatmap** : carte parquet avec tous les tirs (vert=réussi, rouge=raté)
-- **ThermalHeatmap** : carte thermique avec zones chaudes/froides
-  - Bleu = froid (faible %)
-  - Rouge = chaud (bon %)
-  - Dégradés radiaux par zone
-- Filtrable par match sélectionné
-
-### Play-by-play
-- Chaque action enregistrée avec timestamp (Q2 5:30)
-- Bouton "Annuler" dernière action
-- Stats par quart-temps
 
 ## Commandes
 
 ```bash
-# Développement
+# Développement web
 npm run dev
 
-# Build production
+# Build production (avec PWA)
 npm run build
 
-# Preview build
-npm run preview
+# Build APK Android complet
+npm run build && npx cap sync android && cd android && ./gradlew assembleDebug
+# APK générée dans: android/app/build/outputs/apk/debug/app-debug.apk
+
+# Copier APK à la racine
+cp android/app/build/outputs/apk/debug/app-debug.apk ./StatsBasket.apk
+
+# Émulateur Android (S24 Ultra)
+~/Android/Sdk/emulator/emulator -avd S24Ultra -gpu auto
+~/Android/Sdk/platform-tools/adb install -r StatsBasket.apk
 ```
+
+## Stack technique
+
+- **Framework** : React 18 avec Vite
+- **Mobile** : Capacitor (Android)
+- **Graphiques** : Recharts (LineChart, RadarChart)
+- **PWA** : vite-plugin-pwa (Service Worker + Manifest)
+- **Persistance** : localStorage
+- **Style** : CSS-in-JS avec clamp() pour le responsive
+- **Java** : OpenJDK 21 (requis pour le build Android)
+
+## Fonctionnalités principales
+
+### Stats de match
+- **Tirs** : 2PTS, 3PTS, LF (réussis/ratés séparés)
+- **Rebonds** : Offensifs et Défensifs séparés
+- **Autres** : Passes, Interceptions, Contres, Fautes, Pertes
+
+### Stats avancées (calculées automatiquement)
+- **TS%** : True Shooting Percentage
+- **GmSc** : Game Score (Hollinger)
+- **PER** : Player Efficiency Rating (simplifié)
+- **USG%** : Usage Rate
+- **+/-** : Plus/Minus différentiel
+
+### Séries de réussite (Streaks)
+- Affichage en temps réel quand 2+ tirs consécutifs réussis
+- Record de série sauvegardé avec le match
+- Affichage dans l'analyse (par match et global)
+
+### Mode hors-ligne (PWA)
+- Service Worker cache tous les assets
+- Fonctionne sans connexion internet
+- Installable sur écran d'accueil (web)
 
 ## Hooks personnalisés (useStats.js)
 
-- `useStats()` : gestion des stats + historique des actions
-- `usePlayer()` : infos joueur
+- `useStats()` : stats + actionHistory + getEfficiency() + getStreaks() + deleteAction()
+- `usePlayer()` : nom et numéro
 - `useTimer()` : timer avec quart-temps
-- `usePlayingTime()` : temps de jeu sur terrain/banc
-- `useMatchHistory()` : historique des matchs
-
-## Logique des tirs
-
-Les tirs réussis/ratés sont gérés intelligemment :
-- **+1 réussi** → ajoute 1 réussi ET 1 tenté
-- **-1 réussi** → retire 1 réussi (devient un raté)
-- **+1 raté** → ajoute 1 tenté seulement
-- **-1 raté** → retire 1 raté (si possible)
+- `usePlayingTime()` : temps terrain/banc
+- `useMatchHistory()` : historique + saveMatch() + getAverages() + getRecords()
 
 ## localStorage keys
 
-- `basketAppPin` : code PIN (encodé en base64)
+- `basketAppPin` : code PIN (base64)
 - `basketStats` : stats du match en cours
 - `basketActionHistory` : historique des actions
-- `basketPlayer` : infos joueur
+- `basketPlayer` : infos joueur {name, number}
 - `basketTimer` : état du timer
-- `basketQuarterDuration` : durée d'un QT
+- `basketQuarterDuration` : durée d'un QT (défaut: 600s = 10min)
 - `basketMatchHistory` : historique des matchs
-- `basketPlayingTime` : temps de jeu
-- `basketBenchTime` : temps sur le banc
-- `basketIsOnCourt` : sur terrain ou non
+- `basketPlayingTime` / `basketBenchTime` / `basketIsOnCourt`
+- `basketGithubToken` / `basketGistId` : sync GitHub
+- `basketTheme` : dark/light
 
-## sessionStorage keys
+## Structure d'un match sauvegardé
 
-- `basketAppUnlocked` : état de déverrouillage de la session
+```javascript
+{
+  id: Date.now(),
+  date: ISO string,
+  player: { name, number },
+  opponent: string,
+  location: 'home' | 'away',
+  score: { team, opponent },
+  plusMinus: number,
+  stats: { fg2Made, fg2Attempted, fg3Made, ... },
+  shotMarkers: [{ x, y, made, isThree, isFreeThrow, quarter }],
+  summary: { points, rebounds, assists, ... },
+  efficiency: { trueShootingPct, gameScore, per, usageRate },
+  streaks: { bestStreak, bestPointsStreak },
+  notes: { strengths, improvements }
+}
+```

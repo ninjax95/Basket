@@ -113,13 +113,14 @@ export function useStats() {
     }
   }
 
-  // Calculate efficiency metrics (True Shooting % and Game Score)
+  // Calculate efficiency metrics (True Shooting %, Game Score, PER, Usage Rate)
   const getEfficiency = () => {
     const totalPoints = (stats.fg2Made * 2) + (stats.fg3Made * 3) + stats.ftMade
     const fgAttempted = stats.fg2Attempted + stats.fg3Attempted
     const fgMade = stats.fg2Made + stats.fg3Made
     const ftAttempted = stats.ftAttempted
     const ftMade = stats.ftMade
+    const totalRebounds = stats.offRebounds + stats.defRebounds
 
     // True Shooting % = Points / (2 * (FGA + 0.44 * FTA))
     const tsaDenominator = 2 * (fgAttempted + 0.44 * ftAttempted)
@@ -139,9 +140,29 @@ export function useStats() {
       - 0.4 * stats.fouls
       - stats.turnovers
 
+    // PER (Player Efficiency Rating) - Version simplifiée
+    // Basé sur la contribution positive moins les erreurs, normalisé autour de 15 (moyenne NBA)
+    const missedFG = fgAttempted - fgMade
+    const missedFT = ftAttempted - ftMade
+    const positiveActions = totalPoints + totalRebounds + stats.assists + stats.steals + stats.blocks
+    const negativeActions = missedFG + missedFT + stats.turnovers
+    const totalActions = fgAttempted + ftAttempted + totalRebounds + stats.assists + stats.steals + stats.blocks + stats.turnovers
+    // PER simplifié: (contributions positives - négatives) / actions * facteur de normalisation
+    const perRaw = totalActions > 0 ? ((positiveActions - negativeActions) / totalActions) * 30 : 0
+    const per = Math.max(0, perRaw) // PER ne peut pas être négatif dans notre version simplifiée
+
+    // Usage Rate (USG%) - Pourcentage d'utilisation offensive
+    // USG% = (FGA + 0.44 * FTA + TOV) / Total possessions estimées
+    // Représente le % des actions offensives terminées par le joueur
+    const offensiveUsage = fgAttempted + 0.44 * ftAttempted + stats.turnovers
+    const estimatedPossessions = offensiveUsage + stats.assists // Possessions où le joueur est impliqué
+    const usageRate = estimatedPossessions > 0 ? (offensiveUsage / estimatedPossessions) * 100 : 0
+
     return {
       trueShootingPct: Math.round(trueShootingPct * 10) / 10, // 1 decimal
-      gameScore: Math.round(gameScore * 10) / 10 // 1 decimal
+      gameScore: Math.round(gameScore * 10) / 10, // 1 decimal
+      per: Math.round(per * 10) / 10, // 1 decimal
+      usageRate: Math.round(usageRate) // entier
     }
   }
 
@@ -180,6 +201,62 @@ export function useStats() {
     setActionHistory(prev => prev.slice(1))
   }
 
+  // Delete a specific action by ID and update stats
+  const deleteAction = (actionId) => {
+    const action = actionHistory.find(a => a.id === actionId)
+    if (!action) return null
+
+    // Decrement the stat
+    setStats(prev => ({
+      ...prev,
+      [action.type]: Math.max(0, prev[action.type] - 1)
+    }))
+
+    // Remove from history
+    setActionHistory(prev => prev.filter(a => a.id !== actionId))
+
+    return action // Return the deleted action for additional processing
+  }
+
+  // Calculate shooting streaks (consecutive makes)
+  const getStreaks = () => {
+    const madeTypes = ['fg2Made', 'fg3Made', 'ftMade']
+    const missedTypes = ['fg2Attempted', 'fg3Attempted', 'ftAttempted']
+
+    // Action history is ordered newest first, so reverse to get chronological order
+    const chronological = [...actionHistory].reverse()
+
+    let currentStreak = 0
+    let bestStreak = 0
+    let currentPoints = 0
+    let bestPointsStreak = 0
+
+    for (const action of chronological) {
+      if (madeTypes.includes(action.type)) {
+        // Shot made - increment streak
+        currentStreak++
+        bestStreak = Math.max(bestStreak, currentStreak)
+
+        // Calculate points for this shot
+        const points = action.type === 'fg3Made' ? 3 : action.type === 'fg2Made' ? 2 : 1
+        currentPoints += points
+        bestPointsStreak = Math.max(bestPointsStreak, currentPoints)
+      } else if (missedTypes.includes(action.type)) {
+        // Shot missed - reset streaks
+        currentStreak = 0
+        currentPoints = 0
+      }
+      // Other actions (rebounds, assists, etc.) don't affect the streak
+    }
+
+    return {
+      currentStreak,     // Current consecutive makes
+      bestStreak,        // Best consecutive makes this match
+      currentPoints,     // Points scored in current streak
+      bestPointsStreak   // Best points in a streak
+    }
+  }
+
   return {
     stats,
     updateStat,
@@ -187,9 +264,11 @@ export function useStats() {
     importStats,
     getSummary,
     getEfficiency,
+    getStreaks,
     actionHistory,
     getStatsByQuarter,
-    undoLastAction
+    undoLastAction,
+    deleteAction
   }
 }
 
@@ -420,7 +499,7 @@ export function useMatchHistory() {
     localStorage.setItem('basketMatchHistory', JSON.stringify(history))
   }, [history])
 
-  const saveMatch = (player, stats, opponent = '', shotMarkers = [], score = null, location = 'home', plusMinus = 0, notes = null) => {
+  const saveMatch = (player, stats, opponent = '', shotMarkers = [], score = null, location = 'home', plusMinus = 0, notes = null, matchStreaks = null) => {
     const totalPoints = (stats.fg2Made * 2) + (stats.fg3Made * 3) + stats.ftMade
     const totalRebounds = stats.offRebounds + stats.defRebounds
     const fgMade = stats.fg2Made + stats.fg3Made
@@ -443,6 +522,20 @@ export function useMatchHistory() {
       + 0.7 * stats.blocks
       - 0.4 * stats.fouls
       - stats.turnovers) * 10) / 10
+
+    // PER (Player Efficiency Rating) - Version simplifiée
+    const missedFG = fgAttempted - fgMade
+    const missedFT = ftAttempted - ftMade
+    const positiveActions = totalPoints + totalRebounds + stats.assists + stats.steals + stats.blocks
+    const negativeActions = missedFG + missedFT + stats.turnovers
+    const totalActions = fgAttempted + ftAttempted + totalRebounds + stats.assists + stats.steals + stats.blocks + stats.turnovers
+    const perRaw = totalActions > 0 ? ((positiveActions - negativeActions) / totalActions) * 30 : 0
+    const per = Math.round(Math.max(0, perRaw) * 10) / 10
+
+    // Usage Rate (USG%)
+    const offensiveUsage = fgAttempted + 0.44 * ftAttempted + stats.turnovers
+    const estimatedPossessions = offensiveUsage + stats.assists
+    const usageRate = estimatedPossessions > 0 ? Math.round((offensiveUsage / estimatedPossessions) * 100) : 0
 
     const match = {
       id: Date.now(),
@@ -467,9 +560,12 @@ export function useMatchHistory() {
       },
       efficiency: {
         trueShootingPct,
-        gameScore
+        gameScore,
+        per,
+        usageRate
       },
-      notes: notes || null  // { strengths: '', improvements: '' }
+      notes: notes || null,  // { strengths: '', improvements: '' }
+      streaks: matchStreaks || null  // { bestStreak, bestPointsStreak }
     }
 
     setHistory(prev => [...prev, match])
