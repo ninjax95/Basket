@@ -3739,12 +3739,24 @@ const styles = `
 export default function App() {
   const [isUnlocked, setIsUnlocked] = useState(false)
   const [activeTab, setActiveTab] = useState('match')
-  const [opponent, setOpponent] = useState('')
-  const [matchLocation, setMatchLocation] = useState('home') // 'home' or 'away'
-  const [liveScoreTeam, setLiveScoreTeam] = useState(0)
-  const [liveScoreOpponent, setLiveScoreOpponent] = useState(0)
-  const [plusMinus, setPlusMinus] = useState(0)
-  const [lastPlusMinusScore, setLastPlusMinusScore] = useState({ team: 0, opponent: 0 })
+  const [opponent, setOpponent] = useState(() => localStorage.getItem('basketOpponent') || '')
+  const [matchLocation, setMatchLocation] = useState(() => localStorage.getItem('basketMatchLocation') || 'home')
+  const [liveScoreTeam, setLiveScoreTeam] = useState(() => {
+    const saved = localStorage.getItem('basketLiveScoreTeam')
+    return saved ? parseInt(saved) : 0
+  })
+  const [liveScoreOpponent, setLiveScoreOpponent] = useState(() => {
+    const saved = localStorage.getItem('basketLiveScoreOpponent')
+    return saved ? parseInt(saved) : 0
+  })
+  const [plusMinus, setPlusMinus] = useState(() => {
+    const saved = localStorage.getItem('basketPlusMinus')
+    return saved ? parseInt(saved) : 0
+  })
+  const [lastPlusMinusScore, setLastPlusMinusScore] = useState(() => {
+    const saved = localStorage.getItem('basketLastPlusMinusScore')
+    return saved ? JSON.parse(saved) : { team: 0, opponent: 0 }
+  })
   const [shotMarkers, setShotMarkers] = useState(() => {
     const saved = localStorage.getItem('basketShotMarkers')
     return saved ? JSON.parse(saved) : []
@@ -3796,6 +3808,31 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem('basketShotMarkers', JSON.stringify(shotMarkers))
   }, [shotMarkers])
+
+  // Save live score and match data to localStorage
+  useEffect(() => {
+    localStorage.setItem('basketLiveScoreTeam', liveScoreTeam.toString())
+  }, [liveScoreTeam])
+
+  useEffect(() => {
+    localStorage.setItem('basketLiveScoreOpponent', liveScoreOpponent.toString())
+  }, [liveScoreOpponent])
+
+  useEffect(() => {
+    localStorage.setItem('basketPlusMinus', plusMinus.toString())
+  }, [plusMinus])
+
+  useEffect(() => {
+    localStorage.setItem('basketLastPlusMinusScore', JSON.stringify(lastPlusMinusScore))
+  }, [lastPlusMinusScore])
+
+  useEffect(() => {
+    localStorage.setItem('basketOpponent', opponent)
+  }, [opponent])
+
+  useEffect(() => {
+    localStorage.setItem('basketMatchLocation', matchLocation)
+  }, [matchLocation])
 
   // Calculate +/- when player is on court and score changes
   useEffect(() => {
@@ -3995,8 +4032,6 @@ export default function App() {
     setPlusMinus(0)
     setLastPlusMinusScore({ team: 0, opponent: 0 })
     setOpponent('')
-    setScoreTeam('')
-    setScoreOpponent('')
     setMatchLocation('home')
     setShotMarkers([])  // Clear shot markers
   }
@@ -4212,8 +4247,6 @@ export default function App() {
       setShotMarkers([])
       localStorage.setItem('basketShotMarkers', JSON.stringify([]))
       setOpponent('')
-      setScoreTeam('')
-      setScoreOpponent('')
       setMatchLocation('home')
       setLiveScoreTeam(0)
       setLiveScoreOpponent(0)
