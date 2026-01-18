@@ -4462,7 +4462,7 @@ const styles = `
 
   [data-theme="light"] .nav-tab {
     background: rgba(0, 0, 0, 0.08);
-    color: #333;
+    color: #1a1a2e;
   }
 
   [data-theme="light"] .nav-tab:hover {
@@ -4521,7 +4521,7 @@ const styles = `
   [data-theme="light"] .player-info input::placeholder,
   [data-theme="light"] .opponent-input::placeholder,
   [data-theme="light"] .match-notes-input::placeholder {
-    color: #777;
+    color: #555;
   }
 
   [data-theme="light"] .timer-display {
@@ -4582,13 +4582,13 @@ const styles = `
 
   [data-theme="light"] .ds-label,
   [data-theme="light"] .stat-name {
-    color: #444;
+    color: #2a2a2a;
   }
 
   [data-theme="light"] .options-description,
   [data-theme="light"] .history-filter label,
   [data-theme="light"] .analysis-filter label {
-    color: #444;
+    color: #2a2a2a;
   }
 
   [data-theme="light"] .match-select {
@@ -4600,7 +4600,7 @@ const styles = `
   [data-theme="light"] .theme-btn {
     background: rgba(0, 0, 0, 0.06);
     border-color: rgba(0, 0, 0, 0.25);
-    color: #333;
+    color: #1a1a2e;
   }
 
   [data-theme="light"] .theme-btn:hover {
@@ -4624,7 +4624,7 @@ const styles = `
   }
 
   [data-theme="light"] .delete-btn {
-    color: #666;
+    color: #444;
   }
 
   [data-theme="light"] .delete-btn:hover {
@@ -4675,7 +4675,7 @@ const styles = `
 
   [data-theme="light"] .pts-label,
   [data-theme="light"] .pts-breakdown {
-    color: #444;
+    color: #2a2a2a;
   }
 
   [data-theme="light"] .pts-value {
@@ -4696,13 +4696,13 @@ const styles = `
   }
 
   [data-theme="light"] .streak-points {
-    color: #444;
+    color: #2a2a2a;
   }
 
   [data-theme="light"] .more-options-toggle {
     background: rgba(0, 0, 0, 0.06);
     border-color: rgba(0, 0, 0, 0.3);
-    color: #333;
+    color: #1a1a2e;
   }
 
   [data-theme="light"] .more-options-toggle:hover {
@@ -4744,7 +4744,7 @@ const styles = `
   }
 
   [data-theme="light"] .action-time {
-    color: #555;
+    color: #333;
   }
 
   [data-theme="light"] .advanced-stats-grid {
@@ -4795,7 +4795,7 @@ const styles = `
   }
 
   [data-theme="light"] .adv-desc {
-    color: #555;
+    color: #333;
   }
 
   [data-theme="light"] .shooting-stats {
@@ -4807,7 +4807,7 @@ const styles = `
   }
 
   [data-theme="light"] .shooting-label {
-    color: #444;
+    color: #2a2a2a;
   }
 
   [data-theme="light"] .shooting-value {
@@ -4815,7 +4815,7 @@ const styles = `
   }
 
   [data-theme="light"] .shooting-pct {
-    color: #555;
+    color: #333;
   }
 
   [data-theme="light"] .averages-inline,
@@ -4845,12 +4845,12 @@ const styles = `
   }
 
   [data-theme="light"] .record-info {
-    color: #555;
+    color: #333;
   }
 
   [data-theme="light"] .no-data-message {
     background: rgba(0, 0, 0, 0.05);
-    color: #444;
+    color: #2a2a2a;
   }
 
   [data-theme="light"] .summary {
@@ -4862,7 +4862,7 @@ const styles = `
   }
 
   [data-theme="light"] .summary-label {
-    color: #444;
+    color: #2a2a2a;
   }
 
   [data-theme="light"] .duration-selector {
@@ -4884,7 +4884,7 @@ const styles = `
   }
 
   [data-theme="light"] .settings-btn {
-    color: #444;
+    color: #2a2a2a;
   }
 
   [data-theme="light"] .settings-btn:hover,
@@ -4903,7 +4903,7 @@ const styles = `
   }
 
   [data-theme="light"] .confirm-warning {
-    color: #444;
+    color: #2a2a2a;
   }
 
   /* ========== MOBILE RESPONSIVE STYLES ========== */
