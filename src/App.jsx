@@ -4528,6 +4528,14 @@ const styles = `
     color: #1a4a8f;
   }
 
+  [data-theme="light"] .player-name-compact {
+    color: #1a1a2e;
+  }
+
+  [data-theme="light"] .player-number-compact {
+    color: #1a4a8f;
+  }
+
   [data-theme="light"] .timer-btn,
   [data-theme="light"] .action-btn {
     background: rgba(0, 0, 0, 0.08);
