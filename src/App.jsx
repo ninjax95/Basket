@@ -4461,8 +4461,8 @@ const styles = `
   }
 
   [data-theme="light"] .nav-tab {
-    background: rgba(0, 0, 0, 0.05);
-    color: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.08);
+    color: #333;
   }
 
   [data-theme="light"] .nav-tab:hover {
@@ -4521,7 +4521,7 @@ const styles = `
   [data-theme="light"] .player-info input::placeholder,
   [data-theme="light"] .opponent-input::placeholder,
   [data-theme="light"] .match-notes-input::placeholder {
-    color: rgba(0, 0, 0, 0.4);
+    color: #777;
   }
 
   [data-theme="light"] .timer-display {
@@ -4582,13 +4582,13 @@ const styles = `
 
   [data-theme="light"] .ds-label,
   [data-theme="light"] .stat-name {
-    color: rgba(0, 0, 0, 0.6);
+    color: #444;
   }
 
   [data-theme="light"] .options-description,
   [data-theme="light"] .history-filter label,
   [data-theme="light"] .analysis-filter label {
-    color: rgba(0, 0, 0, 0.6);
+    color: #444;
   }
 
   [data-theme="light"] .match-select {
@@ -4598,9 +4598,9 @@ const styles = `
   }
 
   [data-theme="light"] .theme-btn {
-    background: rgba(0, 0, 0, 0.05);
-    border-color: rgba(0, 0, 0, 0.15);
-    color: rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 0.06);
+    border-color: rgba(0, 0, 0, 0.25);
+    color: #333;
   }
 
   [data-theme="light"] .theme-btn:hover {
@@ -4624,7 +4624,7 @@ const styles = `
   }
 
   [data-theme="light"] .delete-btn {
-    color: rgba(0, 0, 0, 0.4);
+    color: #666;
   }
 
   [data-theme="light"] .delete-btn:hover {
@@ -4675,7 +4675,7 @@ const styles = `
 
   [data-theme="light"] .pts-label,
   [data-theme="light"] .pts-breakdown {
-    color: rgba(0, 0, 0, 0.6);
+    color: #444;
   }
 
   [data-theme="light"] .pts-value {
@@ -4696,13 +4696,13 @@ const styles = `
   }
 
   [data-theme="light"] .streak-points {
-    color: rgba(0, 0, 0, 0.6);
+    color: #444;
   }
 
   [data-theme="light"] .more-options-toggle {
-    background: rgba(0, 0, 0, 0.05);
-    border-color: rgba(0, 0, 0, 0.2);
-    color: rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 0.06);
+    border-color: rgba(0, 0, 0, 0.3);
+    color: #333;
   }
 
   [data-theme="light"] .more-options-toggle:hover {
@@ -4744,7 +4744,7 @@ const styles = `
   }
 
   [data-theme="light"] .action-time {
-    color: rgba(0, 0, 0, 0.5);
+    color: #555;
   }
 
   [data-theme="light"] .advanced-stats-grid {
@@ -4795,7 +4795,7 @@ const styles = `
   }
 
   [data-theme="light"] .adv-desc {
-    color: rgba(0, 0, 0, 0.5);
+    color: #555;
   }
 
   [data-theme="light"] .shooting-stats {
@@ -4807,7 +4807,7 @@ const styles = `
   }
 
   [data-theme="light"] .shooting-label {
-    color: rgba(0, 0, 0, 0.6);
+    color: #444;
   }
 
   [data-theme="light"] .shooting-value {
@@ -4815,7 +4815,7 @@ const styles = `
   }
 
   [data-theme="light"] .shooting-pct {
-    color: rgba(0, 0, 0, 0.5);
+    color: #555;
   }
 
   [data-theme="light"] .averages-inline,
@@ -4845,12 +4845,12 @@ const styles = `
   }
 
   [data-theme="light"] .record-info {
-    color: rgba(0, 0, 0, 0.5);
+    color: #555;
   }
 
   [data-theme="light"] .no-data-message {
     background: rgba(0, 0, 0, 0.05);
-    color: rgba(0, 0, 0, 0.6);
+    color: #444;
   }
 
   [data-theme="light"] .summary {
@@ -4862,7 +4862,7 @@ const styles = `
   }
 
   [data-theme="light"] .summary-label {
-    color: rgba(0, 0, 0, 0.6);
+    color: #444;
   }
 
   [data-theme="light"] .duration-selector {
@@ -4884,7 +4884,7 @@ const styles = `
   }
 
   [data-theme="light"] .settings-btn {
-    color: rgba(0, 0, 0, 0.6);
+    color: #444;
   }
 
   [data-theme="light"] .settings-btn:hover,
@@ -4903,7 +4903,7 @@ const styles = `
   }
 
   [data-theme="light"] .confirm-warning {
-    color: rgba(0, 0, 0, 0.6);
+    color: #444;
   }
 
   /* ========== MOBILE RESPONSIVE STYLES ========== */
