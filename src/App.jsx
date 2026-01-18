@@ -4545,6 +4545,10 @@ const styles = `
     color: #2a2a2a;
   }
 
+  [data-theme="light"] .score-value {
+    color: #1a1a2e;
+  }
+
   [data-theme="light"] .player-name-compact {
     color: #1a1a2e;
   }
