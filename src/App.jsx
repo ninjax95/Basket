@@ -4528,6 +4528,23 @@ const styles = `
     color: #1a4a8f;
   }
 
+  [data-theme="light"] .time-compact {
+    color: #1a1a2e;
+  }
+
+  [data-theme="light"] .time-compact.running {
+    color: #27ae60;
+  }
+
+  [data-theme="light"] .quarter-compact {
+    background: rgba(26, 74, 143, 0.15);
+    color: #1a4a8f;
+  }
+
+  [data-theme="light"] .score-label {
+    color: #2a2a2a;
+  }
+
   [data-theme="light"] .player-name-compact {
     color: #1a1a2e;
   }
