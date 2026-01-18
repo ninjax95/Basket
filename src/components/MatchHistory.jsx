@@ -5,7 +5,8 @@ export default function MatchHistory({
   history,
   averages,
   records,
-  onDelete
+  onDelete,
+  onEditOpponent
 }) {
   const [selectedMatchId, setSelectedMatchId] = useState('all') // 'all' or match id
   const [showReplay, setShowReplay] = useState(false)
@@ -393,6 +394,13 @@ export default function MatchHistory({
                       {match.score.team ?? '-'} - {match.score.opponent ?? '-'}
                     </span>
                   )}
+                  <button
+                    className="edit-btn"
+                    onClick={(e) => { e.stopPropagation(); onEditOpponent(match.id, match.opponent); }}
+                    title="Modifier l'adversaire"
+                  >
+                    ✎
+                  </button>
                   <button
                     className="delete-btn"
                     onClick={(e) => { e.stopPropagation(); onDelete(match.id); }}

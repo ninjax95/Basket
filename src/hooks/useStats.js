@@ -576,6 +576,12 @@ export function useMatchHistory() {
     setHistory(prev => prev.filter(m => m.id !== matchId))
   }
 
+  const updateMatchOpponent = (matchId, newOpponent) => {
+    setHistory(prev => prev.map(m =>
+      m.id === matchId ? { ...m, opponent: newOpponent } : m
+    ))
+  }
+
   const clearHistory = () => {
     setHistory([])
   }
@@ -676,5 +682,5 @@ export function useMatchHistory() {
     return newRecords
   }
 
-  return { history, saveMatch, deleteMatch, clearHistory, importHistory, getAverages, getRecords, checkNewRecords }
+  return { history, saveMatch, deleteMatch, updateMatchOpponent, clearHistory, importHistory, getAverages, getRecords, checkNewRecords }
 }

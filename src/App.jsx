@@ -1097,6 +1097,21 @@ const styles = `
     color: #f1c40f;
   }
 
+  .edit-btn {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 0 8px;
+    line-height: 1;
+    transition: color 0.2s;
+  }
+
+  .edit-btn:hover {
+    color: #61dafb;
+  }
+
   .delete-btn {
     margin-left: auto;
     background: transparent;
@@ -4652,6 +4667,14 @@ const styles = `
     color: #1a1a2e;
   }
 
+  [data-theme="light"] .edit-btn {
+    color: #666;
+  }
+
+  [data-theme="light"] .edit-btn:hover {
+    color: #1a4a8f;
+  }
+
   [data-theme="light"] .delete-btn {
     color: #444;
   }
@@ -5511,7 +5534,7 @@ export default function App() {
   const { stats, updateStat, resetStats, importStats, getSummary, getEfficiency, getStreaks, actionHistory, getStatsByQuarter, undoLastAction, deleteAction } = useStats()
   const { player, updatePlayer } = usePlayer()
   const timer = useTimer()
-  const { history, saveMatch, deleteMatch, clearHistory, importHistory, getAverages, getRecords, checkNewRecords } = useMatchHistory()
+  const { history, saveMatch, deleteMatch, updateMatchOpponent, clearHistory, importHistory, getAverages, getRecords, checkNewRecords } = useMatchHistory()
   const playingTime = usePlayingTime()
 
   const summary = getSummary()
@@ -5771,6 +5794,13 @@ export default function App() {
   const handleDeleteMatch = (matchId) => {
     if (confirm('Supprimer ce match ?')) {
       deleteMatch(matchId)
+    }
+  }
+
+  const handleEditOpponent = (matchId, currentOpponent) => {
+    const newOpponent = prompt('Modifier l\'adversaire :', currentOpponent || '')
+    if (newOpponent !== null && newOpponent !== currentOpponent) {
+      updateMatchOpponent(matchId, newOpponent)
     }
   }
 
@@ -6478,6 +6508,7 @@ export default function App() {
             averages={averages}
             records={getRecords()}
             onDelete={handleDeleteMatch}
+            onEditOpponent={handleEditOpponent}
           />
         )}
 
