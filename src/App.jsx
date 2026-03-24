@@ -1074,6 +1074,84 @@ const styles = `
     font-weight: bold;
   }
 
+  .match-playtime {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.8rem;
+  }
+
+  .compare-section {
+    margin-top: 8px;
+  }
+
+  .compare-section label {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .compare-view {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+  }
+
+  .compare-view h3 {
+    color: #61dafb;
+    text-align: center;
+    margin-bottom: 12px;
+    font-size: 1rem;
+  }
+
+  .compare-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .compare-team {
+    color: #fff;
+    font-weight: bold;
+    font-size: 0.85rem;
+    text-align: center;
+    flex: 1;
+  }
+
+  .compare-vs {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.8rem;
+    padding: 0 10px;
+  }
+
+  .compare-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .compare-val {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.95rem;
+    width: 60px;
+    text-align: center;
+  }
+
+  .compare-val.better {
+    color: #2ecc71;
+    font-weight: bold;
+  }
+
+  .compare-label {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.8rem;
+    text-align: center;
+    flex: 1;
+  }
+
   .match-score {
     padding: 4px 10px;
     border-radius: 6px;
@@ -1506,6 +1584,109 @@ const styles = `
   .pt-label {
     color: rgba(255, 255, 255, 0.6);
     font-size: 0.8rem;
+  }
+
+  .goals-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+
+  .goal-input label {
+    display: block;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.8rem;
+    margin-bottom: 4px;
+  }
+
+  .goal-input input {
+    width: 100%;
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    font-size: 1rem;
+    text-align: center;
+  }
+
+  .goals-section {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    padding: 15px;
+  }
+
+  .goals-section h4 {
+    color: #61dafb;
+    margin-bottom: 10px;
+    font-size: 0.95rem;
+  }
+
+  .goals-progress-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .goal-progress {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .goal-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+  }
+
+  .goal-label {
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .goal-values {
+    color: #fff;
+    font-weight: bold;
+  }
+
+  .goal-bar {
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .goal-fill {
+    height: 100%;
+    background: #61dafb;
+    border-radius: 4px;
+    transition: width 0.3s ease;
+  }
+
+  .goal-fill.reached {
+    background: #2ecc71;
+  }
+
+  .undo-floating {
+    position: sticky;
+    bottom: 70px;
+    width: 100%;
+    padding: 12px;
+    background: rgba(231, 76, 60, 0.9);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 50;
+    text-align: center;
+    margin-top: 10px;
+  }
+
+  .undo-floating:active {
+    background: rgba(231, 76, 60, 1);
+    transform: scale(0.98);
   }
 
   @media (max-width: 600px) {
@@ -4961,6 +5142,46 @@ const styles = `
     color: #1a4a8f;
   }
 
+  [data-theme="light"] .compare-view {
+    background: rgba(0, 0, 0, 0.03);
+  }
+
+  [data-theme="light"] .compare-view h3 {
+    color: #1a1a2e;
+  }
+
+  [data-theme="light"] .compare-header {
+    border-bottom-color: rgba(0, 0, 0, 0.1);
+  }
+
+  [data-theme="light"] .compare-team {
+    color: #1a1a2e;
+  }
+
+  [data-theme="light"] .compare-vs {
+    color: #999;
+  }
+
+  [data-theme="light"] .compare-row {
+    border-bottom-color: rgba(0, 0, 0, 0.05);
+  }
+
+  [data-theme="light"] .compare-val {
+    color: #333;
+  }
+
+  [data-theme="light"] .compare-label {
+    color: #777;
+  }
+
+  [data-theme="light"] .compare-section label {
+    color: #555;
+  }
+
+  [data-theme="light"] .match-playtime {
+    color: #666;
+  }
+
   [data-theme="light"] .rolling-averages {
     border-top-color: rgba(0, 0, 0, 0.1);
   }
@@ -5001,6 +5222,36 @@ const styles = `
 
   [data-theme="light"] .pt-label {
     color: #555;
+  }
+
+  [data-theme="light"] .goals-section {
+    background: rgba(0, 0, 0, 0.03);
+  }
+
+  [data-theme="light"] .goals-section h4 {
+    color: #1a1a2e;
+  }
+
+  [data-theme="light"] .goal-label {
+    color: #555;
+  }
+
+  [data-theme="light"] .goal-values {
+    color: #1a1a2e;
+  }
+
+  [data-theme="light"] .goal-bar {
+    background: rgba(0, 0, 0, 0.1);
+  }
+
+  [data-theme="light"] .goal-input label {
+    color: #555;
+  }
+
+  [data-theme="light"] .goal-input input {
+    background: rgba(0, 0, 0, 0.05);
+    border-color: rgba(0, 0, 0, 0.2);
+    color: #1a1a2e;
   }
 
   [data-theme="light"] .record-card {
@@ -5626,6 +5877,10 @@ export default function App() {
     return saved ? atob(saved) : ''
   })
   const [gistId, setGistId] = useState(() => localStorage.getItem('basketGistId') || '')
+  const [goals, setGoals] = useState(() => {
+    const saved = localStorage.getItem('basketGoals')
+    return saved ? JSON.parse(saved) : { points: '', rebounds: '', assists: '' }
+  })
   const [showGistSettings, setShowGistSettings] = useState(false)
   const [gistLoading, setGistLoading] = useState(false)
   const [tempToken, setTempToken] = useState('')
@@ -5694,6 +5949,10 @@ export default function App() {
     localStorage.setItem('basketTheme', theme)
     document.body.setAttribute('data-theme', theme)
   }, [theme])
+
+  useEffect(() => {
+    localStorage.setItem('basketGoals', JSON.stringify(goals))
+  }, [goals])
 
   // Calculate +/- when player is on court and score changes
   useEffect(() => {
@@ -6710,6 +6969,13 @@ export default function App() {
                   Sauvegarder et terminer
                 </button>
               </div>
+
+              {/* Bouton Undo flottant */}
+              {actionHistory.length > 0 && (
+                <button className="undo-floating" onClick={undoLastAction}>
+                  ↩ Annuler : {actionHistory[0]?.label}
+                </button>
+              )}
             </div>
 
             <div className="actions">
@@ -6727,6 +6993,7 @@ export default function App() {
             recentAverages3={getRecentAverages(3)}
             recentAverages5={getRecentAverages(5)}
             records={getRecords()}
+            goals={goals}
             onDelete={handleDeleteMatch}
             onEditOpponent={handleEditOpponent}
             onEditScore={handleEditScore}
@@ -6988,6 +7255,40 @@ export default function App() {
                 <button className="options-btn danger" onClick={handleClearHistory}>
                   🗑️ Effacer l'historique
                 </button>
+              </div>
+            </div>
+
+            {/* Objectifs */}
+            <div className="options-section">
+              <h3>🎯 Objectifs par match</h3>
+              <div className="goals-grid">
+                <div className="goal-input">
+                  <label>Points</label>
+                  <input
+                    type="number"
+                    value={goals.points}
+                    onChange={(e) => setGoals(prev => ({ ...prev, points: e.target.value }))}
+                    placeholder="Ex: 15"
+                  />
+                </div>
+                <div className="goal-input">
+                  <label>Rebonds</label>
+                  <input
+                    type="number"
+                    value={goals.rebounds}
+                    onChange={(e) => setGoals(prev => ({ ...prev, rebounds: e.target.value }))}
+                    placeholder="Ex: 8"
+                  />
+                </div>
+                <div className="goal-input">
+                  <label>Passes D.</label>
+                  <input
+                    type="number"
+                    value={goals.assists}
+                    onChange={(e) => setGoals(prev => ({ ...prev, assists: e.target.value }))}
+                    placeholder="Ex: 5"
+                  />
+                </div>
               </div>
             </div>
           </div>

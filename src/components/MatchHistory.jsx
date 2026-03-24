@@ -7,11 +7,13 @@ export default function MatchHistory({
   recentAverages3,
   recentAverages5,
   records,
+  goals,
   onDelete,
   onEditOpponent,
   onEditScore
 }) {
   const [selectedMatchId, setSelectedMatchId] = useState('all') // 'all' or match id
+  const [compareMatchId, setCompareMatchId] = useState(null)
   const [showReplay, setShowReplay] = useState(false)
 
   // Trend indicator: compare recent average vs global average
@@ -94,6 +96,7 @@ export default function MatchHistory({
 
   const totals = getTotals()
   const selectedMatch = selectedMatchId === 'all' ? null : history.find(m => m.id === selectedMatchId)
+  const compareMatch = compareMatchId ? history.find(m => m.id === compareMatchId) : null
 
   // Check if a match contains any records
   const getMatchRecords = (match) => {
@@ -158,6 +161,79 @@ export default function MatchHistory({
               </option>
             ))}
           </select>
+          {selectedMatch && history.length >= 2 && (
+            <div className="compare-section">
+              <label>Comparer avec :</label>
+              <select
+                value={compareMatchId || ''}
+                onChange={(e) => setCompareMatchId(e.target.value ? Number(e.target.value) : null)}
+                className="match-select"
+              >
+                <option value="">-- Aucun --</option>
+                {[...history].reverse().filter(m => m.id !== selectedMatchId).map((match, index) => (
+                  <option key={match.id} value={match.id}>
+                    {new Date(match.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}
+                    {match.opponent ? ` vs ${match.opponent}` : ` - Match`}
+                    {' '}({match.summary.points} pts)
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Comparison View */}
+      {selectedMatch && compareMatch && (
+        <div className="compare-view">
+          <h3>⚔️ Comparaison</h3>
+          <div className="compare-header">
+            <span className="compare-team">{selectedMatch.opponent || 'Match 1'}<br/>{new Date(selectedMatch.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}</span>
+            <span className="compare-vs">VS</span>
+            <span className="compare-team">{compareMatch.opponent || 'Match 2'}<br/>{new Date(compareMatch.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}</span>
+          </div>
+          {[
+            { label: 'Points', key: 'points' },
+            { label: 'Rebonds', key: 'rebounds' },
+            { label: 'Passes D.', key: 'assists' },
+            { label: 'Interc.', key: 'steals' },
+            { label: 'Contres', key: 'blocks' },
+            { label: 'Pertes', key: 'turnovers', inverse: true },
+            { label: 'Fautes', key: 'fouls', inverse: true },
+            { label: 'FG%', key: 'fgPercentage' },
+            { label: 'FT%', key: 'ftPercentage' },
+          ].map(({ label, key, inverse }) => {
+            const v1 = selectedMatch.summary[key] ?? 0
+            const v2 = compareMatch.summary[key] ?? 0
+            const better = inverse ? (v1 < v2 ? 'left' : v1 > v2 ? 'right' : 'equal') : (v1 > v2 ? 'left' : v1 < v2 ? 'right' : 'equal')
+            return (
+              <div key={key} className="compare-row">
+                <span className={`compare-val ${better === 'left' ? 'better' : ''}`}>{v1}</span>
+                <span className="compare-label">{label}</span>
+                <span className={`compare-val ${better === 'right' ? 'better' : ''}`}>{v2}</span>
+              </div>
+            )
+          })}
+          {selectedMatch.efficiency && compareMatch.efficiency && (
+            <>
+              {[
+                { label: 'TS%', k: 'trueShootingPct' },
+                { label: 'GmSc', k: 'gameScore' },
+                { label: 'PER', k: 'per' },
+              ].map(({ label, k }) => {
+                const v1 = selectedMatch.efficiency[k] ?? 0
+                const v2 = compareMatch.efficiency[k] ?? 0
+                const better = v1 > v2 ? 'left' : v1 < v2 ? 'right' : 'equal'
+                return (
+                  <div key={k} className="compare-row">
+                    <span className={`compare-val ${better === 'left' ? 'better' : ''}`}>{v1}</span>
+                    <span className="compare-label">{label}</span>
+                    <span className={`compare-val ${better === 'right' ? 'better' : ''}`}>{v2}</span>
+                  </div>
+                )
+              })}
+            </>
+          )}
         </div>
       )}
 
@@ -427,6 +503,57 @@ export default function MatchHistory({
               </div>
             </div>
           )}
+
+          {/* Goals Progress (only for all matches) */}
+          {!selectedMatch && averages && goals && (goals.points || goals.rebounds || goals.assists) && (
+            <div className="goals-section">
+              <h4>🎯 Objectifs</h4>
+              <div className="goals-progress-grid">
+                {goals.points && (
+                  <div className="goal-progress">
+                    <div className="goal-info">
+                      <span className="goal-label">Points</span>
+                      <span className="goal-values">{averages.points} / {goals.points}</span>
+                    </div>
+                    <div className="goal-bar">
+                      <div
+                        className={`goal-fill ${parseFloat(averages.points) >= parseFloat(goals.points) ? 'reached' : ''}`}
+                        style={{ width: `${Math.min(100, (parseFloat(averages.points) / parseFloat(goals.points)) * 100)}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
+                {goals.rebounds && (
+                  <div className="goal-progress">
+                    <div className="goal-info">
+                      <span className="goal-label">Rebonds</span>
+                      <span className="goal-values">{averages.rebounds} / {goals.rebounds}</span>
+                    </div>
+                    <div className="goal-bar">
+                      <div
+                        className={`goal-fill ${parseFloat(averages.rebounds) >= parseFloat(goals.rebounds) ? 'reached' : ''}`}
+                        style={{ width: `${Math.min(100, (parseFloat(averages.rebounds) / parseFloat(goals.rebounds)) * 100)}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
+                {goals.assists && (
+                  <div className="goal-progress">
+                    <div className="goal-info">
+                      <span className="goal-label">Passes D.</span>
+                      <span className="goal-values">{averages.assists} / {goals.assists}</span>
+                    </div>
+                    <div className="goal-bar">
+                      <div
+                        className={`goal-fill ${parseFloat(averages.assists) >= parseFloat(goals.assists) ? 'reached' : ''}`}
+                        style={{ width: `${Math.min(100, (parseFloat(averages.assists) / parseFloat(goals.assists)) * 100)}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -467,6 +594,9 @@ export default function MatchHistory({
                   )}
                   {matchRecords.length > 0 && (
                     <span className="record-badge">🏆 {matchRecords.join(', ')}</span>
+                  )}
+                  {match.playingTime && match.playingTime.onCourt > 0 && (
+                    <span className="match-playtime">⏱️ {formatMinutes(match.playingTime.onCourt)}</span>
                   )}
                   {match.score && (match.score.team !== null || match.score.opponent !== null) && (
                     <span className={`match-score ${
