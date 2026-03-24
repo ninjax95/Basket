@@ -6088,7 +6088,7 @@ export default function App() {
 
   useEffect(() => {
     localStorage.setItem('basketShowTraining', JSON.stringify(showTraining))
-  }, [goals])
+  }, [showTraining])
 
   // Calculate +/- when player is on court and score changes
   useEffect(() => {
