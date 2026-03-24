@@ -5823,9 +5823,27 @@ export default function App() {
         try {
           const data = JSON.parse(event.target.result)
           if (data.history && Array.isArray(data.history)) {
-            if (confirm(`Restaurer ${data.history.length} match(s) depuis le backup du ${new Date(data.exportDate).toLocaleDateString('fr-FR')} ?\n\nCela remplacera l'historique actuel.`)) {
-              importHistory(data.history)
-              alert('Historique restauré avec succès !')
+            const existingIds = new Set(history.map(m => m.id))
+            const newMatches = data.history.filter(m => !existingIds.has(m.id))
+            const duplicates = data.history.length - newMatches.length
+
+            if (history.length > 0 && newMatches.length > 0) {
+              const msg = `Backup du ${new Date(data.exportDate).toLocaleDateString('fr-FR')} : ${data.history.length} match(s)\n\n` +
+                `${newMatches.length} nouveau(x) match(s) à ajouter` +
+                (duplicates > 0 ? `, ${duplicates} déjà présent(s)` : '') +
+                `\n\nFusionner avec l'historique actuel (${history.length} match(s)) ?`
+              if (confirm(msg)) {
+                const merged = [...history, ...newMatches].sort((a, b) => new Date(a.date) - new Date(b.date))
+                importHistory(merged)
+                alert(`Fusion réussie ! ${merged.length} match(s) au total.`)
+              }
+            } else if (history.length === 0) {
+              if (confirm(`Restaurer ${data.history.length} match(s) depuis le backup du ${new Date(data.exportDate).toLocaleDateString('fr-FR')} ?`)) {
+                importHistory(data.history)
+                alert('Historique restauré avec succès !')
+              }
+            } else {
+              alert('Aucun nouveau match à importer (tous déjà présents).')
             }
           } else {
             alert('Fichier de backup invalide.')
@@ -5937,17 +5955,40 @@ export default function App() {
           const backupData = JSON.parse(fileContent)
           if (backupData.history && Array.isArray(backupData.history)) {
             const playerInfo = backupData.player ? ` (${backupData.player.name || 'Joueur'} #${backupData.player.number || '0'})` : ''
-            if (confirm(`Restaurer ${backupData.history.length} match(s)${playerInfo} depuis le Gist ?\nBackup du ${new Date(backupData.exportDate).toLocaleDateString('fr-FR')}`)) {
-              // Restore player info
-              if (backupData.player) {
-                if (backupData.player.name) updatePlayer('name', backupData.player.name)
-                if (backupData.player.number) updatePlayer('number', backupData.player.number)
+            const existingIds = new Set(history.map(m => m.id))
+            const newMatches = backupData.history.filter(m => !existingIds.has(m.id))
+            const duplicates = backupData.history.length - newMatches.length
+
+            if (history.length > 0 && newMatches.length > 0) {
+              const msg = `Gist${playerInfo} : ${backupData.history.length} match(s)\n` +
+                `Backup du ${new Date(backupData.exportDate).toLocaleDateString('fr-FR')}\n\n` +
+                `${newMatches.length} nouveau(x) match(s) à ajouter` +
+                (duplicates > 0 ? `, ${duplicates} déjà présent(s)` : '') +
+                `\n\nFusionner avec l'historique actuel (${history.length} match(s)) ?`
+              if (confirm(msg)) {
+                if (backupData.player) {
+                  if (backupData.player.name) updatePlayer('name', backupData.player.name)
+                  if (backupData.player.number) updatePlayer('number', backupData.player.number)
+                }
+                const merged = [...history, ...newMatches].sort((a, b) => new Date(a.date) - new Date(b.date))
+                importHistory(merged)
+                setGistId(inputGistId)
+                localStorage.setItem('basketGistId', inputGistId)
+                alert(`Fusion réussie ! ${merged.length} match(s) au total.`)
               }
-              // Restore match history
-              importHistory(backupData.history)
-              setGistId(inputGistId)
-              localStorage.setItem('basketGistId', inputGistId)
-              alert('Données joueur et historique restaurés depuis GitHub Gist !')
+            } else if (history.length === 0) {
+              if (confirm(`Restaurer ${backupData.history.length} match(s)${playerInfo} depuis le Gist ?\nBackup du ${new Date(backupData.exportDate).toLocaleDateString('fr-FR')}`)) {
+                if (backupData.player) {
+                  if (backupData.player.name) updatePlayer('name', backupData.player.name)
+                  if (backupData.player.number) updatePlayer('number', backupData.player.number)
+                }
+                importHistory(backupData.history)
+                setGistId(inputGistId)
+                localStorage.setItem('basketGistId', inputGistId)
+                alert('Données joueur et historique restaurés depuis GitHub Gist !')
+              }
+            } else {
+              alert('Aucun nouveau match à importer (tous déjà présents).')
             }
           } else {
             alert('Fichier de backup invalide dans le Gist.')
