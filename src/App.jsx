@@ -6030,10 +6030,11 @@ export default function App() {
           alert('Fichier stats_basket_backup.json non trouvé dans le Gist.')
         }
       } else {
-        alert('Gist non trouvé ou accès refusé.')
+        const errData = await response.json().catch(() => null)
+        alert(`Erreur ${response.status}: ${errData?.message || 'Gist non trouvé ou accès refusé.'}`)
       }
     } catch (err) {
-      alert(`Erreur: ${err.message}`)
+      alert(`Erreur réseau: ${err.message}`)
     } finally {
       setGistLoading(false)
     }
