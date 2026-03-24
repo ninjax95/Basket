@@ -6322,69 +6322,47 @@ export default function App() {
       return
     }
 
+    // If already listening, stop
     if (voiceActive) {
       const rec = recognitionRef.current
       recognitionRef.current = null
-      if (rec) {
-        try { rec.abort() } catch {}
-      }
+      if (rec) try { rec.abort() } catch {}
       setVoiceActive(false)
       setVoiceStatus('')
       return
     }
 
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+    const recognition = new SpeechRecognition()
+    recognition.lang = 'fr-FR'
+    recognition.continuous = false
+    recognition.interimResults = false
 
-    const startRecognition = () => {
-      const recognition = new SpeechRecognition()
-      recognition.lang = 'fr-FR'
-      recognition.continuous = false
-      recognition.interimResults = false
-      recognition.maxAlternatives = 1
-
-      recognition.onresult = (event) => {
-        const last = event.results[event.results.length - 1]
-        if (last.isFinal) {
-          processVoiceCommand(last[0].transcript)
-        }
+    recognition.onresult = (event) => {
+      const last = event.results[event.results.length - 1]
+      if (last.isFinal) {
+        processVoiceCommand(last[0].transcript)
       }
+    }
 
-      recognition.onerror = (event) => {
-        if (event.error === 'no-speech' || event.error === 'aborted') return
+    recognition.onerror = (event) => {
+      if (event.error !== 'no-speech' && event.error !== 'aborted') {
         setVoiceStatus(`Erreur: ${event.error}`)
         setTimeout(() => setVoiceStatus(''), 2000)
       }
-
-      recognition.onend = () => {
-        // Restart silently after a short delay (avoids rapid bip loop)
-        if (recognitionRef.current !== null) {
-          setTimeout(() => {
-            if (recognitionRef.current !== null) {
-              startRecognition()
-            }
-          }, 300)
-        }
-      }
-
-      recognition.start()
-      recognitionRef.current = recognition
     }
 
-    startRecognition()
-    setVoiceActive(true)
-    setVoiceStatus('🎤 Écoute...')
-  }
-
-  // Cleanup voice on unmount or tab change
-  useEffect(() => {
-    if (activeTab !== 'match' && recognitionRef.current !== null) {
-      const rec = recognitionRef.current
+    recognition.onend = () => {
+      // Single shot: stop after one command
       recognitionRef.current = null
-      try { rec.abort() } catch {}
       setVoiceActive(false)
-      setVoiceStatus('')
     }
-  }, [activeTab])
+
+    recognitionRef.current = recognition
+    recognition.start()
+    setVoiceActive(true)
+    setVoiceStatus('🎤 Parle...')
+  }
 
   // Calculate +/- when player is on court and score changes
   useEffect(() => {
