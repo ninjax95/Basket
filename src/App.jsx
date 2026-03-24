@@ -6,7 +6,6 @@ import PlayerInfo from './components/PlayerInfo'
 import StatsDisplay from './components/StatsDisplay'
 import MatchHistory from './components/MatchHistory'
 import CourtMap from './components/CourtMap'
-import PinLock from './components/PinLock'
 import ShotReplay from './components/ShotReplay'
 import EvolutionChart from './components/EvolutionChart'
 import PerformanceRadar from './components/PerformanceRadar'
@@ -5473,7 +5472,7 @@ const styles = `
 `
 
 export default function App() {
-  const [isUnlocked, setIsUnlocked] = useState(false)
+  const [isUnlocked, setIsUnlocked] = useState(true)
   const [activeTab, setActiveTab] = useState('match')
   const [opponent, setOpponent] = useState(() => localStorage.getItem('basketOpponent') || '')
   const [matchLocation, setMatchLocation] = useState(() => localStorage.getItem('basketMatchLocation') || 'home')
@@ -5518,18 +5517,7 @@ export default function App() {
   const [showHelpModal, setShowHelpModal] = useState(false)
   const [analysisSelectedMatchId, setAnalysisSelectedMatchId] = useState('all')
 
-  // Check if already unlocked this session
-  useEffect(() => {
-    const sessionUnlocked = sessionStorage.getItem('basketAppUnlocked')
-    if (sessionUnlocked === 'true') {
-      setIsUnlocked(true)
-    }
-  }, [])
 
-  const handleUnlock = () => {
-    setIsUnlocked(true)
-    sessionStorage.setItem('basketAppUnlocked', 'true')
-  }
 
   const { stats, updateStat, resetStats, importStats, getSummary, getEfficiency, getStreaks, actionHistory, getStatsByQuarter, undoLastAction, deleteAction } = useStats()
   const { player, updatePlayer } = usePlayer()
@@ -6237,16 +6225,6 @@ export default function App() {
       deleteAction(action.id)
     }
     setActionToDelete(null)
-  }
-
-  // Show PIN lock if not unlocked
-  if (!isUnlocked) {
-    return (
-      <>
-        <style>{styles}</style>
-        <PinLock onUnlock={handleUnlock} />
-      </>
-    )
   }
 
   return (
