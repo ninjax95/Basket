@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useStats, usePlayer, useTimer, useMatchHistory, usePlayingTime } from './hooks/useStats'
 import StatCounter from './components/StatCounter'
 import Timer from './components/Timer'
@@ -6209,6 +6209,21 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem('basketShowTraining', JSON.stringify(showTraining))
   }, [showTraining])
+
+  // Auto-sync vers Gist quand l'historique change (debounce 5s)
+  const syncTimeoutRef = useRef(null)
+  useEffect(() => {
+    if (!githubToken || !gistId || history.length === 0) return
+
+    if (syncTimeoutRef.current) clearTimeout(syncTimeoutRef.current)
+    syncTimeoutRef.current = setTimeout(() => {
+      pushToGist(history).catch(() => {})
+    }, 5000)
+
+    return () => {
+      if (syncTimeoutRef.current) clearTimeout(syncTimeoutRef.current)
+    }
+  }, [history, githubToken, gistId])
 
   // Inactivity warning: if timer running + on court + no action for 2 min
   useEffect(() => {
