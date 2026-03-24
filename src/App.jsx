@@ -4704,6 +4704,34 @@ const styles = `
     font-size: 1.1rem;
   }
 
+  .option-toggle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+  }
+
+  .option-toggle label {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.95rem;
+  }
+
+  .toggle-btn {
+    padding: 6px 16px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+    font-size: 0.85rem;
+  }
+
+  .toggle-btn.active {
+    background: rgba(46, 204, 113, 0.2);
+    border-color: #2ecc71;
+    color: #2ecc71;
+  }
+
   .options-description {
     color: rgba(255, 255, 255, 0.6);
     font-size: 0.9rem;
@@ -5979,6 +6007,10 @@ export default function App() {
     const saved = localStorage.getItem('basketGoals')
     return saved ? JSON.parse(saved) : { points: '', rebounds: '', assists: '' }
   })
+  const [showTraining, setShowTraining] = useState(() => {
+    const saved = localStorage.getItem('basketShowTraining')
+    return saved ? JSON.parse(saved) : true
+  })
   const [showGistSettings, setShowGistSettings] = useState(false)
   const [gistLoading, setGistLoading] = useState(false)
   const [tempToken, setTempToken] = useState('')
@@ -6052,6 +6084,10 @@ export default function App() {
 
   useEffect(() => {
     localStorage.setItem('basketGoals', JSON.stringify(goals))
+  }, [goals])
+
+  useEffect(() => {
+    localStorage.setItem('basketShowTraining', JSON.stringify(showTraining))
   }, [goals])
 
   // Calculate +/- when player is on court and score changes
@@ -6958,12 +6994,14 @@ export default function App() {
           >
             📋 Historique ({history.length})
           </button>
-          <button
-            className={`nav-tab ${activeTab === 'training' ? 'active' : ''}`}
-            onClick={() => setActiveTab('training')}
-          >
-            🏋️ Entraîn.
-          </button>
+          {showTraining && (
+            <button
+              className={`nav-tab ${activeTab === 'training' ? 'active' : ''}`}
+              onClick={() => setActiveTab('training')}
+            >
+              🏋️ Entraîn.
+            </button>
+          )}
           <button
             className={`nav-tab ${activeTab === 'analysis' ? 'active' : ''}`}
             onClick={() => setActiveTab('analysis')}
@@ -7665,6 +7703,23 @@ export default function App() {
                 </button>
                 <button className="options-btn danger" onClick={handleClearHistory}>
                   🗑️ Effacer l'historique
+                </button>
+              </div>
+            </div>
+
+            {/* Affichage */}
+            <div className="options-section">
+              <h3>📱 Affichage</h3>
+              <div className="option-toggle">
+                <label>Mode entraînement</label>
+                <button
+                  className={`toggle-btn ${showTraining ? 'active' : ''}`}
+                  onClick={() => {
+                    setShowTraining(prev => !prev)
+                    if (activeTab === 'training') setActiveTab('match')
+                  }}
+                >
+                  {showTraining ? 'Activé' : 'Désactivé'}
                 </button>
               </div>
             </div>
