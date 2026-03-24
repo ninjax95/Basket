@@ -7280,13 +7280,13 @@ export default function App() {
               {/* Inactivity warning */}
               {inactivityWarning && (
                 <div className="inactivity-warning" onClick={() => setInactivityWarning(false)}>
-                  ⚠️ Aucune action depuis 2 min — Es-tu toujours sur le terrain ?
+                  ⚠️ Aucune action depuis 2 min — Toujours sur le terrain ?
                   <div className="inactivity-actions">
                     <button onClick={(e) => { e.stopPropagation(); setInactivityWarning(false); setLastActionTime(Date.now()); }}>
-                      Oui, je joue
+                      Oui
                     </button>
                     <button onClick={(e) => { e.stopPropagation(); playingTime.toggleOnCourt(); setInactivityWarning(false); setLastActionTime(Date.now()); }}>
-                      Non, je suis sur le banc
+                      Non
                     </button>
                   </div>
                 </div>
@@ -7475,7 +7475,7 @@ export default function App() {
                   onReset={timer.resetQuarter}
                   onNext={() => {
                     timer.nextQuarter()
-                    const onCourt = confirm('Es-tu sur le terrain pour le prochain quart-temps ?')
+                    const onCourt = confirm('Sur le terrain ?')
                     if (onCourt !== playingTime.isOnCourt) playingTime.toggleOnCourt()
                   }}
                   onPrev={timer.prevQuarter}
