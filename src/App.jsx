@@ -4184,6 +4184,13 @@ const styles = `
     gap: 8px;
   }
 
+  .gist-action-btn.sync-btn {
+    background: linear-gradient(135deg, rgba(46, 204, 113, 0.2) 0%, rgba(46, 204, 113, 0.1) 100%);
+    border-color: #2ecc71;
+    color: #2ecc71;
+    flex: 2;
+  }
+
   .gist-action-btn:hover:not(:disabled) {
     background: linear-gradient(135deg, rgba(97, 218, 251, 0.3) 0%, rgba(97, 218, 251, 0.2) 100%);
     transform: translateY(-2px);
@@ -6286,8 +6293,12 @@ export default function App() {
 
     // Proposer sync vers Gist si configuré
     if (githubToken && gistId) {
-      if (confirm('Sauvegarder aussi sur GitHub Gist ?')) {
-        autoSyncToGist(updatedHistory)
+      if (confirm('Synchroniser avec le Gist ?')) {
+        pushToGist(updatedHistory).then(() => {
+          alert('✅ Gist mis à jour !')
+        }).catch(err => {
+          alert(`Erreur sync: ${err.message}`)
+        })
       }
     }
 
@@ -6674,117 +6685,196 @@ export default function App() {
     }
   }
 
-  // Auto-sync silencieux vers Gist (appelé après chaque sauvegarde de match)
-  const autoSyncToGist = async (updatedHistory) => {
-    if (!githubToken || !gistId) return
+  // Fetch Gist data without modifying anything
+  const fetchGistData = async () => {
+    const targetGistId = gistId || prompt('Entre l\'ID du Gist :')
+    if (!targetGistId) return null
 
+    const response = await fetch(`https://api.github.com/gists/${targetGistId}`, {
+      headers: { 'Authorization': `token ${githubToken}` }
+    })
+
+    if (!response.ok) {
+      const errData = await response.json().catch(() => null)
+      throw new Error(`${response.status}: ${errData?.message || 'Gist non trouvé ou accès refusé.'}`)
+    }
+
+    const data = await response.json()
+    const fileContent = data.files['stats_basket_backup.json']?.content
+    if (!fileContent) throw new Error('Fichier stats_basket_backup.json non trouvé dans le Gist.')
+
+    const backupData = JSON.parse(fileContent)
+    if (!backupData.history || !Array.isArray(backupData.history)) {
+      throw new Error('Fichier de backup invalide.')
+    }
+
+    if (!gistId) {
+      setGistId(targetGistId)
+      localStorage.setItem('basketGistId', targetGistId)
+    }
+
+    return backupData
+  }
+
+  // Push local history to Gist
+  const pushToGist = async (historyToSave) => {
     const backupData = {
       exportDate: new Date().toISOString(),
       player: player,
-      matchCount: updatedHistory.length,
-      history: updatedHistory
+      matchCount: historyToSave.length,
+      history: historyToSave
     }
 
-    try {
-      const response = await fetch(`https://api.github.com/gists/${gistId}`, {
-        method: 'PATCH',
-        headers: {
-          'Authorization': `token ${githubToken}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          description: `Stats Basket - Backup ${player.name || 'joueur'} (${updatedHistory.length} matchs)`,
-          files: {
-            'stats_basket_backup.json': {
-              content: JSON.stringify(backupData, null, 2)
-            }
+    const response = await fetch(`https://api.github.com/gists/${gistId}`, {
+      method: 'PATCH',
+      headers: {
+        'Authorization': `token ${githubToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        description: `Stats Basket - Backup ${player.name || 'joueur'} (${historyToSave.length} matchs)`,
+        files: {
+          'stats_basket_backup.json': {
+            content: JSON.stringify(backupData, null, 2)
           }
-        })
+        }
       })
+    })
 
-      if (!response.ok) {
-        console.warn('Auto-sync Gist échoué:', response.status)
-      }
-    } catch (err) {
-      console.warn('Auto-sync Gist erreur:', err.message)
-    }
+    if (!response.ok) throw new Error('Échec du push vers le Gist')
+    return true
   }
 
-  const loadFromGist = async () => {
+  // Compare two match objects to detect modifications
+  const matchDiffers = (local, remote) => {
+    // Compare key fields that can be edited after save
+    if (local.opponent !== remote.opponent) return true
+    if (JSON.stringify(local.score) !== JSON.stringify(remote.score)) return true
+    if (local.photo !== remote.photo) return true
+    if (JSON.stringify(local.notes) !== JSON.stringify(remote.notes)) return true
+    // Compare stats in case of any correction
+    if (local.summary.points !== remote.summary.points) return true
+    if (local.summary.rebounds !== remote.summary.rebounds) return true
+    return false
+  }
+
+  // Describe differences for a match
+  const describeDiff = (local, remote) => {
+    const diffs = []
+    if (local.opponent !== remote.opponent) diffs.push(`Adversaire: "${local.opponent || '—'}" vs "${remote.opponent || '—'}"`)
+    if (JSON.stringify(local.score) !== JSON.stringify(remote.score)) {
+      const ls = local.score ? `${local.score.team}-${local.score.opponent}` : '—'
+      const rs = remote.score ? `${remote.score.team}-${remote.score.opponent}` : '—'
+      diffs.push(`Score: ${ls} vs ${rs}`)
+    }
+    if (local.summary.points !== remote.summary.points) diffs.push(`Points: ${local.summary.points} vs ${remote.summary.points}`)
+    if (local.photo && !remote.photo) diffs.push('Photo ajoutée localement')
+    if (!local.photo && remote.photo) diffs.push('Photo sur le Gist')
+    if (JSON.stringify(local.notes) !== JSON.stringify(remote.notes)) diffs.push('Notes différentes')
+    return diffs
+  }
+
+  // Full bidirectional sync
+  const handleSync = async () => {
     if (!githubToken) {
       setShowGistSettings(true)
       return
     }
 
-    const inputGistId = gistId || prompt('Entre l\'ID du Gist à charger:')
-    if (!inputGistId) return
-
     setGistLoading(true)
     try {
-      const response = await fetch(`https://api.github.com/gists/${inputGistId}`, {
-        headers: {
-          'Authorization': `token ${githubToken}`
+      const remoteData = await fetchGistData()
+      if (!remoteData) return
+
+      const remoteHistory = remoteData.history
+      const localMap = new Map(history.map(m => [m.id, m]))
+      const remoteMap = new Map(remoteHistory.map(m => [m.id, m]))
+
+      // Categorize differences
+      const onlyLocal = history.filter(m => !remoteMap.has(m.id))
+      const onlyRemote = remoteHistory.filter(m => !localMap.has(m.id))
+      const modified = []
+
+      for (const [id, local] of localMap) {
+        const remote = remoteMap.get(id)
+        if (remote && matchDiffers(local, remote)) {
+          modified.push({ id, local, remote, diffs: describeDiff(local, remote) })
         }
-      })
+      }
 
-      if (response.ok) {
-        const data = await response.json()
-        const fileContent = data.files['stats_basket_backup.json']?.content
-        if (fileContent) {
-          const backupData = JSON.parse(fileContent)
-          if (backupData.history && Array.isArray(backupData.history)) {
-            const playerInfo = backupData.player ? ` (${backupData.player.name || 'Joueur'} #${backupData.player.number || '0'})` : ''
-            const existingIds = new Set(history.map(m => m.id))
-            const newMatches = backupData.history.filter(m => !existingIds.has(m.id))
-            const duplicates = backupData.history.length - newMatches.length
+      // Build sync report
+      const hasChanges = onlyLocal.length > 0 || onlyRemote.length > 0 || modified.length > 0
 
-            if (history.length > 0 && newMatches.length > 0) {
-              const msg = `Gist${playerInfo} : ${backupData.history.length} match(s)\n` +
-                `Backup du ${new Date(backupData.exportDate).toLocaleDateString('fr-FR')}\n\n` +
-                `${newMatches.length} nouveau(x) match(s) à ajouter` +
-                (duplicates > 0 ? `, ${duplicates} déjà présent(s)` : '') +
-                `\n\nFusionner avec l'historique actuel (${history.length} match(s)) ?`
-              if (confirm(msg)) {
-                if (backupData.player) {
-                  if (backupData.player.name) updatePlayer('name', backupData.player.name)
-                  if (backupData.player.number) updatePlayer('number', backupData.player.number)
-                }
-                const merged = [...history, ...newMatches].sort((a, b) => new Date(a.date) - new Date(b.date))
-                importHistory(merged)
-                setGistId(inputGistId)
-                localStorage.setItem('basketGistId', inputGistId)
-                alert(`Fusion réussie ! ${merged.length} match(s) au total.`)
-              }
-            } else if (history.length === 0) {
-              if (confirm(`Restaurer ${backupData.history.length} match(s)${playerInfo} depuis le Gist ?\nBackup du ${new Date(backupData.exportDate).toLocaleDateString('fr-FR')}`)) {
-                if (backupData.player) {
-                  if (backupData.player.name) updatePlayer('name', backupData.player.name)
-                  if (backupData.player.number) updatePlayer('number', backupData.player.number)
-                }
-                importHistory(backupData.history)
-                setGistId(inputGistId)
-                localStorage.setItem('basketGistId', inputGistId)
-                alert('Données joueur et historique restaurés depuis GitHub Gist !')
-              }
-            } else {
-              alert('Aucun nouveau match à importer (tous déjà présents).')
-            }
-          } else {
-            alert('Fichier de backup invalide dans le Gist.')
-          }
+      if (!hasChanges) {
+        alert(`✅ Tout est synchronisé !\n\nLocal: ${history.length} match(s)\nGist: ${remoteHistory.length} match(s)`)
+        return
+      }
+
+      let report = `📊 Rapport de synchronisation\n\n`
+      report += `Local: ${history.length} match(s) | Gist: ${remoteHistory.length} match(s)\n\n`
+
+      if (onlyLocal.length > 0) {
+        report += `➕ ${onlyLocal.length} match(s) uniquement en local:\n`
+        onlyLocal.forEach(m => {
+          report += `  • ${m.opponent || 'Match'} (${m.summary.points} pts)\n`
+        })
+        report += '\n'
+      }
+
+      if (onlyRemote.length > 0) {
+        report += `⬇️ ${onlyRemote.length} match(s) uniquement sur le Gist:\n`
+        onlyRemote.forEach(m => {
+          report += `  • ${m.opponent || 'Match'} (${m.summary.points} pts)\n`
+        })
+        report += '\n'
+      }
+
+      if (modified.length > 0) {
+        report += `⚠️ ${modified.length} match(s) modifié(s) (local vs Gist):\n`
+        modified.forEach(({ local, diffs }) => {
+          report += `  • ${local.opponent || 'Match'}: ${diffs.join(', ')}\n`
+        })
+        report += '\n'
+      }
+
+      report += `Fusionner ? (local prioritaire pour les conflits)`
+
+      if (confirm(report)) {
+        // Merge: start with local, add remote-only, for conflicts keep local
+        const merged = [...history]
+
+        // Add remote-only matches
+        onlyRemote.forEach(m => merged.push(m))
+
+        // Sort by date
+        merged.sort((a, b) => new Date(a.date) - new Date(b.date))
+
+        // Update local
+        importHistory(merged)
+
+        // Restore player info if needed
+        if (remoteData.player) {
+          if (remoteData.player.name && !player.name) updatePlayer('name', remoteData.player.name)
+          if (remoteData.player.number && !player.number) updatePlayer('number', remoteData.player.number)
+        }
+
+        // Push merged result to Gist
+        if (confirm('Envoyer le résultat fusionné vers le Gist ?')) {
+          await pushToGist(merged)
+          alert(`✅ Sync terminée ! ${merged.length} match(s) synchronisés.`)
         } else {
-          alert('Fichier stats_basket_backup.json non trouvé dans le Gist.')
+          alert(`✅ Fusion locale terminée ! ${merged.length} match(s). Gist non mis à jour.`)
         }
-      } else {
-        const errData = await response.json().catch(() => null)
-        alert(`Erreur ${response.status}: ${errData?.message || 'Gist non trouvé ou accès refusé.'}`)
       }
     } catch (err) {
-      alert(`Erreur réseau: ${err.message}`)
+      alert(`Erreur sync: ${err.message}`)
     } finally {
       setGistLoading(false)
     }
   }
+
+  // Legacy loadFromGist redirects to handleSync
+  const loadFromGist = handleSync
 
   const exportData = () => {
     const data = {
@@ -7675,18 +7765,18 @@ export default function App() {
               </div>
               <div className="gist-actions">
                 <button
+                  className="gist-action-btn sync-btn"
+                  onClick={handleSync}
+                  disabled={gistLoading || !githubToken}
+                >
+                  {gistLoading ? '⏳' : '🔄'} Synchroniser
+                </button>
+                <button
                   className="gist-action-btn"
                   onClick={saveToGist}
                   disabled={gistLoading || history.length === 0 || !githubToken}
                 >
-                  {gistLoading ? '⏳' : '⬆️'} Sauvegarder sur Gist
-                </button>
-                <button
-                  className="gist-action-btn"
-                  onClick={loadFromGist}
-                  disabled={gistLoading || !githubToken}
-                >
-                  {gistLoading ? '⏳' : '⬇️'} Charger depuis Gist
+                  {gistLoading ? '⏳' : '⬆️'} Forcer envoi
                 </button>
               </div>
             </div>
