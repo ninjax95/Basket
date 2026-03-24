@@ -499,7 +499,7 @@ export function useMatchHistory() {
     localStorage.setItem('basketMatchHistory', JSON.stringify(history))
   }, [history])
 
-  const saveMatch = (player, stats, opponent = '', shotMarkers = [], score = null, location = 'home', plusMinus = 0, notes = null, matchStreaks = null) => {
+  const saveMatch = (player, stats, opponent = '', shotMarkers = [], score = null, location = 'home', plusMinus = 0, notes = null, matchStreaks = null, quarterStats = null, playingTimeData = null) => {
     const totalPoints = (stats.fg2Made * 2) + (stats.fg3Made * 3) + stats.ftMade
     const totalRebounds = stats.offRebounds + stats.defRebounds
     const fgMade = stats.fg2Made + stats.fg3Made
@@ -565,7 +565,9 @@ export function useMatchHistory() {
         usageRate
       },
       notes: notes || null,  // { strengths: '', improvements: '' }
-      streaks: matchStreaks || null  // { bestStreak, bestPointsStreak }
+      streaks: matchStreaks || null,  // { bestStreak, bestPointsStreak }
+      quarterStats: quarterStats || null,  // Stats par quart-temps
+      playingTime: playingTimeData || null  // { onCourt: seconds, bench: seconds }
     }
 
     setHistory(prev => [...prev, match])
@@ -579,6 +581,12 @@ export function useMatchHistory() {
   const updateMatchOpponent = (matchId, newOpponent) => {
     setHistory(prev => prev.map(m =>
       m.id === matchId ? { ...m, opponent: newOpponent } : m
+    ))
+  }
+
+  const updateMatchScore = (matchId, newScore) => {
+    setHistory(prev => prev.map(m =>
+      m.id === matchId ? { ...m, score: newScore } : m
     ))
   }
 
@@ -682,5 +690,32 @@ export function useMatchHistory() {
     return newRecords
   }
 
-  return { history, saveMatch, deleteMatch, updateMatchOpponent, clearHistory, importHistory, getAverages, getRecords, checkNewRecords }
+  const getRecentAverages = (count) => {
+    const recent = history.slice(-count)
+    if (recent.length === 0) return null
+
+    const totals = recent.reduce((acc, match) => ({
+      points: acc.points + match.summary.points,
+      rebounds: acc.rebounds + match.summary.rebounds,
+      assists: acc.assists + match.summary.assists,
+      steals: acc.steals + match.summary.steals,
+      blocks: acc.blocks + match.summary.blocks,
+      fouls: acc.fouls + match.summary.fouls,
+      turnovers: acc.turnovers + match.summary.turnovers
+    }), { points: 0, rebounds: 0, assists: 0, steals: 0, blocks: 0, fouls: 0, turnovers: 0 })
+
+    const n = recent.length
+    return {
+      points: (totals.points / n).toFixed(1),
+      rebounds: (totals.rebounds / n).toFixed(1),
+      assists: (totals.assists / n).toFixed(1),
+      steals: (totals.steals / n).toFixed(1),
+      blocks: (totals.blocks / n).toFixed(1),
+      fouls: (totals.fouls / n).toFixed(1),
+      turnovers: (totals.turnovers / n).toFixed(1),
+      matchCount: n
+    }
+  }
+
+  return { history, saveMatch, deleteMatch, updateMatchOpponent, updateMatchScore, clearHistory, importHistory, getAverages, getRecentAverages, getRecords, checkNewRecords }
 }

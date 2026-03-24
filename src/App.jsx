@@ -1430,6 +1430,84 @@ const styles = `
     font-size: 0.95rem;
   }
 
+  .rolling-averages {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .rolling-averages h5 {
+    color: rgba(97, 218, 251, 0.8);
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+  }
+
+  .quarter-stats-display, .playing-time-display {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    padding: 15px;
+  }
+
+  .quarter-stats-display h4, .playing-time-display h4 {
+    color: #61dafb;
+    margin-bottom: 10px;
+    font-size: 0.95rem;
+  }
+
+  .quarter-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+
+  .quarter-stat-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    padding: 8px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .qs-quarter {
+    color: #61dafb;
+    font-weight: bold;
+    font-size: 0.85rem;
+  }
+
+  .qs-points {
+    color: #fff;
+    font-weight: bold;
+    font-size: 1rem;
+  }
+
+  .qs-detail {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.75rem;
+  }
+
+  .playing-time-grid {
+    display: flex;
+    justify-content: space-around;
+  }
+
+  .playing-time-item {
+    text-align: center;
+  }
+
+  .pt-value {
+    display: block;
+    color: #fff;
+    font-size: 1.2rem;
+    font-weight: bold;
+  }
+
+  .pt-label {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.8rem;
+  }
+
   @media (max-width: 600px) {
     .detailed-stats-grid {
       grid-template-columns: repeat(3, 1fr);
@@ -4883,6 +4961,48 @@ const styles = `
     color: #1a4a8f;
   }
 
+  [data-theme="light"] .rolling-averages {
+    border-top-color: rgba(0, 0, 0, 0.1);
+  }
+
+  [data-theme="light"] .rolling-averages h5 {
+    color: rgba(26, 26, 46, 0.7);
+  }
+
+  [data-theme="light"] .quarter-stats-display,
+  [data-theme="light"] .playing-time-display {
+    background: rgba(0, 0, 0, 0.03);
+  }
+
+  [data-theme="light"] .quarter-stats-display h4,
+  [data-theme="light"] .playing-time-display h4 {
+    color: #1a1a2e;
+  }
+
+  [data-theme="light"] .quarter-stat-card {
+    background: rgba(0, 0, 0, 0.05);
+  }
+
+  [data-theme="light"] .qs-quarter {
+    color: #1a4a8f;
+  }
+
+  [data-theme="light"] .qs-points {
+    color: #1a1a2e;
+  }
+
+  [data-theme="light"] .qs-detail {
+    color: #555;
+  }
+
+  [data-theme="light"] .pt-value {
+    color: #1a1a2e;
+  }
+
+  [data-theme="light"] .pt-label {
+    color: #555;
+  }
+
   [data-theme="light"] .record-card {
     background: rgba(0, 0, 0, 0.05);
   }
@@ -5522,7 +5642,7 @@ export default function App() {
   const { stats, updateStat, resetStats, importStats, getSummary, getEfficiency, getStreaks, actionHistory, getStatsByQuarter, undoLastAction, deleteAction } = useStats()
   const { player, updatePlayer } = usePlayer()
   const timer = useTimer()
-  const { history, saveMatch, deleteMatch, updateMatchOpponent, clearHistory, importHistory, getAverages, getRecords, checkNewRecords } = useMatchHistory()
+  const { history, saveMatch, deleteMatch, updateMatchOpponent, updateMatchScore, clearHistory, importHistory, getAverages, getRecentAverages, getRecords, checkNewRecords } = useMatchHistory()
   const playingTime = usePlayingTime()
 
   const summary = getSummary()
@@ -5755,7 +5875,9 @@ export default function App() {
     if (!confirm('Sauvegarder et terminer le match ?')) return
 
     const matchStreaks = { bestStreak: streaks.bestStreak, bestPointsStreak: streaks.bestPointsStreak }
-    const savedMatch = saveMatch(player, stats, opponent, shotMarkers, matchScore, matchLocation, plusMinus, matchNotes, matchStreaks)
+    const matchQuarterStats = getStatsByQuarter()
+    const playingTimeData = { onCourt: playingTime.playingTime, bench: playingTime.benchTime }
+    const savedMatch = saveMatch(player, stats, opponent, shotMarkers, matchScore, matchLocation, plusMinus, matchNotes, matchStreaks, matchQuarterStats, playingTimeData)
 
     const updatedHistory = [...history, savedMatch]
     backupHistory(updatedHistory)
@@ -5798,6 +5920,18 @@ export default function App() {
     const newOpponent = prompt('Modifier l\'adversaire :', currentOpponent || '')
     if (newOpponent !== null && newOpponent !== currentOpponent) {
       updateMatchOpponent(matchId, newOpponent)
+    }
+  }
+
+  const handleEditScore = (matchId, currentScore) => {
+    const teamScore = prompt('Score équipe :', currentScore?.team ?? '')
+    if (teamScore === null) return
+    const oppScore = prompt('Score adversaire :', currentScore?.opponent ?? '')
+    if (oppScore === null) return
+    const team = parseInt(teamScore)
+    const opp = parseInt(oppScore)
+    if (!isNaN(team) && !isNaN(opp)) {
+      updateMatchScore(matchId, { team, opponent: opp })
     }
   }
 
@@ -6590,9 +6724,12 @@ export default function App() {
           <MatchHistory
             history={history}
             averages={averages}
+            recentAverages3={getRecentAverages(3)}
+            recentAverages5={getRecentAverages(5)}
             records={getRecords()}
             onDelete={handleDeleteMatch}
             onEditOpponent={handleEditOpponent}
+            onEditScore={handleEditScore}
           />
         )}
 

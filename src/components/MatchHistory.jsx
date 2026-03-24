@@ -4,12 +4,33 @@ import ShotReplay from './ShotReplay'
 export default function MatchHistory({
   history,
   averages,
+  recentAverages3,
+  recentAverages5,
   records,
   onDelete,
-  onEditOpponent
+  onEditOpponent,
+  onEditScore
 }) {
   const [selectedMatchId, setSelectedMatchId] = useState('all') // 'all' or match id
   const [showReplay, setShowReplay] = useState(false)
+
+  // Trend indicator: compare recent average vs global average
+  const getTrend = (stat, recent, global) => {
+    const r = parseFloat(recent[stat])
+    const g = parseFloat(global[stat])
+    if (g === 0) return r > 0 ? '↑' : ''
+    const diff = ((r - g) / g) * 100
+    if (diff > 10) return '↑'
+    if (diff < -10) return '↓'
+    return '→'
+  }
+
+  const formatMinutes = (seconds) => {
+    if (!seconds) return '0:00'
+    const mins = Math.floor(seconds / 60)
+    const secs = seconds % 60
+    return `${mins}:${secs.toString().padStart(2, '0')}`
+  }
 
   // Calculate totals across all matches
   const getTotals = () => {
@@ -252,6 +273,41 @@ export default function MatchHistory({
             </div>
           </div>
 
+          {/* Playing Time (only for selected match) */}
+          {selectedMatch && selectedMatch.playingTime && (
+            <div className="playing-time-display">
+              <h4>⏱️ Temps de jeu</h4>
+              <div className="playing-time-grid">
+                <div className="playing-time-item">
+                  <span className="pt-value">{formatMinutes(selectedMatch.playingTime.onCourt)}</span>
+                  <span className="pt-label">Sur le terrain</span>
+                </div>
+                <div className="playing-time-item">
+                  <span className="pt-value">{formatMinutes(selectedMatch.playingTime.bench)}</span>
+                  <span className="pt-label">Sur le banc</span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Quarter Stats (only for selected match) */}
+          {selectedMatch && selectedMatch.quarterStats && (
+            <div className="quarter-stats-display">
+              <h4>📊 Stats par quart-temps</h4>
+              <div className="quarter-stats-grid">
+                {selectedMatch.quarterStats.map(q => (
+                  <div key={q.quarter} className="quarter-stat-card">
+                    <span className="qs-quarter">Q{q.quarter}</span>
+                    <span className="qs-points">{q.points} pts</span>
+                    <span className="qs-detail">{q.fg} FG</span>
+                    <span className="qs-detail">{q.rebounds} reb</span>
+                    <span className="qs-detail">{q.assists} ast</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Match Notes (only for selected match) */}
           {selectedMatch && selectedMatch.notes && (selectedMatch.notes.strengths || selectedMatch.notes.improvements) && (
             <div className="match-notes-display">
@@ -282,6 +338,32 @@ export default function MatchHistory({
                 <span>{averages.steals} stl</span>
                 <span>{averages.blocks} blk</span>
               </div>
+
+              {/* Moyennes glissantes */}
+              {recentAverages3 && history.length >= 3 && (
+                <div className="rolling-averages">
+                  <h5>3 derniers matchs</h5>
+                  <div className="averages-inline-grid">
+                    <span>{recentAverages3.points} pts {getTrend('points', recentAverages3, averages)}</span>
+                    <span>{recentAverages3.rebounds} reb {getTrend('rebounds', recentAverages3, averages)}</span>
+                    <span>{recentAverages3.assists} ast {getTrend('assists', recentAverages3, averages)}</span>
+                    <span>{recentAverages3.steals} stl {getTrend('steals', recentAverages3, averages)}</span>
+                    <span>{recentAverages3.blocks} blk {getTrend('blocks', recentAverages3, averages)}</span>
+                  </div>
+                </div>
+              )}
+              {recentAverages5 && history.length >= 5 && (
+                <div className="rolling-averages">
+                  <h5>5 derniers matchs</h5>
+                  <div className="averages-inline-grid">
+                    <span>{recentAverages5.points} pts {getTrend('points', recentAverages5, averages)}</span>
+                    <span>{recentAverages5.rebounds} reb {getTrend('rebounds', recentAverages5, averages)}</span>
+                    <span>{recentAverages5.assists} ast {getTrend('assists', recentAverages5, averages)}</span>
+                    <span>{recentAverages5.steals} stl {getTrend('steals', recentAverages5, averages)}</span>
+                    <span>{recentAverages5.blocks} blk {getTrend('blocks', recentAverages5, averages)}</span>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
@@ -400,6 +482,13 @@ export default function MatchHistory({
                     title="Modifier l'adversaire"
                   >
                     ✎
+                  </button>
+                  <button
+                    className="edit-btn"
+                    onClick={(e) => { e.stopPropagation(); onEditScore(match.id, match.score); }}
+                    title="Modifier le score"
+                  >
+                    🏆
                   </button>
                   <button
                     className="delete-btn"
