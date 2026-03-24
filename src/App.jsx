@@ -2123,14 +2123,14 @@ const styles = `
   @media screen and (min-width: 700px) {
     .match-body {
       flex-direction: row;
-      gap: 15px;
+      gap: 10px;
       align-items: flex-start;
     }
 
     .match-body-court {
-      flex: 1;
+      flex: 1.2;
       min-width: 0;
-      max-width: 50%;
+      max-width: 55%;
       position: sticky;
       top: 10px;
     }
@@ -2141,11 +2141,36 @@ const styles = `
     }
 
     .match-body-stats .quick-stats-grid {
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px;
+    }
+
+    .match-body-stats .quick-stat {
+      padding: 6px 4px;
+    }
+
+    .match-body-stats .qs-controls button {
+      width: 32px;
+      height: 32px;
+      font-size: 1.1rem;
+    }
+
+    .match-body-stats .qs-value {
+      font-size: 0.85rem;
+      min-width: 30px;
+    }
+
+    .match-body-stats .qs-label {
+      font-size: 0.7rem;
     }
 
     .match-body-stats .stats-category-title {
-      font-size: 0.8rem;
+      font-size: 0.75rem;
+      margin-bottom: 4px;
+    }
+
+    .match-body-stats .stats-category {
+      margin-bottom: 6px;
     }
   }
 
