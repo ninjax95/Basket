@@ -1941,6 +1941,57 @@ const styles = `
     color: #e74c3c;
   }
 
+  .timeout-btn {
+    background: rgba(241, 196, 15, 0.2);
+    border: 1px solid rgba(241, 196, 15, 0.5);
+    color: #f1c40f;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    font-weight: bold;
+    animation: pulse 2s infinite;
+  }
+
+  .inactivity-warning {
+    background: rgba(231, 76, 60, 0.15);
+    border: 1px solid rgba(231, 76, 60, 0.4);
+    border-radius: 10px;
+    padding: 10px;
+    text-align: center;
+    color: #e74c3c;
+    font-size: 0.85rem;
+    font-weight: bold;
+    animation: pulse 1.5s infinite;
+    cursor: pointer;
+  }
+
+  .inactivity-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 8px;
+  }
+
+  .inactivity-actions button {
+    padding: 6px 14px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: bold;
+  }
+
+  .inactivity-actions button:first-child {
+    background: rgba(46, 204, 113, 0.3);
+    color: #2ecc71;
+  }
+
+  .inactivity-actions button:last-child {
+    background: rgba(231, 76, 60, 0.3);
+    color: #e74c3c;
+  }
+
   .playing-time-compact {
     font-size: clamp(0.75rem, 2vw, 1rem);
     color: rgba(255, 255, 255, 0.7);
@@ -6086,6 +6137,8 @@ export default function App() {
   const [trainingStats, setTrainingStats] = useState({ fg2Made: 0, fg2Attempted: 0, fg3Made: 0, fg3Attempted: 0, ftMade: 0, ftAttempted: 0 })
   const [actionToDelete, setActionToDelete] = useState(null) // Action pending deletion confirmation
   const [showMoreOptions, setShowMoreOptions] = useState(false)
+  const [lastActionTime, setLastActionTime] = useState(Date.now())
+  const [inactivityWarning, setInactivityWarning] = useState(false)
   const [showReplay, setShowReplay] = useState(false)
   const [recordNotification, setRecordNotification] = useState(null) // { records: [...] }
   const [showHelpModal, setShowHelpModal] = useState(false)
@@ -6157,6 +6210,20 @@ export default function App() {
     localStorage.setItem('basketShowTraining', JSON.stringify(showTraining))
   }, [showTraining])
 
+  // Inactivity warning: if timer running + on court + no action for 2 min
+  useEffect(() => {
+    if (!timer.isRunning || !playingTime.isOnCourt) {
+      setInactivityWarning(false)
+      return
+    }
+    const check = setInterval(() => {
+      if (Date.now() - lastActionTime > 120000) {
+        setInactivityWarning(true)
+      }
+    }, 10000)
+    return () => clearInterval(check)
+  }, [timer.isRunning, playingTime.isOnCourt, lastActionTime])
+
   // Calculate +/- when player is on court and score changes
   useEffect(() => {
     if (playingTime.isOnCourt) {
@@ -6173,6 +6240,8 @@ export default function App() {
   // Helper to update stat with current time
   const updateStatWithTime = (statName, delta, silent = false) => {
     updateStat(statName, delta, timer.quarter, timer.timeLeft, silent)
+    setLastActionTime(Date.now())
+    setInactivityWarning(false)
   }
 
   // Shot management: made shots automatically count as attempted
@@ -7195,7 +7264,34 @@ export default function App() {
                 >
                   {playingTime.isOnCourt ? '🏃' : '🪑'} {playingTime.formatPlayingTime(playingTime.playingTime)}
                 </button>
+                {timer.isRunning && (
+                  <button
+                    className="timeout-btn"
+                    onClick={() => {
+                      timer.toggleTimer()
+                      setInactivityWarning(false)
+                    }}
+                  >
+                    ⏱️ Temps mort
+                  </button>
+                )}
               </div>
+
+              {/* Inactivity warning */}
+              {inactivityWarning && (
+                <div className="inactivity-warning" onClick={() => setInactivityWarning(false)}>
+                  ⚠️ Aucune action depuis 2 min — Es-tu toujours sur le terrain ?
+                  <div className="inactivity-actions">
+                    <button onClick={(e) => { e.stopPropagation(); setInactivityWarning(false); setLastActionTime(Date.now()); }}>
+                      Oui, je joue
+                    </button>
+                    <button onClick={(e) => { e.stopPropagation(); playingTime.toggleOnCourt(); setInactivityWarning(false); setLastActionTime(Date.now()); }}>
+                      Non, je suis sur le banc
+                    </button>
+                  </div>
+                </div>
+              )}
+
               {/* Score en direct avec boutons +/- */}
               <div className="live-score-row">
                 <div className="score-team">
@@ -7377,7 +7473,11 @@ export default function App() {
                   quarterDuration={timer.quarterDuration}
                   onToggle={timer.toggleTimer}
                   onReset={timer.resetQuarter}
-                  onNext={timer.nextQuarter}
+                  onNext={() => {
+                    timer.nextQuarter()
+                    const onCourt = confirm('Es-tu sur le terrain pour le prochain quart-temps ?')
+                    if (onCourt !== playingTime.isOnCourt) playingTime.toggleOnCourt()
+                  }}
                   onPrev={timer.prevQuarter}
                   onDurationChange={timer.updateQuarterDuration}
                   onEndMatch={() => {
