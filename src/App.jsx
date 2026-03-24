@@ -6084,7 +6084,25 @@ export default function App() {
           if (data.stats) {
             importStats(data.stats)
           }
-          alert('Données importées avec succès !')
+          // Importer l'historique si présent (avec fusion)
+          if (data.history && Array.isArray(data.history)) {
+            const existingIds = new Set(history.map(m => m.id))
+            const newMatches = data.history.filter(m => !existingIds.has(m.id))
+
+            if (newMatches.length > 0) {
+              if (confirm(`${newMatches.length} nouveau(x) match(s) trouvé(s). Fusionner avec l'historique actuel ?`)) {
+                const merged = [...history, ...newMatches].sort((a, b) => new Date(a.date) - new Date(b.date))
+                importHistory(merged)
+                alert(`Fusion réussie ! ${merged.length} match(s) au total.`)
+              }
+            } else if (data.history.length > 0) {
+              alert('Données joueur importées. Aucun nouveau match à ajouter.')
+            } else {
+              alert('Données importées avec succès !')
+            }
+          } else {
+            alert('Données importées avec succès !')
+          }
         } catch {
           alert('Erreur lors de l\'import : fichier invalide')
         }
