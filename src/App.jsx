@@ -5770,8 +5770,12 @@ export default function App() {
     const updatedHistory = [...history, savedMatch]
     backupHistory(updatedHistory)
 
-    // Auto-sync vers Gist (crée une nouvelle révision)
-    autoSyncToGist(updatedHistory)
+    // Proposer sync vers Gist si configuré
+    if (githubToken && gistId) {
+      if (confirm('Sauvegarder aussi sur GitHub Gist ?')) {
+        autoSyncToGist(updatedHistory)
+      }
+    }
 
     // Show records notification if any
     if (newRecords.length > 0) {
