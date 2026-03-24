@@ -5763,25 +5763,27 @@ export default function App() {
     }
     const newRecords = checkNewRecords(tempMatch)
 
+    // Confirmation avant sauvegarde
+    if (!confirm('Sauvegarder et terminer le match ?')) return
+
     const matchStreaks = { bestStreak: streaks.bestStreak, bestPointsStreak: streaks.bestPointsStreak }
     const savedMatch = saveMatch(player, stats, opponent, shotMarkers, matchScore, matchLocation, plusMinus, matchNotes, matchStreaks)
 
-    // Auto backup after save
     const updatedHistory = [...history, savedMatch]
     backupHistory(updatedHistory)
+
+    // Show records notification if any
+    if (newRecords.length > 0) {
+      setRecordNotification({ records: newRecords })
+    } else {
+      alert('Match sauvegardé !')
+    }
 
     // Proposer sync vers Gist si configuré
     if (githubToken && gistId) {
       if (confirm('Sauvegarder aussi sur GitHub Gist ?')) {
         autoSyncToGist(updatedHistory)
       }
-    }
-
-    // Show records notification if any
-    if (newRecords.length > 0) {
-      setRecordNotification({ records: newRecords })
-    } else {
-      alert('Match sauvegardé ! Backup téléchargé.')
     }
 
     // Reset for next match
