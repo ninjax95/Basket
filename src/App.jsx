@@ -5856,9 +5856,10 @@ export default function App() {
 
   // GitHub Gist functions
   const saveGithubToken = (token) => {
-    setGithubToken(token)
-    if (token) {
-      localStorage.setItem('basketGithubToken', btoa(token))
+    const cleanToken = token.trim()
+    setGithubToken(cleanToken)
+    if (cleanToken) {
+      localStorage.setItem('basketGithubToken', btoa(cleanToken))
     } else {
       localStorage.removeItem('basketGithubToken')
     }
