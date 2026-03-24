@@ -2114,6 +2114,41 @@ const styles = `
     }
   }
 
+  /* Wide screen layout (Fold unfolded, tablet) - Court + Stats side by side */
+  .match-body {
+    display: flex;
+    flex-direction: column;
+  }
+
+  @media screen and (min-width: 700px) {
+    .match-body {
+      flex-direction: row;
+      gap: 15px;
+      align-items: flex-start;
+    }
+
+    .match-body-court {
+      flex: 1;
+      min-width: 0;
+      max-width: 50%;
+      position: sticky;
+      top: 10px;
+    }
+
+    .match-body-stats {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .match-body-stats .quick-stats-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .match-body-stats .stats-category-title {
+      font-size: 0.8rem;
+    }
+  }
+
   /* Points Total Display - Responsive */
   .points-total-display {
     background: linear-gradient(135deg, rgba(97, 218, 251, 0.2), rgba(97, 218, 251, 0.1));
@@ -7158,7 +7193,9 @@ export default function App() {
               </div>
             </div>
 
-            {/* Court Map - Full Width */}
+            {/* Court + Stats side by side on wide screens */}
+            <div className="match-body">
+            <div className="match-body-court">
             <CourtMap
               onShotRecorded={handleShotRecorded}
               onShotRemoved={handleShotRemoved}
@@ -7170,8 +7207,10 @@ export default function App() {
               onShowReplay={() => setShowReplay(true)}
               onShowHistory={() => setShowActionPanel(true)}
             />
+            </div>
 
-            {/* Quick Stats Grid - Compact for mobile */}
+            <div className="match-body-stats">
+            {/* Quick Stats Grid */}
             {/* ATTAQUE */}
             <div className="stats-category">
               <h4 className="stats-category-title">ATTAQUE</h4>
@@ -7272,6 +7311,8 @@ export default function App() {
                   </div>
                 </div>
               </div>
+            </div>
+            </div>
             </div>
 
             {/* Points Total Display */}
