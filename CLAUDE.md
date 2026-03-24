@@ -123,8 +123,10 @@ git add -A && git commit -m "message" && git push origin main
 2. **Historique** : Liste des matchs sauvegardés avec stats détaillées
 3. **Entraînement** : Mode tir simplifié (activable/désactivable dans Options)
 4. **Analyse** : Graphiques et visualisations avancées
-5. **Options** : Paramètres (thème, sync, objectifs, durée QT)
+5. **Options** : Paramètres (thème, sync, objectifs, affichage, durée QT)
 6. **Aide** : Guide d'utilisation
+
+> Note: la reconnaissance vocale (Web Speech API) a été testée et retirée — les navigateurs mobiles jouent un bip à chaque restart du micro, inutilisable en match.
 
 ### Stats de match
 - **Tirs** : 2PTS, 3PTS, LF (réussis/ratés séparés avec boutons +/-)
