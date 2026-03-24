@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { useStats, usePlayer, useTimer, useMatchHistory, usePlayingTime } from './hooks/useStats'
 import StatCounter from './components/StatCounter'
 import Timer from './components/Timer'
@@ -1992,41 +1992,6 @@ const styles = `
     color: #e74c3c;
   }
 
-  .voice-btn {
-    background: rgba(255, 255, 255, 0.1);
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    color: #fff;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    cursor: pointer;
-    font-size: 1.2rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
-  }
-
-  .voice-btn.active {
-    background: rgba(231, 76, 60, 0.3);
-    border-color: #e74c3c;
-    animation: pulse 1s infinite;
-  }
-
-  .voice-status {
-    text-align: center;
-    padding: 8px;
-    border-radius: 8px;
-    font-size: 0.9rem;
-    font-weight: bold;
-    background: rgba(97, 218, 251, 0.1);
-    color: #61dafb;
-    animation: fadeIn 0.2s ease;
-  }
-
-  .voice-status.listening {
-    border: 1px solid rgba(231, 76, 60, 0.3);
-  }
 
   .playing-time-compact {
     font-size: clamp(0.75rem, 2vw, 1rem);
@@ -6175,9 +6140,6 @@ export default function App() {
   const [showMoreOptions, setShowMoreOptions] = useState(false)
   const [lastActionTime, setLastActionTime] = useState(Date.now())
   const [inactivityWarning, setInactivityWarning] = useState(false)
-  const [voiceActive, setVoiceActive] = useState(false)
-  const [voiceStatus, setVoiceStatus] = useState('')
-  const recognitionRef = useRef(null)
   const [showReplay, setShowReplay] = useState(false)
   const [recordNotification, setRecordNotification] = useState(null) // { records: [...] }
   const [showHelpModal, setShowHelpModal] = useState(false)
@@ -6265,105 +6227,6 @@ export default function App() {
   }, [timer.isRunning, playingTime.isOnCourt, lastActionTime])
 
   // Voice commands
-  const processVoiceCommand = (transcript) => {
-    const text = transcript.toLowerCase().trim()
-    setVoiceStatus(text)
-
-    // Match commands
-    if (/3\s*points?|trois\s*points?/.test(text)) {
-      handleShotMadeIncrement('fg3Made', 'fg3Attempted', 3)
-      setVoiceStatus('✅ 3 Points !')
-    } else if (/2\s*points?|deux\s*points?|panier/.test(text)) {
-      handleShotMadeIncrement('fg2Made', 'fg2Attempted', 2)
-      setVoiceStatus('✅ 2 Points !')
-    } else if (/lancer\s*(franc)?|lf/.test(text)) {
-      handleFreeThrowMadeIncrement()
-      setVoiceStatus('✅ Lancer franc !')
-    } else if (/rat[ée]|manqu[ée]|loup[ée]/.test(text)) {
-      updateStatWithTime('fg2Attempted', 1)
-      setVoiceStatus('❌ Tir raté')
-    } else if (/rebond\s*off/.test(text)) {
-      updateStatWithTime('offRebounds', 1)
-      setVoiceStatus('✅ Rebond offensif')
-    } else if (/rebond/.test(text)) {
-      updateStatWithTime('defRebounds', 1)
-      setVoiceStatus('✅ Rebond')
-    } else if (/passe|assist/.test(text)) {
-      updateStatWithTime('assists', 1)
-      setVoiceStatus('✅ Passe décisive')
-    } else if (/inter/.test(text)) {
-      updateStatWithTime('steals', 1)
-      setVoiceStatus('✅ Interception')
-    } else if (/contre|block/.test(text)) {
-      updateStatWithTime('blocks', 1)
-      setVoiceStatus('✅ Contre')
-    } else if (/faute/.test(text)) {
-      updateStatWithTime('fouls', 1)
-      setVoiceStatus('✅ Faute')
-    } else if (/perte|turnover/.test(text)) {
-      updateStatWithTime('turnovers', 1)
-      setVoiceStatus('✅ Perte de balle')
-    } else if (/temps\s*mort|pause|timeout/.test(text)) {
-      if (timer.isRunning) timer.toggleTimer()
-      setVoiceStatus('⏱️ Temps mort')
-    } else if (/annuler|undo/.test(text)) {
-      undoLastAction()
-      setVoiceStatus('↩ Annulé')
-    } else {
-      setVoiceStatus(`❓ "${text}"`)
-    }
-
-    setTimeout(() => setVoiceStatus(''), 2000)
-  }
-
-  const toggleVoice = () => {
-    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-      alert('La reconnaissance vocale n\'est pas supportée par ce navigateur.')
-      return
-    }
-
-    // If already listening, stop
-    if (voiceActive) {
-      const rec = recognitionRef.current
-      recognitionRef.current = null
-      if (rec) try { rec.abort() } catch {}
-      setVoiceActive(false)
-      setVoiceStatus('')
-      return
-    }
-
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
-    const recognition = new SpeechRecognition()
-    recognition.lang = 'fr-FR'
-    recognition.continuous = false
-    recognition.interimResults = false
-
-    recognition.onresult = (event) => {
-      const last = event.results[event.results.length - 1]
-      if (last.isFinal) {
-        processVoiceCommand(last[0].transcript)
-      }
-    }
-
-    recognition.onerror = (event) => {
-      if (event.error !== 'no-speech' && event.error !== 'aborted') {
-        setVoiceStatus(`Erreur: ${event.error}`)
-        setTimeout(() => setVoiceStatus(''), 2000)
-      }
-    }
-
-    recognition.onend = () => {
-      // Single shot: stop after one command
-      recognitionRef.current = null
-      setVoiceActive(false)
-    }
-
-    recognitionRef.current = recognition
-    recognition.start()
-    setVoiceActive(true)
-    setVoiceStatus('🎤 Parle...')
-  }
-
   // Calculate +/- when player is on court and score changes
   useEffect(() => {
     if (playingTime.isOnCourt) {
@@ -7415,12 +7278,6 @@ export default function App() {
                     ⏱️ Temps mort
                   </button>
                 )}
-                <button
-                  className={`voice-btn ${voiceActive ? 'active' : ''}`}
-                  onClick={toggleVoice}
-                >
-                  {voiceActive ? '🔴' : '🎤'}
-                </button>
               </div>
 
               {/* Inactivity warning */}
@@ -7435,13 +7292,6 @@ export default function App() {
                       Non
                     </button>
                   </div>
-                </div>
-              )}
-
-              {/* Voice status */}
-              {voiceStatus && (
-                <div className={`voice-status ${voiceActive ? 'listening' : ''}`}>
-                  {voiceStatus}
                 </div>
               )}
 
