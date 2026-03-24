@@ -1,5 +1,43 @@
 # CLAUDE.md - Stats Basket App
 
+## 🚨 ISOLATION ABSOLUE DU SOUS-PROJET
+
+### Règles strictes d'isolation
+
+**Répertoire de base unique :** `/home/ninjax/claude/Idées applications/Score kaiji/`
+
+**INTERDICTION FORMELLE de :**
+- Lire ou écrire des fichiers en dehors de `/home/ninjax/claude/Idées applications/Score kaiji/`
+- Utiliser `..` pour sortir du répertoire
+- Accéder aux sous-projets frères (Geolocalisation, Gestion des Charges, etc.)
+- Accéder au répertoire parent `/home/ninjax/claude/Idées applications/`
+- Accéder à d'autres projets (IT2Society, Mitra, RH, clients, etc.)
+- Faire des recherches Glob/Grep en dehors de ce répertoire
+
+### Vérification obligatoire
+
+**AVANT toute opération de fichier (Read, Write, Edit, Glob, Grep), tu DOIS :**
+1. Vérifier que le chemin commence par `/home/ninjax/claude/Idées applications/Score kaiji/`
+2. Si le chemin sort de ce répertoire, **REFUSER** l'opération
+3. Demander confirmation explicite à l'utilisateur
+
+### Exception unique
+
+Accès externe **UNIQUEMENT** si l'utilisateur dit explicitement :
+- "va lire dans [autre-projet]"
+- "accède à [chemin-externe]"
+- "copie depuis [autre-répertoire]"
+
+Sans cette confirmation explicite, **REFUSE TOUTE OPÉRATION EXTERNE**.
+
+## Session locale
+
+**Fichier de session :** `/home/ninjax/claude/Idées applications/Score kaiji/.SESSION.md`
+- Ce fichier contient UNIQUEMENT le contexte de ce sous-projet
+- Ne mélange pas avec les sessions d'autres sous-projets ou projets
+
+---
+
 ## Overview
 
 Application React/Capacitor pour tracker les statistiques d'un joueur de basketball pendant un match. Disponible en web (PWA) et Android (APK).
@@ -83,9 +121,10 @@ git add -A && git commit -m "message" && git push origin main
 ### Onglets de l'application
 1. **Match** : Écran principal pour tracker les stats en temps réel
 2. **Historique** : Liste des matchs sauvegardés avec stats détaillées
-3. **Analyse** : Graphiques et visualisations avancées
-4. **Options** : Paramètres (thème, PIN, sync, durée QT)
-5. **Aide** : Guide d'utilisation
+3. **Entraînement** : Mode tir simplifié (activable/désactivable dans Options)
+4. **Analyse** : Graphiques et visualisations avancées
+5. **Options** : Paramètres (thème, sync, objectifs, durée QT)
+6. **Aide** : Guide d'utilisation
 
 ### Stats de match
 - **Tirs** : 2PTS, 3PTS, LF (réussis/ratés séparés avec boutons +/-)
@@ -137,8 +176,18 @@ git add -A && git commit -m "message" && git push origin main
 - Filtres et tri
 - Stats détaillées par match
 - **Bouton ✎ pour modifier l'adversaire après sauvegarde**
+- **Bouton 🏆 pour modifier le score après sauvegarde**
+- **Bouton 📷 pour attacher une photo au match**
 - Bouton × pour supprimer un match
 - Badges records personnels
+- **Comparaison côte à côte** de 2 matchs (stats en vert = meilleur)
+- **Stats par quart-temps** sauvegardées et affichées par match
+- **Temps de jeu** (terrain/banc) sauvegardé et affiché par match
+- **Tendances** ↑↓→ comparant moyennes récentes vs globales
+- **Moyennes glissantes** sur 3 et 5 derniers matchs
+- **Objectifs** personnels (pts/reb/ast) avec barres de progression
+- **Partage image** (📤) génère une image Canvas partageable
+- **Export PDF** (📄) ouvre une page imprimable
 
 ### Analyse et graphiques
 - **Graphique d'évolution** : Courbe des stats sur plusieurs matchs
@@ -157,14 +206,31 @@ git add -A && git commit -m "message" && git push origin main
 - **Mode sombre** (défaut) : Fond foncé, texte clair
 - **Mode clair** : Fond clair, texte foncé avec bon contraste
 
-### Sécurité
-- **PIN 4 chiffres** : Verrouillage de l'app
-- Stockage sécurisé (base64)
-- Bouton reset complet des données
+### Gestion du temps de jeu
+- **Bouton Temps mort** (⏱️) : pause rapide du timer en 1 clic
+- **Alerte inactivité** : si aucune action depuis 2 min + timer actif, demande "Toujours sur le terrain ?"
+- **Prompt au changement de QT** : demande si le joueur est sur le terrain
+- **Bouton Annuler** rouge sticky visible pendant le match avec dernière action
+
+### Mode entraînement
+- Onglet dédié (activable/désactivable dans Options > Affichage)
+- Carte des tirs interactive sans timer ni score
+- Stats de tirs en temps réel (2PTS/3PTS/LF + total + %)
+- Bouton réinitialiser
 
 ### Synchronisation
-- Export/Import des données via GitHub Gist
+- **Sync bidirectionnelle** : compare local vs Gist, montre les différences
+- **Détection de conflits** : matchs nouveaux, modifiés, communs
+- **Sync au changement de QT** : push automatique vers le Gist
+- **Sync après sauvegarde match** : sur confirmation
+- **Bouton Synchroniser** : sync manuelle avec rapport détaillé
+- **Bouton Forcer envoi** : écrase le Gist avec le local
+- **Import fichier avec fusion** : déduplique par ID, trie par date
 - Sauvegarde automatique dans localStorage
+
+### Layout responsive
+- **Écran large (Fold déplié, tablette)** : terrain à gauche + stats à droite (côte à côte)
+- **Petit écran** : layout vertical classique
 
 ### Mode hors-ligne (PWA)
 - Service Worker cache tous les assets
@@ -195,13 +261,12 @@ git add -A && git commit -m "message" && git push origin main
 
 - `useMatchHistory()` :
   - history (liste des matchs)
-  - saveMatch(), deleteMatch(), **updateMatchOpponent()**
+  - saveMatch(), deleteMatch(), **updateMatchOpponent()**, **updateMatchScore()**, **updateMatchPhoto()**
   - clearHistory(), importHistory()
-  - getAverages(), getRecords(), checkNewRecords()
+  - getAverages(), **getRecentAverages(n)**, getRecords(), checkNewRecords()
 
 ## localStorage keys
 
-- `basketAppPin` : code PIN (base64)
 - `basketStats` : stats du match en cours
 - `basketActionHistory` : historique des actions du match
 - `basketPlayer` : infos joueur {name, number}
@@ -214,6 +279,8 @@ git add -A && git commit -m "message" && git push origin main
 - `basketGithubToken` : token GitHub pour sync
 - `basketGistId` : ID du Gist pour sync
 - `basketTheme` : 'dark' | 'light'
+- `basketGoals` : objectifs par match {points, rebounds, assists}
+- `basketShowTraining` : boolean afficher/masquer onglet entraînement
 
 ## Structure d'un match sauvegardé
 
@@ -257,7 +324,15 @@ git add -A && git commit -m "message" && git push origin main
   notes: {
     strengths,        // Points forts
     improvements      // À améliorer
-  }
+  },
+  quarterStats: [{    // Stats par quart-temps
+    quarter, points, rebounds, assists, steals, blocks, fouls, turnovers, fg
+  }],
+  playingTime: {      // Temps de jeu
+    onCourt,          // secondes sur le terrain
+    bench             // secondes sur le banc
+  },
+  photo: string       // base64 JPEG compressée (400px max)
 }
 ```
 
