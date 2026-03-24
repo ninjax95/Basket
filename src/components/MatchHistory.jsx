@@ -10,7 +10,10 @@ export default function MatchHistory({
   goals,
   onDelete,
   onEditOpponent,
-  onEditScore
+  onEditScore,
+  onAddPhoto,
+  onShare,
+  onExportPDF
 }) {
   const [selectedMatchId, setSelectedMatchId] = useState('all') // 'all' or match id
   const [compareMatchId, setCompareMatchId] = useState(null)
@@ -247,15 +250,29 @@ export default function MatchHistory({
                 : `📊 Total sur ${displayStats.matchCount} match${displayStats.matchCount > 1 ? 's' : ''}`
               }
             </h3>
-            {selectedMatch && selectedMatch.shotMarkers && selectedMatch.shotMarkers.length > 0 && (
-              <button
-                className="replay-btn-history"
-                onClick={() => setShowReplay(true)}
-              >
-                🎬 Replay
-              </button>
+            {selectedMatch && (
+              <div className="match-actions-row">
+                {selectedMatch.shotMarkers && selectedMatch.shotMarkers.length > 0 && (
+                  <button className="replay-btn-history" onClick={() => setShowReplay(true)}>
+                    🎬 Replay
+                  </button>
+                )}
+                <button className="share-btn-history" onClick={() => onShare(selectedMatch.id)}>
+                  📤 Partager
+                </button>
+                <button className="share-btn-history" onClick={() => onExportPDF(selectedMatch.id)}>
+                  📄 PDF
+                </button>
+              </div>
             )}
           </div>
+
+          {/* Match Photo */}
+          {selectedMatch && selectedMatch.photo && (
+            <div className="match-photo-display">
+              <img src={selectedMatch.photo} alt="Photo du match" />
+            </div>
+          )}
 
           {/* Main Stats */}
           <div className="detailed-stats-grid">
@@ -619,6 +636,13 @@ export default function MatchHistory({
                     title="Modifier le score"
                   >
                     🏆
+                  </button>
+                  <button
+                    className="edit-btn"
+                    onClick={(e) => { e.stopPropagation(); onAddPhoto(match.id); }}
+                    title={match.photo ? 'Changer la photo' : 'Ajouter une photo'}
+                  >
+                    📷
                   </button>
                   <button
                     className="delete-btn"

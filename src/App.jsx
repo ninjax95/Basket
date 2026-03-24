@@ -1667,6 +1667,104 @@ const styles = `
     background: #2ecc71;
   }
 
+  .match-actions-row {
+    display: flex;
+    gap: 6px;
+  }
+
+  .share-btn-history {
+    background: rgba(97, 218, 251, 0.15);
+    border: 1px solid rgba(97, 218, 251, 0.3);
+    color: #61dafb;
+    padding: 4px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+  }
+
+  .share-btn-history:active {
+    background: rgba(97, 218, 251, 0.3);
+  }
+
+  .training-page {
+    padding: 10px 0;
+  }
+
+  .training-page h2 {
+    text-align: center;
+    color: #61dafb;
+    margin-bottom: 5px;
+  }
+
+  .training-desc {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.85rem;
+    margin-bottom: 15px;
+  }
+
+  .training-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-top: 15px;
+  }
+
+  .training-stat {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .training-stat.total {
+    background: rgba(97, 218, 251, 0.1);
+  }
+
+  .ts-label {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.75rem;
+    font-weight: bold;
+  }
+
+  .ts-value {
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: bold;
+  }
+
+  .ts-pct {
+    color: #61dafb;
+    font-size: 0.9rem;
+  }
+
+  .training-reset {
+    width: 100%;
+    margin-top: 15px;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    cursor: pointer;
+  }
+
+  .match-photo-display {
+    text-align: center;
+    margin-bottom: 10px;
+  }
+
+  .match-photo-display img {
+    max-width: 100%;
+    max-height: 250px;
+    border-radius: 10px;
+    object-fit: cover;
+  }
+
   .undo-floating {
     position: sticky;
     bottom: 70px;
@@ -5885,6 +5983,8 @@ export default function App() {
   const [gistLoading, setGistLoading] = useState(false)
   const [tempToken, setTempToken] = useState('')
   const [showActionPanel, setShowActionPanel] = useState(false)
+  const [trainingMarkers, setTrainingMarkers] = useState([])
+  const [trainingStats, setTrainingStats] = useState({ fg2Made: 0, fg2Attempted: 0, fg3Made: 0, fg3Attempted: 0, ftMade: 0, ftAttempted: 0 })
   const [actionToDelete, setActionToDelete] = useState(null) // Action pending deletion confirmation
   const [showMoreOptions, setShowMoreOptions] = useState(false)
   const [showReplay, setShowReplay] = useState(false)
@@ -5897,7 +5997,7 @@ export default function App() {
   const { stats, updateStat, resetStats, importStats, getSummary, getEfficiency, getStreaks, actionHistory, getStatsByQuarter, undoLastAction, deleteAction } = useStats()
   const { player, updatePlayer } = usePlayer()
   const timer = useTimer()
-  const { history, saveMatch, deleteMatch, updateMatchOpponent, updateMatchScore, clearHistory, importHistory, getAverages, getRecentAverages, getRecords, checkNewRecords } = useMatchHistory()
+  const { history, saveMatch, deleteMatch, updateMatchOpponent, updateMatchScore, updateMatchPhoto, clearHistory, importHistory, getAverages, getRecentAverages, getRecords, checkNewRecords } = useMatchHistory()
   const playingTime = usePlayingTime()
 
   const summary = getSummary()
@@ -6180,6 +6280,222 @@ export default function App() {
     if (newOpponent !== null && newOpponent !== currentOpponent) {
       updateMatchOpponent(matchId, newOpponent)
     }
+  }
+
+  const generateMatchImage = (match) => {
+    const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d')
+    canvas.width = 600
+    canvas.height = 800
+
+    // Background
+    ctx.fillStyle = '#1a1a2e'
+    ctx.fillRect(0, 0, 600, 800)
+
+    // Header
+    ctx.fillStyle = '#61dafb'
+    ctx.font = 'bold 28px sans-serif'
+    ctx.textAlign = 'center'
+    ctx.fillText('🏀 Stats Basket', 300, 45)
+
+    // Match info
+    ctx.fillStyle = '#fff'
+    ctx.font = 'bold 22px sans-serif'
+    const matchDate = new Date(match.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
+    ctx.fillText(match.opponent ? `vs ${match.opponent}` : 'Match', 300, 85)
+    ctx.font = '16px sans-serif'
+    ctx.fillStyle = 'rgba(255,255,255,0.6)'
+    ctx.fillText(`${matchDate} | ${match.location === 'away' ? 'Extérieur' : 'Domicile'}`, 300, 110)
+
+    // Score
+    if (match.score) {
+      ctx.font = 'bold 36px sans-serif'
+      ctx.fillStyle = match.score.team > match.score.opponent ? '#2ecc71' : match.score.team < match.score.opponent ? '#e74c3c' : '#fff'
+      ctx.fillText(`${match.score.team} - ${match.score.opponent}`, 300, 160)
+    }
+
+    // Player
+    ctx.font = '18px sans-serif'
+    ctx.fillStyle = '#61dafb'
+    ctx.fillText(`${match.player.name} #${match.player.number}`, 300, 195)
+
+    // Stats grid
+    const stats = [
+      { label: 'PTS', value: match.summary.points, big: true },
+      { label: 'REB', value: match.summary.rebounds },
+      { label: 'AST', value: match.summary.assists },
+      { label: 'STL', value: match.summary.steals },
+      { label: 'BLK', value: match.summary.blocks },
+      { label: 'FG%', value: `${match.summary.fgPercentage}%` },
+      { label: 'FT%', value: `${match.summary.ftPercentage}%` },
+      { label: '+/-', value: match.plusMinus > 0 ? `+${match.plusMinus}` : match.plusMinus },
+    ]
+
+    let y = 240
+    // Points big
+    ctx.fillStyle = '#fff'
+    ctx.font = 'bold 60px sans-serif'
+    ctx.fillText(match.summary.points, 300, y + 40)
+    ctx.font = '16px sans-serif'
+    ctx.fillStyle = 'rgba(255,255,255,0.6)'
+    ctx.fillText('POINTS', 300, y + 65)
+
+    y = 330
+    const cols = 4
+    const cellW = 140
+    const startX = 20
+    stats.slice(1).forEach((stat, i) => {
+      const col = i % cols
+      const row = Math.floor(i / cols)
+      const x = startX + col * cellW + cellW / 2
+      const cy = y + row * 80
+
+      ctx.fillStyle = 'rgba(255,255,255,0.05)'
+      ctx.beginPath()
+      ctx.roundRect(startX + col * cellW + 5, cy - 25, cellW - 10, 65, 8)
+      ctx.fill()
+
+      ctx.fillStyle = '#fff'
+      ctx.font = 'bold 24px sans-serif'
+      ctx.fillText(String(stat.value), x, cy + 8)
+      ctx.fillStyle = 'rgba(255,255,255,0.5)'
+      ctx.font = '12px sans-serif'
+      ctx.fillText(stat.label, x, cy + 28)
+    })
+
+    // Efficiency
+    y = 510
+    if (match.efficiency) {
+      ctx.fillStyle = 'rgba(97,218,251,0.1)'
+      ctx.beginPath()
+      ctx.roundRect(20, y, 560, 60, 10)
+      ctx.fill()
+
+      const effStats = [
+        { label: 'TS%', value: `${match.efficiency.trueShootingPct}%` },
+        { label: 'GmSc', value: match.efficiency.gameScore },
+        { label: 'PER', value: match.efficiency.per },
+        { label: 'USG%', value: `${match.efficiency.usageRate}%` },
+      ]
+      effStats.forEach((stat, i) => {
+        const x = 90 + i * 140
+        ctx.fillStyle = '#61dafb'
+        ctx.font = 'bold 18px sans-serif'
+        ctx.fillText(String(stat.value), x, y + 30)
+        ctx.fillStyle = 'rgba(255,255,255,0.5)'
+        ctx.font = '11px sans-serif'
+        ctx.fillText(stat.label, x, y + 48)
+      })
+    }
+
+    // Shooting detail
+    y = 600
+    ctx.fillStyle = 'rgba(255,255,255,0.7)'
+    ctx.font = '14px sans-serif'
+    const shootingLine = `2PTS: ${match.stats.fg2Made}/${match.stats.fg2Attempted}  |  3PTS: ${match.stats.fg3Made}/${match.stats.fg3Attempted}  |  LF: ${match.stats.ftMade}/${match.stats.ftAttempted}`
+    ctx.fillText(shootingLine, 300, y)
+
+    // Notes
+    y = 640
+    if (match.notes?.strengths) {
+      ctx.fillStyle = 'rgba(46,204,113,0.6)'
+      ctx.font = '13px sans-serif'
+      ctx.fillText(`💪 ${match.notes.strengths}`, 300, y)
+      y += 25
+    }
+    if (match.notes?.improvements) {
+      ctx.fillStyle = 'rgba(231,76,60,0.6)'
+      ctx.font = '13px sans-serif'
+      ctx.fillText(`📈 ${match.notes.improvements}`, 300, y)
+    }
+
+    // Footer
+    ctx.fillStyle = 'rgba(255,255,255,0.3)'
+    ctx.font = '12px sans-serif'
+    ctx.fillText('Stats Basket App', 300, 780)
+
+    return canvas
+  }
+
+  const handleShareMatch = async (matchId) => {
+    const match = history.find(m => m.id === matchId)
+    if (!match) return
+
+    const canvas = generateMatchImage(match)
+    canvas.toBlob(async (blob) => {
+      if (navigator.share && navigator.canShare) {
+        const file = new File([blob], `stats_${match.opponent || 'match'}.png`, { type: 'image/png' })
+        try {
+          await navigator.share({
+            title: `Stats vs ${match.opponent || 'Match'}`,
+            files: [file]
+          })
+        } catch {
+          // Fallback: download
+          downloadBlob(blob, `stats_${match.opponent || 'match'}.png`)
+        }
+      } else {
+        downloadBlob(blob, `stats_${match.opponent || 'match'}.png`)
+      }
+    }, 'image/png')
+  }
+
+  const handleExportPDF = (matchId) => {
+    const match = history.find(m => m.id === matchId)
+    if (!match) return
+
+    const canvas = generateMatchImage(match)
+    const imgData = canvas.toDataURL('image/png')
+    // Create a printable HTML page with the image
+    const printWindow = window.open('', '_blank')
+    printWindow.document.write(`
+      <html><head><title>Stats vs ${match.opponent || 'Match'}</title>
+      <style>body{margin:0;display:flex;justify-content:center;align-items:center;min-height:100vh;background:#fff;}
+      img{max-width:100%;height:auto;}
+      @media print{body{margin:0;}img{width:100%;}}
+      </style></head><body>
+      <img src="${imgData}" />
+      <script>setTimeout(()=>window.print(),500)<\/script>
+      </body></html>
+    `)
+    printWindow.document.close()
+  }
+
+  const downloadBlob = (blob, filename) => {
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = filename
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  const handleAddPhoto = (matchId) => {
+    const input = document.createElement('input')
+    input.type = 'file'
+    input.accept = 'image/*'
+    input.capture = 'environment'
+    input.onchange = (e) => {
+      const file = e.target.files[0]
+      if (!file) return
+
+      const canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d')
+      const img = new Image()
+      img.onload = () => {
+        const maxSize = 400
+        let w = img.width, h = img.height
+        if (w > h) { h = (h / w) * maxSize; w = maxSize }
+        else { w = (w / h) * maxSize; h = maxSize }
+        canvas.width = w
+        canvas.height = h
+        ctx.drawImage(img, 0, 0, w, h)
+        const compressed = canvas.toDataURL('image/jpeg', 0.6)
+        updateMatchPhoto(matchId, compressed)
+      }
+      img.src = URL.createObjectURL(file)
+    }
+    input.click()
   }
 
   const handleEditScore = (matchId, currentScore) => {
@@ -6643,6 +6959,12 @@ export default function App() {
             📋 Historique ({history.length})
           </button>
           <button
+            className={`nav-tab ${activeTab === 'training' ? 'active' : ''}`}
+            onClick={() => setActiveTab('training')}
+          >
+            🏋️ Entraîn.
+          </button>
+          <button
             className={`nav-tab ${activeTab === 'analysis' ? 'active' : ''}`}
             onClick={() => setActiveTab('analysis')}
           >
@@ -6997,7 +7319,96 @@ export default function App() {
             onDelete={handleDeleteMatch}
             onEditOpponent={handleEditOpponent}
             onEditScore={handleEditScore}
+            onAddPhoto={handleAddPhoto}
+            onShare={handleShareMatch}
+            onExportPDF={handleExportPDF}
           />
+        )}
+
+        {activeTab === 'training' && (
+          <div className="training-page">
+            <h2>🏋️ Mode Entraînement</h2>
+            <p className="training-desc">Entraîne tes tirs sans créer de match</p>
+
+            <CourtMap
+              shotMarkers={trainingMarkers}
+              onAddMarker={(marker) => {
+                setTrainingMarkers(prev => [...prev, marker])
+                if (marker.isFreeThrow) {
+                  if (marker.made) setTrainingStats(p => ({ ...p, ftMade: p.ftMade + 1, ftAttempted: p.ftAttempted + 1 }))
+                  else setTrainingStats(p => ({ ...p, ftAttempted: p.ftAttempted + 1 }))
+                } else if (marker.isThree) {
+                  if (marker.made) setTrainingStats(p => ({ ...p, fg3Made: p.fg3Made + 1, fg3Attempted: p.fg3Attempted + 1 }))
+                  else setTrainingStats(p => ({ ...p, fg3Attempted: p.fg3Attempted + 1 }))
+                } else {
+                  if (marker.made) setTrainingStats(p => ({ ...p, fg2Made: p.fg2Made + 1, fg2Attempted: p.fg2Attempted + 1 }))
+                  else setTrainingStats(p => ({ ...p, fg2Attempted: p.fg2Attempted + 1 }))
+                }
+              }}
+              undoLastMarker={() => {
+                if (trainingMarkers.length === 0) return
+                const last = trainingMarkers[trainingMarkers.length - 1]
+                setTrainingMarkers(prev => prev.slice(0, -1))
+                if (last.isFreeThrow) {
+                  if (last.made) setTrainingStats(p => ({ ...p, ftMade: p.ftMade - 1, ftAttempted: p.ftAttempted - 1 }))
+                  else setTrainingStats(p => ({ ...p, ftAttempted: p.ftAttempted - 1 }))
+                } else if (last.isThree) {
+                  if (last.made) setTrainingStats(p => ({ ...p, fg3Made: p.fg3Made - 1, fg3Attempted: p.fg3Attempted - 1 }))
+                  else setTrainingStats(p => ({ ...p, fg3Attempted: p.fg3Attempted - 1 }))
+                } else {
+                  if (last.made) setTrainingStats(p => ({ ...p, fg2Made: p.fg2Made - 1, fg2Attempted: p.fg2Attempted - 1 }))
+                  else setTrainingStats(p => ({ ...p, fg2Attempted: p.fg2Attempted - 1 }))
+                }
+              }}
+              clearAllMarkers={() => {
+                setTrainingMarkers([])
+                setTrainingStats({ fg2Made: 0, fg2Attempted: 0, fg3Made: 0, fg3Attempted: 0, ftMade: 0, ftAttempted: 0 })
+              }}
+              quarter={1}
+            />
+
+            <div className="training-stats">
+              <div className="training-stat">
+                <span className="ts-label">2PTS</span>
+                <span className="ts-value">{trainingStats.fg2Made}/{trainingStats.fg2Attempted}</span>
+                <span className="ts-pct">{trainingStats.fg2Attempted > 0 ? Math.round(trainingStats.fg2Made / trainingStats.fg2Attempted * 100) : 0}%</span>
+              </div>
+              <div className="training-stat">
+                <span className="ts-label">3PTS</span>
+                <span className="ts-value">{trainingStats.fg3Made}/{trainingStats.fg3Attempted}</span>
+                <span className="ts-pct">{trainingStats.fg3Attempted > 0 ? Math.round(trainingStats.fg3Made / trainingStats.fg3Attempted * 100) : 0}%</span>
+              </div>
+              <div className="training-stat">
+                <span className="ts-label">LF</span>
+                <span className="ts-value">{trainingStats.ftMade}/{trainingStats.ftAttempted}</span>
+                <span className="ts-pct">{trainingStats.ftAttempted > 0 ? Math.round(trainingStats.ftMade / trainingStats.ftAttempted * 100) : 0}%</span>
+              </div>
+              <div className="training-stat total">
+                <span className="ts-label">TOTAL</span>
+                <span className="ts-value">
+                  {trainingStats.fg2Made + trainingStats.fg3Made + trainingStats.ftMade}/
+                  {trainingStats.fg2Attempted + trainingStats.fg3Attempted + trainingStats.ftAttempted}
+                </span>
+                <span className="ts-pct">
+                  {(trainingStats.fg2Attempted + trainingStats.fg3Attempted + trainingStats.ftAttempted) > 0
+                    ? Math.round((trainingStats.fg2Made + trainingStats.fg3Made + trainingStats.ftMade) /
+                      (trainingStats.fg2Attempted + trainingStats.fg3Attempted + trainingStats.ftAttempted) * 100) : 0}%
+                </span>
+              </div>
+            </div>
+
+            <button
+              className="training-reset"
+              onClick={() => {
+                if (trainingMarkers.length === 0 || confirm('Réinitialiser l\'entraînement ?')) {
+                  setTrainingMarkers([])
+                  setTrainingStats({ fg2Made: 0, fg2Attempted: 0, fg3Made: 0, fg3Attempted: 0, ftMade: 0, ftAttempted: 0 })
+                }
+              }}
+            >
+              🔄 Réinitialiser
+            </button>
+          </div>
         )}
 
         {activeTab === 'analysis' && (

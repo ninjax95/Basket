@@ -590,6 +590,12 @@ export function useMatchHistory() {
     ))
   }
 
+  const updateMatchPhoto = (matchId, photoData) => {
+    setHistory(prev => prev.map(m =>
+      m.id === matchId ? { ...m, photo: photoData } : m
+    ))
+  }
+
   const clearHistory = () => {
     setHistory([])
   }
@@ -717,5 +723,5 @@ export function useMatchHistory() {
     }
   }
 
-  return { history, saveMatch, deleteMatch, updateMatchOpponent, updateMatchScore, clearHistory, importHistory, getAverages, getRecentAverages, getRecords, checkNewRecords }
+  return { history, saveMatch, deleteMatch, updateMatchOpponent, updateMatchScore, updateMatchPhoto, clearHistory, importHistory, getAverages, getRecentAverages, getRecords, checkNewRecords }
 }
