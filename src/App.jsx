@@ -5770,6 +5770,9 @@ export default function App() {
     const updatedHistory = [...history, savedMatch]
     backupHistory(updatedHistory)
 
+    // Auto-sync vers Gist (crée une nouvelle révision)
+    autoSyncToGist(updatedHistory)
+
     // Show records notification if any
     if (newRecords.length > 0) {
       setRecordNotification({ records: newRecords })
@@ -5928,6 +5931,42 @@ export default function App() {
       alert(`Erreur: ${err.message}`)
     } finally {
       setGistLoading(false)
+    }
+  }
+
+  // Auto-sync silencieux vers Gist (appelé après chaque sauvegarde de match)
+  const autoSyncToGist = async (updatedHistory) => {
+    if (!githubToken || !gistId) return
+
+    const backupData = {
+      exportDate: new Date().toISOString(),
+      player: player,
+      matchCount: updatedHistory.length,
+      history: updatedHistory
+    }
+
+    try {
+      const response = await fetch(`https://api.github.com/gists/${gistId}`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `token ${githubToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          description: `Stats Basket - Backup ${player.name || 'joueur'} (${updatedHistory.length} matchs)`,
+          files: {
+            'stats_basket_backup.json': {
+              content: JSON.stringify(backupData, null, 2)
+            }
+          }
+        })
+      })
+
+      if (!response.ok) {
+        console.warn('Auto-sync Gist échoué:', response.status)
+      }
+    } catch (err) {
+      console.warn('Auto-sync Gist erreur:', err.message)
     }
   }
 
