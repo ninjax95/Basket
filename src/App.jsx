@@ -6323,9 +6323,10 @@ export default function App() {
     }
 
     if (voiceActive) {
-      if (recognitionRef.current) {
-        recognitionRef.current.stop()
-        recognitionRef.current = null
+      const rec = recognitionRef.current
+      recognitionRef.current = null
+      if (rec) {
+        try { rec.abort() } catch {}
       }
       setVoiceActive(false)
       setVoiceStatus('')
@@ -6333,43 +6334,53 @@ export default function App() {
     }
 
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
-    const recognition = new SpeechRecognition()
-    recognition.lang = 'fr-FR'
-    recognition.continuous = true
-    recognition.interimResults = false
 
-    recognition.onresult = (event) => {
-      const last = event.results[event.results.length - 1]
-      if (last.isFinal) {
-        processVoiceCommand(last[0].transcript)
+    const startRecognition = () => {
+      const recognition = new SpeechRecognition()
+      recognition.lang = 'fr-FR'
+      recognition.continuous = false
+      recognition.interimResults = false
+      recognition.maxAlternatives = 1
+
+      recognition.onresult = (event) => {
+        const last = event.results[event.results.length - 1]
+        if (last.isFinal) {
+          processVoiceCommand(last[0].transcript)
+        }
       }
-    }
 
-    recognition.onerror = (event) => {
-      if (event.error === 'no-speech') return
-      if (event.error === 'aborted') return
-      setVoiceStatus(`Erreur: ${event.error}`)
-      setTimeout(() => setVoiceStatus(''), 2000)
-    }
-
-    recognition.onend = () => {
-      // Restart if still active
-      if (recognitionRef.current) {
-        try { recognitionRef.current.start() } catch {}
+      recognition.onerror = (event) => {
+        if (event.error === 'no-speech' || event.error === 'aborted') return
+        setVoiceStatus(`Erreur: ${event.error}`)
+        setTimeout(() => setVoiceStatus(''), 2000)
       }
+
+      recognition.onend = () => {
+        // Restart silently after a short delay (avoids rapid bip loop)
+        if (recognitionRef.current !== null) {
+          setTimeout(() => {
+            if (recognitionRef.current !== null) {
+              startRecognition()
+            }
+          }, 300)
+        }
+      }
+
+      recognition.start()
+      recognitionRef.current = recognition
     }
 
-    recognitionRef.current = recognition
-    recognition.start()
+    startRecognition()
     setVoiceActive(true)
     setVoiceStatus('🎤 Écoute...')
   }
 
   // Cleanup voice on unmount or tab change
   useEffect(() => {
-    if (activeTab !== 'match' && recognitionRef.current) {
-      recognitionRef.current.stop()
+    if (activeTab !== 'match' && recognitionRef.current !== null) {
+      const rec = recognitionRef.current
       recognitionRef.current = null
+      try { rec.abort() } catch {}
       setVoiceActive(false)
       setVoiceStatus('')
     }
