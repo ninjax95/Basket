@@ -173,6 +173,12 @@ git add -A && git commit -m "message" && git push origin main
 - Record de série sauvegardé avec le match
 - Affichage dans l'analyse (par match et global)
 
+### Saisons
+- Saison déduite de la date du match : 1er août → 31 juillet (`getSeason(date)` → `"2026/2027"`)
+- Sélecteur « Saison » en haut des onglets Historique et Analyse (saison en cours par défaut, anciennes = archive)
+- Historique, moyennes, tendances, records, graphiques : filtrés sur la saison sélectionnée
+- Archive non destructive : `basketMatchHistory`, Gist, export/import gardent toutes les saisons
+
 ### Historique des matchs
 - Liste des matchs sauvegardés
 - Filtres et tri
@@ -265,7 +271,8 @@ git add -A && git commit -m "message" && git push origin main
   - history (liste des matchs)
   - saveMatch(), deleteMatch(), **updateMatchOpponent()**, **updateMatchScore()**, **updateMatchPhoto()**
   - clearHistory(), importHistory()
-  - getAverages(), **getRecentAverages(n)**, getRecords(), checkNewRecords()
+  - **seasonHistory**, **season**, **setSeason()**, **seasons**, **currentSeason**
+  - getAverages(), **getRecentAverages(n)**, getRecords(), checkNewRecords() — calculés sur la saison sélectionnée
 
 ## localStorage keys
 

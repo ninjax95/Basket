@@ -489,6 +489,13 @@ export function useTimer() {
   }
 }
 
+// Saison sportive : du 1er août au 31 juillet (ex: "2026/2027")
+export function getSeason(date) {
+  const d = new Date(date)
+  const y = d.getMonth() >= 7 ? d.getFullYear() : d.getFullYear() - 1
+  return `${y}/${y + 1}`
+}
+
 export function useMatchHistory() {
   const [history, setHistory] = useState(() => {
     const saved = localStorage.getItem('basketMatchHistory')
@@ -498,6 +505,12 @@ export function useMatchHistory() {
   useEffect(() => {
     localStorage.setItem('basketMatchHistory', JSON.stringify(history))
   }, [history])
+
+  // Les saisons passées restent dans history (archive), seule la saison sélectionnée est affichée
+  const currentSeason = getSeason(new Date())
+  const [season, setSeason] = useState(currentSeason)
+  const seasons = [...new Set([currentSeason, ...history.map(m => getSeason(m.date))])].sort().reverse()
+  const seasonHistory = history.filter(m => getSeason(m.date) === season)
 
   const saveMatch = (player, stats, opponent = '', shotMarkers = [], score = null, location = 'home', plusMinus = 0, notes = null, matchStreaks = null, quarterStats = null, playingTimeData = null) => {
     const totalPoints = (stats.fg2Made * 2) + (stats.fg3Made * 3) + stats.ftMade
@@ -605,9 +618,9 @@ export function useMatchHistory() {
   }
 
   const getAverages = () => {
-    if (history.length === 0) return null
+    if (seasonHistory.length === 0) return null
 
-    const totals = history.reduce((acc, match) => ({
+    const totals = seasonHistory.reduce((acc, match) => ({
       points: acc.points + match.summary.points,
       rebounds: acc.rebounds + match.summary.rebounds,
       assists: acc.assists + match.summary.assists,
@@ -617,7 +630,7 @@ export function useMatchHistory() {
       turnovers: acc.turnovers + match.summary.turnovers
     }), { points: 0, rebounds: 0, assists: 0, steals: 0, blocks: 0, fouls: 0, turnovers: 0 })
 
-    const count = history.length
+    const count = seasonHistory.length
     return {
       points: (totals.points / count).toFixed(1),
       rebounds: (totals.rebounds / count).toFixed(1),
@@ -630,7 +643,7 @@ export function useMatchHistory() {
   }
 
   const getRecords = () => {
-    if (history.length === 0) return null
+    if (seasonHistory.length === 0) return null
 
     const records = {
       points: { value: 0, date: null, opponent: null },
@@ -641,7 +654,7 @@ export function useMatchHistory() {
       plusMinus: { value: -999, date: null, opponent: null }
     }
 
-    history.forEach(match => {
+    seasonHistory.forEach(match => {
       if (match.summary.points > records.points.value) {
         records.points = { value: match.summary.points, date: match.date, opponent: match.opponent }
       }
@@ -697,7 +710,7 @@ export function useMatchHistory() {
   }
 
   const getRecentAverages = (count) => {
-    const recent = history.slice(-count)
+    const recent = seasonHistory.slice(-count)
     if (recent.length === 0) return null
 
     const totals = recent.reduce((acc, match) => ({
@@ -723,5 +736,5 @@ export function useMatchHistory() {
     }
   }
 
-  return { history, saveMatch, deleteMatch, updateMatchOpponent, updateMatchScore, updateMatchPhoto, clearHistory, importHistory, getAverages, getRecentAverages, getRecords, checkNewRecords }
+  return { history, seasonHistory, season, setSeason, seasons, currentSeason, saveMatch, deleteMatch, updateMatchOpponent, updateMatchScore, updateMatchPhoto, clearHistory, importHistory, getAverages, getRecentAverages, getRecords, checkNewRecords }
 }

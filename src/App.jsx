@@ -6150,7 +6150,7 @@ export default function App() {
   const { stats, updateStat, resetStats, importStats, getSummary, getEfficiency, getStreaks, actionHistory, getStatsByQuarter, undoLastAction, deleteAction } = useStats()
   const { player, updatePlayer } = usePlayer()
   const timer = useTimer()
-  const { history, saveMatch, deleteMatch, updateMatchOpponent, updateMatchScore, updateMatchPhoto, clearHistory, importHistory, getAverages, getRecentAverages, getRecords, checkNewRecords } = useMatchHistory()
+  const { history, seasonHistory, season, setSeason, seasons, currentSeason, saveMatch, deleteMatch, updateMatchOpponent, updateMatchScore, updateMatchPhoto, clearHistory, importHistory, getAverages, getRecentAverages, getRecords, checkNewRecords } = useMatchHistory()
   const playingTime = usePlayingTime()
 
   const summary = getSummary()
@@ -7214,7 +7214,7 @@ export default function App() {
             className={`nav-tab ${activeTab === 'history' ? 'active' : ''}`}
             onClick={() => setActiveTab('history')}
           >
-            📋 Historique ({history.length})
+            📋 Historique ({seasonHistory.length})
           </button>
           {showTraining && (
             <button
@@ -7609,9 +7609,27 @@ export default function App() {
           </>
         ) : null}
 
+        {(activeTab === 'history' || activeTab === 'analysis') && (
+          <div className="analysis-filter">
+            <label>Saison :</label>
+            <select
+              value={season}
+              onChange={(e) => { setSeason(e.target.value); setAnalysisSelectedMatchId('all') }}
+              className="match-select"
+            >
+              {seasons.map(s => (
+                <option key={s} value={s}>
+                  {s}{s === currentSeason ? ' (en cours)' : ' (archive)'}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
         {activeTab === 'history' && (
           <MatchHistory
-            history={history}
+            key={season}
+            history={seasonHistory}
             averages={averages}
             recentAverages3={getRecentAverages(3)}
             recentAverages5={getRecentAverages(5)}
@@ -7716,7 +7734,7 @@ export default function App() {
           <div className="analysis-page">
             <h2>📈 Analyse des performances</h2>
 
-            {history.length === 0 ? (
+            {seasonHistory.length === 0 ? (
               <div className="no-data-message">
                 <p>Aucune donnée à analyser.</p>
                 <p>Sauvegarde des matchs pour voir tes statistiques ici !</p>
@@ -7732,10 +7750,10 @@ export default function App() {
                     className="match-select"
                   >
                     <option value="all">📊 Tous les matchs</option>
-                    {[...history].reverse().map((match, index) => (
+                    {[...seasonHistory].reverse().map((match, index) => (
                       <option key={match.id} value={match.id}>
                         {new Date(match.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}
-                        {match.opponent ? ` vs ${match.opponent}` : ` - Match ${history.length - index}`}
+                        {match.opponent ? ` vs ${match.opponent}` : ` - Match ${seasonHistory.length - index}`}
                         {' '}({match.summary.points} pts)
                       </option>
                     ))}
@@ -7746,8 +7764,8 @@ export default function App() {
                 <div className="analysis-section">
                   <h3>🎯 Cartes des tirs</h3>
                   <div className="shot-charts-grid">
-                    <ShotHeatmap history={history} selectedMatchId={analysisSelectedMatchId} />
-                    <ThermalHeatmap history={history} selectedMatchId={analysisSelectedMatchId} />
+                    <ShotHeatmap history={seasonHistory} selectedMatchId={analysisSelectedMatchId} />
+                    <ThermalHeatmap history={seasonHistory} selectedMatchId={analysisSelectedMatchId} />
                   </div>
                 </div>
 
@@ -7755,8 +7773,8 @@ export default function App() {
                 <div className="analysis-section">
                   <h3>📊 Graphiques de performance</h3>
                   <div className="charts-grid">
-                    <EvolutionChart history={history} />
-                    <PerformanceRadar averages={averages} lastMatch={history[history.length - 1]} />
+                    <EvolutionChart history={seasonHistory} />
+                    <PerformanceRadar averages={averages} lastMatch={seasonHistory[seasonHistory.length - 1]} />
                   </div>
                 </div>
 
@@ -7767,7 +7785,7 @@ export default function App() {
                     // Calculate stats for selected match or all matches
                     const selectedMatch = analysisSelectedMatchId === 'all'
                       ? null
-                      : history.find(m => m.id === analysisSelectedMatchId)
+                      : seasonHistory.find(m => m.id === analysisSelectedMatchId)
 
                     if (selectedMatch) {
                       // Single match stats
@@ -7810,7 +7828,7 @@ export default function App() {
                       )
                     } else {
                       // All matches - calculate averages
-                      const totals = history.reduce((acc, m) => ({
+                      const totals = seasonHistory.reduce((acc, m) => ({
                         points: acc.points + m.summary.points,
                         fg2Made: acc.fg2Made + (m.stats?.fg2Made || 0),
                         fg2Attempted: acc.fg2Attempted + (m.stats?.fg2Attempted || 0),
