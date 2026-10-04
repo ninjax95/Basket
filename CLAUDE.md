@@ -91,7 +91,8 @@ npm run dev
 # Build production (avec PWA)
 npm run build
 
-# Build APK Android complet
+# Build APK Android complet (JDK 21 + SDK installés dans ~/Android, sans sudo)
+export JAVA_HOME=~/Android/jdk21 ANDROID_HOME=~/Android/Sdk PATH=~/Android/jdk21/bin:$PATH
 npm run build && npx cap sync android && cd android && ./gradlew assembleDebug
 # APK générée dans: android/app/build/outputs/apk/debug/app-debug.apk
 
@@ -109,12 +110,12 @@ git add -A && git commit -m "message" && git push origin main
 ## Stack technique
 
 - **Framework** : React 19 avec Vite 8
-- **Mobile** : Capacitor (Android)
+- **Mobile** : Capacitor 8 (Android 16 / SDK 36, minSdk 24)
 - **Graphiques** : Recharts (LineChart, RadarChart)
 - **PWA** : vite-plugin-pwa 2 (Service Worker + Manifest)
 - **Persistance** : localStorage
 - **Style** : CSS-in-JS avec clamp() pour le responsive. Couche « MODERNISATION 2026/2027 » en fin de `styles` (App.jsx) : variables `--bg`, `--surface`, `--accent`… sur `body` / `body[data-theme="light"]`, règles préfixées `#root` pour primer sur l'ancien CSS
-- **Java** : OpenJDK 21 (requis pour le build Android)
+- **Java** : OpenJDK 21 Temurin dans `~/Android/jdk21` (requis pour le build Android)
 
 ## Fonctionnalités principales
 
