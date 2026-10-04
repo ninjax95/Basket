@@ -7037,6 +7037,249 @@ const styles = `
     80% { opacity: 1; transform: translate(-50%, -50%) scale(1.04) rotate(-4deg); }
     100% { opacity: 0; transform: translate(-50%, -80%) scale(0.9) rotate(-4deg); }
   }
+
+  /* ============================================================
+     CARTOON — AUTRES ONGLETS (Historique, Entraînement, Analyse,
+     Options, bas de l'écran Match, fenêtres)
+     ============================================================ */
+
+  /* Grands panneaux */
+  #root .analysis-filter,
+  #root .history-filter,
+  #root .detailed-stats-section,
+  #root .shooting-stats,
+  #root .averages-inline,
+  #root .records-inline,
+  #root .rolling-averages,
+  #root .goals-section,
+  #root .compare-view,
+  #root .quarter-stats-display,
+  #root .playing-time-display,
+  #root .match-card,
+  #root .chart-container,
+  #root .options-section,
+  #root .timer-section,
+  #root .playing-time-section,
+  #root .quarter-stats-section,
+  #root .summary,
+  #root .save-match-section {
+    background: var(--surface);
+    border: 3px solid var(--ink);
+    border-radius: 18px;
+    box-shadow: 5px 5px 0 var(--ink);
+    color: var(--text);
+  }
+  #root .options-section .player-info { background: transparent; border: none; box-shadow: none; }
+
+  /* Titres de section façon sticker */
+  #root .history-page h2, #root .analysis-page h2, #root .training-page h2, #root .options-page h2,
+  #root .history-page > h2 {
+    font-size: 2rem;
+    color: var(--c-yellow);
+    -webkit-text-stroke: 1.5px var(--ink);
+    text-shadow: 3px 3px 0 var(--ink);
+  }
+  #root .analysis-section > h3,
+  #root .options-section > h3,
+  #root .detailed-stats-section h3,
+  #root .records-inline h3,
+  #root .averages-inline h3,
+  #root .match-list-header h3,
+  #root .shooting-stats h3,
+  #root .goals-section h3,
+  #root .rolling-averages h3,
+  #root .chart-container h3,
+  #root .save-match-section h3,
+  #root .averages-inline h4,
+  #root .records-inline h4,
+  #root .rolling-averages h4,
+  #root .goals-section h4,
+  #root .shooting-stats h4,
+  #root .detailed-stats-section h4 {
+    display: inline-block;
+    padding: 3px 12px;
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 1.2rem;
+    letter-spacing: 0.06em;
+    color: var(--ink);
+    background: var(--c-yellow);
+    border: 2.5px solid var(--ink);
+    border-radius: 8px;
+    box-shadow: 3px 3px 0 var(--ink);
+    transform: rotate(-1.5deg);
+    -webkit-text-stroke: 0;
+    text-shadow: none;
+  }
+  #root .analysis-section > h3 { border-bottom: 2.5px solid var(--ink); }
+  #root .chart-container h3 { background: var(--c-cyan); }
+
+  /* Tuiles de stats colorées */
+  #root .detailed-stat,
+  #root .advanced-stat,
+  #root .record-card,
+  #root .shooting-stat,
+  #root .training-stat,
+  #root .quarter-stat-card,
+  #root .playing-time-item,
+  #root .summary-item,
+  #root .heatmap-stat {
+    background: var(--c-cyan);
+    color: var(--ink);
+    border: 2.5px solid var(--ink);
+    border-radius: 14px;
+    box-shadow: 3px 3px 0 var(--ink);
+  }
+  #root .detailed-stat.big, #root .training-stat.total, #root .advanced-stat.streak, #root .quarter-stat-card.current { background: var(--c-yellow); }
+  #root .detailed-stat.negative, #root .advanced-stat.negative { background: #ff8a8a; }
+  #root .detailed-stat.efficiency { background: #b9a2ff; }
+  #root .detailed-stat.positive, #root .advanced-stat.positive { background: var(--c-green); }
+  #root .record-card { background: var(--c-yellow); }
+  #root .record-card:nth-child(odd) { transform: rotate(-1.5deg); }
+  #root .record-card:nth-child(even) { transform: rotate(1.5deg); background: var(--c-pink); }
+  #root .shooting-stat:nth-child(2) { background: var(--c-green); }
+  #root .shooting-stat:nth-child(3) { background: var(--c-pink); }
+  #root .summary-item:nth-child(even), #root .playing-time-item:nth-child(even) { background: var(--c-yellow); }
+
+  /* Chiffres et libellés dans les tuiles */
+  #root .ds-value, #root .adv-value, #root .record-value, #root .shooting-value,
+  #root .pt-value, #root .qs-points, #root .heatmap-stat-value, #root .stat-val,
+  #root .training-stat span:first-child, #root .summary-item span:first-child {
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: 0.03em;
+  }
+  #root .detailed-stat .ds-value, #root .advanced-stat .adv-value, #root .record-card .record-value,
+  #root .shooting-stat .shooting-value, #root .playing-time-item .pt-value, #root .quarter-stat-card .qs-points,
+  #root .training-stat, #root .summary-item, #root .heatmap-stat .heatmap-stat-value {
+    color: var(--ink);
+    -webkit-text-stroke: 0;
+    text-shadow: none;
+  }
+  #root .detailed-stat .ds-value, #root .advanced-stat .adv-value, #root .record-card .record-value { font-size: 2.2rem; line-height: 1; }
+  #root .detailed-stat.big .ds-value { font-size: 3.2rem; }
+  #root .ds-label, #root .adv-label, #root .adv-desc, #root .record-label, #root .record-info,
+  #root .shooting-label, #root .shooting-pct, #root .pt-label, #root .qs-quarter, #root .qs-detail,
+  #root .heatmap-stat-label {
+    color: var(--ink);
+    opacity: 0.8;
+    font-weight: 700;
+  }
+  #root .ds-label, #root .adv-label, #root .record-label, #root .shooting-label, #root .qs-quarter {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 0.95rem;
+    letter-spacing: 0.06em;
+    opacity: 1;
+  }
+
+  #root .training-stat, #root .training-stat * { color: var(--ink); }
+  #root .edit-btn { color: var(--muted); }
+  #root .option-toggle label, #root .training-desc { color: var(--text); }
+  #root .match-header { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+  #root .match-header .match-opponent { flex-basis: 100%; }
+  #root .match-header .delete-btn { margin-left: auto; }
+
+  /* Cartes de match */
+  #root .match-card { padding: 14px; margin-bottom: 14px; }
+  #root .match-card.has-record { box-shadow: 5px 5px 0 var(--ink), 0 0 0 3px var(--c-yellow) inset; }
+  #root .match-opponent { font-family: var(--font-display); font-size: 1.5rem; letter-spacing: 0.03em; color: var(--text); }
+  #root .match-date { color: var(--muted); font-weight: 700; }
+  #root .match-score {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    letter-spacing: 0.04em;
+    padding: 2px 10px;
+    border: 2.5px solid var(--ink);
+    border-radius: 8px;
+    box-shadow: 2px 2px 0 var(--ink);
+    transform: rotate(-2deg);
+    display: inline-block;
+  }
+  #root .match-score.win { background: var(--c-green); color: var(--ink); }
+  #root .match-score.loss { background: var(--c-red); color: #fff; }
+  #root .record-badge {
+    background: var(--c-yellow);
+    color: var(--ink);
+    border: 2px solid var(--ink);
+    box-shadow: 2px 2px 0 var(--ink);
+    font-family: var(--font-display);
+    letter-spacing: 0.04em;
+    transform: rotate(3deg);
+  }
+  #root .match-stat .stat-val { font-size: 1.6rem; color: var(--text); }
+  #root .match-stat .stat-name { font-family: var(--font-display); letter-spacing: 0.06em; color: var(--muted); }
+
+  /* Boutons */
+  #root .theme-btn, #root .gist-config-btn, #root .gist-action-btn, #root .options-btn, #root .toggle-btn,
+  #root .training-reset, #root .share-btn-history, #root .replay-btn-history,
+  #root .more-options-toggle, #root .location-btn, #root .save-btn, #root .action-btn,
+  #root .timer-btn, #root .time-adjust-btn, #root .settings-btn, #root .court-toggle,
+  #root .court-header-buttons button, #root .court-footer button, #root .undo-btn {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 1.05rem;
+    letter-spacing: 0.05em;
+    color: var(--ink);
+    background: #fff;
+    border: 2.5px solid var(--ink);
+    border-radius: 12px;
+    box-shadow: 3px 3px 0 var(--ink);
+    transition: transform 0.08s ease, box-shadow 0.08s ease;
+    opacity: 1;
+  }
+  #root .theme-btn:active, #root .gist-config-btn:active, #root .gist-action-btn:active, #root .options-btn:active,
+  #root .toggle-btn:active, #root .training-reset:active, #root .share-btn-history:active,
+  #root .replay-btn-history:active, #root .more-options-toggle:active, #root .location-btn:active, #root .save-btn:active,
+  #root .action-btn:active, #root .timer-btn:active, #root .time-adjust-btn:active, #root .court-toggle:active {
+    transform: translate(3px, 3px);
+    box-shadow: 0 0 0 var(--ink);
+  }
+  #root .theme-btn.active, #root .toggle-btn.active, #root .location-btn.active, #root .timer-btn.primary { background: var(--c-yellow); }
+  #root .gist-action-btn.sync-btn, #root .save-btn { background: var(--c-green); }
+  #root .options-btn.danger, #root .action-btn.danger, #root .timer-btn.end-match, #root .delete-btn { background: var(--c-red); color: #fff; }
+  #root .gist-config-btn { background: var(--c-cyan); }
+  #root .more-options-toggle { width: 100%; background: var(--c-pink); color: #fff; -webkit-text-stroke: 0; }
+  #root .timer-btn.quarter-nav.disabled { opacity: 0.45; }
+  #root .delete-btn { border: 2px solid var(--ink); box-shadow: 2px 2px 0 var(--ink); }
+
+  /* Champs */
+  #root input:not([type="file"]):not([type="checkbox"]):not([type="range"]), #root textarea, #root select {
+    color: var(--text);
+    background: var(--surface-2);
+    border: 2.5px solid var(--ink);
+    border-radius: 12px;
+    box-shadow: inset 2px 2px 0 rgba(0, 0, 0, 0.15);
+  }
+  #root input::placeholder, #root textarea::placeholder { color: var(--muted); opacity: 0.8; }
+  #root input:focus, #root textarea:focus, #root select:focus { outline: 3px solid var(--c-yellow); outline-offset: 1px; }
+  #root .match-select { box-shadow: 3px 3px 0 var(--ink); }
+
+  /* Barres de progression (objectifs) */
+  #root .goal-bar { height: 14px; border: 2px solid var(--ink); border-radius: 999px; background: var(--surface-2); overflow: hidden; }
+  #root .goal-progress { background: repeating-linear-gradient(-45deg, var(--c-green), var(--c-green) 8px, #2fc472 8px, #2fc472 16px); border-radius: 999px; }
+
+  /* Fenêtres */
+  #root .help-modal, #root .gist-modal, #root .record-modal, #root .confirm-modal, #root .action-panel, #root .shot-modal-content {
+    background: var(--surface) !important;
+    color: var(--text);
+    border: 4px solid var(--ink) !important;
+    border-radius: 22px !important;
+    box-shadow: 8px 8px 0 var(--ink) !important;
+  }
+  #root .help-modal h2, #root .help-modal h3, #root .gist-modal h2, #root .gist-modal h3, #root .record-modal h2, #root .record-modal h3, #root .confirm-modal h3, #root .action-panel-header h3 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: 0.05em;
+    color: var(--c-yellow);
+    -webkit-text-stroke: 1px var(--ink);
+    text-shadow: 2px 2px 0 var(--ink);
+  }
+  #root .record-modal { animation: fire-in-modal 0.5s cubic-bezier(0.34, 1.6, 0.64, 1); }
+  @keyframes fire-in-modal {
+    0% { transform: scale(0.3) rotate(-12deg); }
+    100% { transform: scale(1) rotate(0); }
+  }
 `
 
 // Petite vibration au tap (ignorée si non supportée)

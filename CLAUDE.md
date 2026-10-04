@@ -244,6 +244,7 @@ git add -A && git commit -m "message" && git push origin main
 - **Panneau TIRS** (`.shot-col`, boutons `.sp-btn` — ne pas utiliser `.shot-btn`, pris par la modale de la carte) : ✓ réussi / ✗ raté pour 2PTS, 3PTS, LF + %
 - **Tuiles ACTIONS** : taper la tuile = +1 (vibration), petit − en coin
 - **Style « cartoon / BD »** (couche CSS CARTOON après BROADCAST, actuelle) : police Bangers (`@fontsource/bangers`), contours encre `--ink` + ombres décalées, couleurs flashy, trame de points, scoreboard jaune
+- **Autres onglets en BD** (couche CSS « CARTOON — AUTRES ONGLETS ») : panneaux à contour encre, titres en étiquette jaune, tuiles de stats colorées (records en stickers inclinés), boutons à ombre décalée, champs, fenêtres modales
 - **Effets** (`fx(e, kind)` dans App.jsx, table `FX`) : bulles BD en étoile (« SWISH ! », « CLANG ! », « CAVIAR ! »…), confettis sur 3PTS réussi, tremblement du scoreboard sur tir raté, bandeau « EN FEU ! » dès 3 tirs réussis d'affilée, `.bump` sur les chiffres. Volontairement PAS coupés par `prefers-reduced-motion` (Samsung l'active en économie d'énergie → l'utilisateur ne voyait aucune animation)
 - Sur mobile, saisie au-dessus de la carte du terrain (CSS `order`)
 - **Écran large (Fold déplié, tablette)** : terrain à gauche + stats à droite (côte à côte)
