@@ -239,8 +239,12 @@ git add -A && git commit -m "message" && git push origin main
 
 ### Layout responsive
 - **Barre d'onglets fixe en bas** (style app mobile), bouton Aide `?` dans l'en-tête
-- **Bandeau timer + score collant** en haut pendant le match
-- **Tuiles de stats** : taper la tuile = +1 (vibration), petit bouton − en coin
+- **Style « broadcast »** (couche CSS BROADCAST après MODERNISATION) : police Barlow Condensed auto-hébergée (`@fontsource`, importée dans `main.jsx`), dégradé `--grad` orange→rose→violet
+- **Scoreboard collant** (`.scoreboard`) : QT, chrono, pastille LIVE, score NOUS/EUX + écart, ligne joueur (PTS, série 🔥, REB/PD/INT)
+- **Panneau TIRS** (`.shot-col`, boutons `.sp-btn` — ne pas utiliser `.shot-btn`, pris par la modale de la carte) : ✓ réussi / ✗ raté pour 2PTS, 3PTS, LF + %
+- **Tuiles ACTIONS** : taper la tuile = +1 (vibration), petit − en coin
+- **Animations** : bulles `pop()` « +2 » au tap, `.bump` sur les chiffres qui changent (désactivées si `prefers-reduced-motion`)
+- Sur mobile, saisie au-dessus de la carte du terrain (CSS `order`)
 - **Écran large (Fold déplié, tablette)** : terrain à gauche + stats à droite (côte à côte)
 - **Petit écran** : layout vertical classique
 
