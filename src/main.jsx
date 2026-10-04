@@ -4,6 +4,7 @@ import App from './App.jsx'
 import '@fontsource/barlow-condensed/latin-600.css'
 import '@fontsource/barlow-condensed/latin-700.css'
 import '@fontsource/barlow-condensed/latin-800.css'
+import '@fontsource/bangers/latin-400.css'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

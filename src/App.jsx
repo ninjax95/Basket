@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useStats, usePlayer, useTimer, useMatchHistory, usePlayingTime } from './hooks/useStats'
 import StatCounter from './components/StatCounter'
 import Timer from './components/Timer'
@@ -6706,9 +6706,336 @@ const styles = `
     20% { opacity: 1; transform: translate(-50%, -80%) scale(1.15); }
     100% { opacity: 0; transform: translate(-50%, -260%) scale(1); }
   }
-  @media (prefers-reduced-motion: reduce) {
-    #root .bump, .pop, #root .sb-live-dot { animation: none; }
-    .pop { display: none; }
+
+  /* ============================================================
+     CARTOON — style BD (par-dessus BROADCAST) : contours encre,
+     ombres décalées, couleurs flashy, trame de points, police Bangers
+     ============================================================ */
+  body {
+    --font-display: 'Bangers', 'Barlow Condensed', system-ui, sans-serif;
+    --ink: #120b2e;
+    --bg: #23175a;
+    --surface: #33247a;
+    --surface-2: #45339a;
+    --text: #ffffff;
+    --muted: #cfc6ff;
+    --border: var(--ink);
+    --c-yellow: #ffd23f;
+    --c-orange: #ff7b1c;
+    --c-pink: #ff4fa3;
+    --c-cyan: #2ee6d6;
+    --c-green: #3ddc84;
+    --c-red: #ff4757;
+    --c-violet: #8b5cf6;
+    --accent: var(--c-yellow);
+    --accent-soft: rgba(255, 210, 63, 0.18);
+    --good: var(--c-green);
+    --bad: var(--c-red);
+    --grad: linear-gradient(135deg, var(--c-yellow), var(--c-orange) 50%, var(--c-pink));
+    --nav-bg: var(--surface);
+    --shadow: 4px 4px 0 var(--ink);
+    --glow: 4px 4px 0 var(--ink);
+    --dots: rgba(255, 255, 255, 0.07);
+    background:
+      radial-gradient(var(--dots) 1.6px, transparent 1.7px) 0 0 / 16px 16px,
+      radial-gradient(900px 500px at 10% -120px, rgba(255, 79, 163, 0.35), transparent 70%),
+      radial-gradient(800px 500px at 100% 0, rgba(46, 230, 214, 0.22), transparent 70%),
+      var(--bg);
+    background-attachment: fixed;
+  }
+  body[data-theme="light"] {
+    --ink: #1a1033;
+    --bg: #fff1c9;
+    --surface: #ffffff;
+    --surface-2: #ffe7a0;
+    --text: #1a1033;
+    --muted: #6b5a8e;
+    --accent: var(--c-orange);
+    --accent-soft: rgba(255, 123, 28, 0.15);
+    --nav-bg: #ffffff;
+    --dots: rgba(26, 16, 51, 0.09);
+    background:
+      radial-gradient(var(--dots) 1.6px, transparent 1.7px) 0 0 / 16px 16px,
+      radial-gradient(900px 500px at 10% -120px, rgba(255, 79, 163, 0.18), transparent 70%),
+      radial-gradient(800px 500px at 100% 0, rgba(46, 230, 214, 0.18), transparent 70%),
+      var(--bg);
+  }
+
+  /* Texte BD : contour + ombre */
+  #root h1, #root h2, #root h3 { font-weight: 400; letter-spacing: 0.04em; }
+  #root .app-header h1 {
+    font-size: 2rem;
+    font-weight: 400;
+    color: var(--c-yellow);
+    -webkit-text-stroke: 1.5px var(--ink);
+    text-shadow: 3px 3px 0 var(--ink);
+    transform: rotate(-2deg);
+  }
+  #root .app-season {
+    background: var(--c-pink);
+    color: #fff;
+    border: 2.5px solid var(--ink);
+    box-shadow: 2px 2px 0 var(--ink);
+    font-size: 1rem;
+    letter-spacing: 0.06em;
+    -webkit-text-stroke: 0;
+    text-shadow: none;
+    transform: rotate(3deg);
+  }
+  #root .help-btn {
+    background: var(--c-cyan);
+    color: var(--ink);
+    border: 3px solid var(--ink);
+    box-shadow: 3px 3px 0 var(--ink);
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+  }
+
+  /* Cartes : contour encre + ombre décalée */
+  #root .match-header-compact,
+  #root .court-container,
+  #root .points-total-display,
+  #root .quick-stat,
+  #root .shot-col {
+    border: 3px solid var(--ink);
+    box-shadow: 5px 5px 0 var(--ink);
+    border-radius: 18px;
+  }
+
+  /* Étiquettes de section façon sticker */
+  #root .stats-category-title {
+    display: inline-block;
+    padding: 3px 12px;
+    margin: 10px 0 10px 2px;
+    font-size: 1.15rem;
+    letter-spacing: 0.08em;
+    color: var(--ink);
+    background: var(--c-yellow);
+    border: 2.5px solid var(--ink);
+    border-radius: 8px;
+    box-shadow: 3px 3px 0 var(--ink);
+    transform: rotate(-2deg);
+  }
+  #root .stats-category-title::before { display: none; }
+
+  /* ---------- Scoreboard ---------- */
+  #root .scoreboard {
+    background:
+      radial-gradient(rgba(18, 11, 46, 0.12) 1.4px, transparent 1.5px) 0 0 / 12px 12px,
+      var(--c-yellow);
+    color: var(--ink);
+    box-shadow: 6px 6px 0 var(--ink);
+    --text: #120b2e;
+    --muted: #4a3d7a;
+    --surface-2: #fff;
+    --border: var(--ink);
+  }
+  #root .scoreboard::before { height: 0; }
+  #root .sb-quarter { background: var(--ink); color: var(--c-yellow); font-weight: 400; font-size: 1.2rem; transform: rotate(-4deg); }
+  #root .sb-time { color: var(--ink); font-size: 1.9rem; font-weight: 400; letter-spacing: 0.06em; }
+  #root .sb-time.running { color: var(--ink); }
+  #root .sb-play { background: var(--c-pink); border: 3px solid var(--ink); box-shadow: 2px 2px 0 var(--ink); width: 38px; height: 38px; }
+  #root .sb-live {
+    color: #fff;
+    background: var(--c-red);
+    padding: 2px 8px;
+    border: 2.5px solid var(--ink);
+    border-radius: 8px;
+    font-weight: 400;
+    font-size: 1rem;
+    animation: live-wiggle 1s ease-in-out infinite;
+  }
+  #root .sb-live-dot { background: #fff; }
+  @keyframes live-wiggle {
+    0%, 100% { transform: rotate(-3deg); }
+    50% { transform: rotate(3deg) scale(1.06); }
+  }
+  #root .sb-paused { color: var(--ink); font-weight: 400; font-size: 1rem; opacity: 0.6; }
+  #root .sb-court { border: 2.5px solid var(--ink); box-shadow: 2px 2px 0 var(--ink); font-weight: 400; font-size: 1.05rem; }
+  #root .sb-court.on-court { background: var(--c-green); color: var(--ink); }
+  #root .sb-court.on-bench { background: #fff; color: var(--ink); }
+  #root .scoreboard .timeout-btn { border: 2.5px solid var(--ink); box-shadow: 2px 2px 0 var(--ink); background: #fff; color: var(--ink); font-family: var(--font-display); font-size: 1.05rem; letter-spacing: 0.04em; }
+
+  #root .sb-team-label { color: var(--ink); font-weight: 400; font-size: 1rem; letter-spacing: 0.12em; }
+  #root .sb-score-value {
+    font-weight: 400;
+    font-size: 4rem;
+    line-height: 0.9;
+    -webkit-text-stroke: 2.5px var(--ink);
+    text-shadow: 4px 4px 0 var(--ink);
+  }
+  #root .sb-team.us .sb-score-value { background: none; -webkit-background-clip: border-box; background-clip: border-box; color: var(--c-orange); }
+  #root .sb-team.them .sb-score-value { color: var(--c-cyan); }
+  #root .sb-score-btns button { border: 2.5px solid var(--ink); box-shadow: 2px 2px 0 var(--ink); background: #fff; color: var(--ink); font-weight: 800; }
+  #root .sb-score-btns button:active { transform: translate(2px, 2px); box-shadow: none; }
+  #root .sb-diff { border: 2.5px solid var(--ink); background: #fff; color: var(--ink); font-weight: 400; font-size: 1.3rem; transform: rotate(-4deg); }
+  #root .sb-diff.up { background: var(--c-green); color: var(--ink); }
+  #root .sb-diff.down { background: var(--c-red); color: #fff; }
+
+  #root .sb-player { border-top: 3px solid var(--ink); background: #fff; }
+  #root .sb-player-name { font-weight: 400; font-size: 1.3rem; letter-spacing: 0.04em; color: var(--ink); }
+  #root .sb-player-number { color: var(--c-pink); font-weight: 400; font-size: 1rem; }
+  #root .sb-pts-value { font-weight: 400; font-size: 2.4rem; color: var(--c-orange); -webkit-text-stroke: 1.5px var(--ink); text-shadow: 2px 2px 0 var(--ink); }
+  #root .sb-pts.hot .sb-pts-value { background: none; color: var(--c-red); filter: none; animation: hot-shake 0.5s ease-in-out infinite; }
+  @keyframes hot-shake {
+    0%, 100% { transform: rotate(-4deg) scale(1.05); }
+    50% { transform: rotate(4deg) scale(1.12); }
+  }
+  #root .sb-pts-label, #root .sb-mini { color: var(--ink); font-weight: 400; letter-spacing: 0.06em; }
+  #root .sb-mini b { font-weight: 400; font-size: 1.3rem; }
+  #root .sb-streak { font-weight: 400; font-size: 1.2rem; color: var(--c-red); }
+
+  /* Tremblement (tir raté) */
+  #root .scoreboard.shake { animation: board-shake 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97); }
+  @keyframes board-shake {
+    10%, 90% { transform: translateX(-2px) rotate(-0.5deg); }
+    20%, 80% { transform: translateX(4px) rotate(0.5deg); }
+    30%, 50%, 70% { transform: translateX(-7px) rotate(-1deg); }
+    40%, 60% { transform: translateX(7px) rotate(1deg); }
+  }
+
+  /* ---------- Tirs ---------- */
+  #root .shot-col { background: var(--surface); padding: 10px 8px 10px; }
+  #root .shot-name { font-weight: 400; font-size: 1.4rem; letter-spacing: 0.04em; }
+  #root .shot-line { font-weight: 400; font-size: 1.3rem; }
+  #root .shot-pct { font-family: var(--font-display); font-weight: 400; font-size: 1rem; color: var(--muted); letter-spacing: 0.04em; }
+  #root .sp-btn {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    border: 3px solid var(--ink);
+    box-shadow: 4px 4px 0 var(--ink);
+    transition: transform 0.08s ease, box-shadow 0.08s ease;
+  }
+  #root .sp-btn.made { background: var(--c-green); color: var(--ink); box-shadow: 4px 4px 0 var(--ink); }
+  #root .sp-btn.missed { background: var(--c-red); color: #fff; border: 3px solid var(--ink); box-shadow: 4px 4px 0 var(--ink); }
+  #root .sp-btn:active { transform: translate(4px, 4px) scale(0.97, 0.9); box-shadow: 0 0 0 var(--ink); filter: none; }
+  #root .sp-btn.made + .qs-minus, #root .shot-btn-wrap .qs-minus { background: #fff; color: var(--ink); border: 2px solid var(--ink); }
+
+  /* ---------- Tuiles actions : une couleur par stat ---------- */
+  #root .quick-stat { overflow: visible; transition: transform 0.08s ease, box-shadow 0.08s ease; }
+  #root .actions-grid .quick-stat:nth-child(1), #root .actions-grid .quick-stat:nth-child(2) { background: var(--c-cyan); }
+  #root .actions-grid .quick-stat:nth-child(3) { background: var(--c-yellow); }
+  #root .actions-grid .quick-stat:nth-child(4) { background: var(--c-green); }
+  #root .actions-grid .quick-stat:nth-child(5) { background: var(--c-pink); }
+  #root .actions-grid .quick-stat:nth-child(6), #root .actions-grid .quick-stat:nth-child(7) { background: #ff8a8a; }
+  #root .actions-grid .qs-label, #root .actions-grid .qs-value { color: var(--ink); }
+  #root .actions-grid .qs-negative .qs-label { color: var(--ink); }
+  #root .qs-label { font-weight: 400; font-size: 1rem; letter-spacing: 0.05em; }
+  #root .qs-value { font-weight: 400; font-size: 2.3rem; }
+  #root .qs-tap:active { background: transparent; transform: none; }
+  #root .quick-stat:has(.qs-tap:active) { transform: translate(4px, 4px) scale(0.97, 0.92); box-shadow: 0 0 0 var(--ink); }
+  #root .qs-minus { background: #fff; color: var(--ink); border: 2px solid var(--ink); font-weight: 800; }
+
+  /* Total + carte */
+  #root .points-total-display { background: var(--surface); }
+  #root .pts-value { background: none; -webkit-background-clip: border-box; background-clip: border-box; color: var(--c-yellow); -webkit-text-stroke: 1.5px var(--ink); text-shadow: 3px 3px 0 var(--ink); font-weight: 400; font-size: 2.4rem; }
+  #root .pts-label { font-weight: 400; font-size: 1.1rem; }
+  #root .court-container { background: var(--surface); }
+
+  /* ---------- Barre d'onglets ---------- */
+  #root .nav-tabs { border-top: 3px solid var(--ink); backdrop-filter: none; -webkit-backdrop-filter: none; }
+  #root .nav-label { font-weight: 400; font-size: 0.95rem; letter-spacing: 0.06em; }
+  #root .nav-tab.active { color: var(--text); }
+  #root .nav-tab.active .nav-icon {
+    background: var(--c-yellow);
+    border: 2.5px solid var(--ink);
+    box-shadow: 2px 2px 0 var(--ink);
+    animation: tab-boing 0.4s cubic-bezier(0.34, 1.8, 0.64, 1);
+  }
+  @keyframes tab-boing {
+    0% { transform: scale(0.6) rotate(-10deg); }
+    100% { transform: scale(1) rotate(0); }
+  }
+  #root .nav-badge { background: var(--c-pink); border: 2px solid var(--ink); }
+  #root .match-select { border: 3px solid var(--ink); box-shadow: 3px 3px 0 var(--ink); }
+
+  /* ---------- Animations BD ---------- */
+  #root .bump { animation: cartoon-bump 0.45s cubic-bezier(0.34, 1.8, 0.64, 1); }
+  @keyframes cartoon-bump {
+    0% { transform: scale(1.6) rotate(-8deg); }
+    60% { transform: scale(0.92) rotate(3deg); }
+    100% { transform: scale(1) rotate(0); }
+  }
+
+  /* Bulle BD en étoile */
+  .pop {
+    font-family: 'Bangers', system-ui, sans-serif;
+    font-weight: 400;
+    font-size: 2rem;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    padding: 22px 26px;
+    color: #fff;
+    -webkit-text-stroke: 1.5px #120b2e;
+    text-shadow: 3px 3px 0 #120b2e;
+    animation: comic-pop 0.9s cubic-bezier(0.34, 1.6, 0.64, 1) forwards;
+    isolation: isolate;
+  }
+  .pop::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--burst, #ffd23f);
+    filter: drop-shadow(3px 3px 0 #120b2e);
+    clip-path: polygon(50% 0%, 61% 22%, 85% 8%, 78% 33%, 100% 38%, 82% 55%, 98% 75%, 72% 72%, 70% 100%, 52% 80%, 32% 98%, 30% 74%, 4% 82%, 18% 58%, 0% 40%, 22% 32%, 14% 8%, 38% 22%);
+  }
+  .pop.good { --burst: #3ddc84; }
+  .pop.gold { --burst: #ffd23f; }
+  .pop.bad { --burst: #ff4757; }
+  .pop.cyan { --burst: #2ee6d6; }
+  .pop.pink { --burst: #ff4fa3; }
+  .pop.good, .pop.gold, .pop.bad, .pop.cyan, .pop.pink { color: #fff; }
+  .pop.small { font-size: 1.4rem; padding: 12px 16px; }
+  @keyframes comic-pop {
+    0% { opacity: 0; transform: translate(-50%, -50%) scale(0.2) rotate(var(--rot, 0deg)); }
+    25% { opacity: 1; transform: translate(-50%, -90%) scale(1.25) rotate(var(--rot, 0deg)); }
+    45% { transform: translate(-50%, -95%) scale(0.95) rotate(var(--rot, 0deg)); }
+    75% { opacity: 1; transform: translate(-50%, -110%) scale(1) rotate(var(--rot, 0deg)); }
+    100% { opacity: 0; transform: translate(-50%, -150%) scale(0.8) rotate(var(--rot, 0deg)); }
+  }
+
+  /* Confettis (3 points) */
+  .confetti {
+    position: fixed;
+    width: 10px;
+    height: 14px;
+    border: 2px solid #120b2e;
+    border-radius: 3px;
+    transform: translate(-50%, -50%);
+    animation: confetti-fly 1s cubic-bezier(0.2, 0.7, 0.4, 1) forwards;
+  }
+  @keyframes confetti-fly {
+    0% { opacity: 1; transform: translate(-50%, -50%) rotate(0) scale(0.4); }
+    70% { opacity: 1; }
+    100% { opacity: 0; transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy) + 80px)) rotate(var(--r)) scale(1); }
+  }
+
+  /* Bandeau "EN FEU" */
+  .fire-banner {
+    position: fixed;
+    left: 50%;
+    top: 42%;
+    padding: 10px 26px;
+    font-family: 'Bangers', system-ui, sans-serif;
+    font-size: 3rem;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+    color: #ffd23f;
+    -webkit-text-stroke: 2px #120b2e;
+    text-shadow: 4px 4px 0 #120b2e;
+    background: #ff4757;
+    border: 4px solid #120b2e;
+    border-radius: 14px;
+    box-shadow: 8px 8px 0 #120b2e;
+    animation: fire-in 1.6s cubic-bezier(0.34, 1.6, 0.64, 1) forwards;
+  }
+  @keyframes fire-in {
+    0% { opacity: 0; transform: translate(-50%, -50%) scale(0.2) rotate(-20deg); }
+    18% { opacity: 1; transform: translate(-50%, -50%) scale(1.15) rotate(-6deg); }
+    30% { transform: translate(-50%, -50%) scale(1) rotate(-4deg); }
+    80% { opacity: 1; transform: translate(-50%, -50%) scale(1.04) rotate(-4deg); }
+    100% { opacity: 0; transform: translate(-50%, -80%) scale(0.9) rotate(-4deg); }
   }
 `
 
@@ -6787,15 +7114,70 @@ export default function App() {
   const efficiency = getEfficiency()
   const streaks = getStreaks()
 
-  // Petites bulles "+2" qui s'envolent depuis l'endroit tapé
+  // Effets "cartoon" : bulles BD, confettis, tremblement, bandeau "EN FEU"
   const [pops, setPops] = useState([])
-  const pop = (e, text, tone = 'good') => {
+  const [bits, setBits] = useState([])
+  const [shake, setShake] = useState(false)
+  const [fire, setFire] = useState(0)
+  const pop = (e, text, tone = 'good', small = false) => {
     const id = Date.now() + Math.random()
     const x = e?.clientX || window.innerWidth / 2
     const y = e?.clientY || window.innerHeight / 2
-    setPops(prev => [...prev, { id, text, tone, x, y }])
-    setTimeout(() => setPops(prev => prev.filter(p => p.id !== id)), 800)
+    const rot = Math.round(Math.random() * 24 - 12)
+    setPops(prev => [...prev, { id, text, tone, small, x, y, rot }])
+    setTimeout(() => setPops(prev => prev.filter(p => p.id !== id)), 900)
   }
+  const confetti = (e) => {
+    const x = e?.clientX || window.innerWidth / 2
+    const y = e?.clientY || window.innerHeight / 2
+    const colors = ['#ffd23f', '#ff4fa3', '#2ee6d6', '#ff7b1c', '#3ddc84', '#8b5cf6']
+    const batch = Array.from({ length: 18 }, (_, i) => {
+      const angle = (i / 18) * Math.PI * 2 + Math.random() * 0.4
+      const dist = 70 + Math.random() * 70
+      return {
+        id: Date.now() + Math.random(), x, y,
+        dx: Math.round(Math.cos(angle) * dist), dy: Math.round(Math.sin(angle) * dist - 40),
+        rot: Math.round(Math.random() * 720 - 360), color: colors[i % colors.length]
+      }
+    })
+    setBits(prev => [...prev, ...batch])
+    setTimeout(() => setBits(prev => prev.filter(b => !batch.includes(b))), 1000)
+  }
+  const FX = {
+    made2: { words: ['SWISH !', 'PANIER !', 'BANG !', 'DEDANS !'], tone: 'good' },
+    made3: { words: ['SPLASH !', 'BOUM !', 'DE LOIN !', 'BANG BANG !'], tone: 'gold', confetti: true },
+    madeFT: { words: ['NET !', 'PROPRE !'], tone: 'good' },
+    miss: { words: ['CLANG !', 'BRIQUE !', 'RATÉ !', 'AÏE !'], tone: 'bad', shake: true },
+    offRebounds: { words: ['REBOND !'], tone: 'cyan' },
+    defRebounds: { words: ['REBOND !'], tone: 'cyan' },
+    assists: { words: ['CAVIAR !', 'PASSE !'], tone: 'gold' },
+    steals: { words: ['VOLÉ !', 'INTER !'], tone: 'good' },
+    blocks: { words: ['CONTRÉ !', 'DEHORS !'], tone: 'pink' },
+    turnovers: { words: ['OUPS !'], tone: 'bad' },
+    fouls: { words: ['FAUTE !'], tone: 'bad' },
+    us: { words: ['+1'], tone: 'good', small: true },
+    them: { words: ['+1'], tone: 'bad', small: true }
+  }
+  const fx = (e, kind) => {
+    const f = FX[kind]
+    pop(e, f.words[Math.floor(Math.random() * f.words.length)], f.tone, f.small)
+    if (f.confetti) confetti(e)
+    if (f.shake) {
+      setShake(true)
+      setTimeout(() => setShake(false), 450)
+    }
+  }
+  // Bandeau "EN FEU" à partir de 3 tirs réussis d'affilée
+  const prevStreak = useRef(streaks.currentStreak)
+  useEffect(() => {
+    if (streaks.currentStreak >= 3 && streaks.currentStreak > prevStreak.current) {
+      setFire(streaks.currentStreak)
+      const t = setTimeout(() => setFire(0), 1600)
+      prevStreak.current = streaks.currentStreak
+      return () => clearTimeout(t)
+    }
+    prevStreak.current = streaks.currentStreak
+  }, [streaks.currentStreak])
 
   // Track playing time when timer is running
   useEffect(() => {
@@ -7840,8 +8222,12 @@ export default function App() {
       <div className="container">
         <div className="pop-layer" aria-hidden="true">
           {pops.map(p => (
-            <span key={p.id} className={`pop ${p.tone}`} style={{ left: p.x, top: p.y }}>{p.text}</span>
+            <span key={p.id} className={`pop ${p.tone} ${p.small ? 'small' : ''}`} style={{ left: p.x, top: p.y, '--rot': `${p.rot}deg` }}>{p.text}</span>
           ))}
+          {bits.map(b => (
+            <span key={b.id} className="confetti" style={{ left: b.x, top: b.y, background: b.color, '--dx': `${b.dx}px`, '--dy': `${b.dy}px`, '--r': `${b.rot}deg` }} />
+          ))}
+          {fire > 0 && <div key={fire} className="fire-banner">EN FEU ! 🔥×{fire}</div>}
         </div>
         <header className="app-header">
           <h1>🏀 Stats Basket <span className="app-season">{currentSeason}</span></h1>
@@ -7894,7 +8280,7 @@ export default function App() {
         {activeTab === 'match' ? (
           <>
             {/* Scoreboard façon broadcast (collant en haut) */}
-            <div className="match-header-compact scoreboard">
+            <div className={`match-header-compact scoreboard ${shake ? 'shake' : ''}`}>
               <div className="sb-top">
                 <span className="sb-quarter">Q{timer.quarter}</span>
                 <span className={`sb-time ${timer.isRunning ? 'running' : ''}`}>{timer.formatTime()}</span>
@@ -7947,7 +8333,7 @@ export default function App() {
                   <span key={liveScoreTeam} className="sb-score-value bump">{liveScoreTeam}</span>
                   <div className="sb-score-btns">
                     <button onClick={() => setLiveScoreTeam(Math.max(0, liveScoreTeam - 1))}>−</button>
-                    <button onClick={(e) => { pop(e, '+1'); setLiveScoreTeam(liveScoreTeam + 1) }}>+</button>
+                    <button onClick={(e) => { fx(e, 'us'); setLiveScoreTeam(liveScoreTeam + 1) }}>+</button>
                   </div>
                 </div>
                 <span className={`sb-diff ${liveScoreTeam > liveScoreOpponent ? 'up' : liveScoreTeam < liveScoreOpponent ? 'down' : ''}`}>
@@ -7958,7 +8344,7 @@ export default function App() {
                   <span key={liveScoreOpponent} className="sb-score-value bump">{liveScoreOpponent}</span>
                   <div className="sb-score-btns">
                     <button onClick={() => setLiveScoreOpponent(Math.max(0, liveScoreOpponent - 1))}>−</button>
-                    <button onClick={(e) => { pop(e, '+1', 'bad'); setLiveScoreOpponent(liveScoreOpponent + 1) }}>+</button>
+                    <button onClick={(e) => { fx(e, 'them'); setLiveScoreOpponent(liveScoreOpponent + 1) }}>+</button>
                   </div>
                 </div>
               </div>
@@ -8010,11 +8396,11 @@ export default function App() {
                   </div>
                   <span className="shot-pct">{stats.fg2Attempted > 0 ? Math.round(stats.fg2Made / stats.fg2Attempted * 100) : 0}%</span>
                   <div className="shot-btn-wrap">
-                    <button className="sp-btn made" onClick={(e) => { tapFeedback(); pop(e, '+2'); handleShotMadeIncrement('fg2Made', 'fg2Attempted', 2) }}>✓</button>
+                    <button className="sp-btn made" onClick={(e) => { tapFeedback(); fx(e, 'made2'); handleShotMadeIncrement('fg2Made', 'fg2Attempted', 2) }}>✓</button>
                     <button className="qs-minus" aria-label="Retirer un réussi" onClick={() => handleShotMadeDecrement('fg2Made', 'fg2Attempted', 2)}>−</button>
                   </div>
                   <div className="shot-btn-wrap">
-                    <button className="sp-btn missed" onClick={(e) => { tapFeedback(); pop(e, '✗', 'bad'); handleShotAttemptedIncrement('fg2Attempted') }}>✗</button>
+                    <button className="sp-btn missed" onClick={(e) => { tapFeedback(); fx(e, 'miss'); handleShotAttemptedIncrement('fg2Attempted') }}>✗</button>
                     <button className="qs-minus" aria-label="Retirer un raté" onClick={() => handleShotAttemptedDecrement('fg2Made', 'fg2Attempted')}>−</button>
                   </div>
                 </div>
@@ -8025,11 +8411,11 @@ export default function App() {
                   </div>
                   <span className="shot-pct">{stats.fg3Attempted > 0 ? Math.round(stats.fg3Made / stats.fg3Attempted * 100) : 0}%</span>
                   <div className="shot-btn-wrap">
-                    <button className="sp-btn made" onClick={(e) => { tapFeedback(); pop(e, '+3'); handleShotMadeIncrement('fg3Made', 'fg3Attempted', 3) }}>✓</button>
+                    <button className="sp-btn made" onClick={(e) => { tapFeedback(); fx(e, 'made3'); handleShotMadeIncrement('fg3Made', 'fg3Attempted', 3) }}>✓</button>
                     <button className="qs-minus" aria-label="Retirer un réussi" onClick={() => handleShotMadeDecrement('fg3Made', 'fg3Attempted', 3)}>−</button>
                   </div>
                   <div className="shot-btn-wrap">
-                    <button className="sp-btn missed" onClick={(e) => { tapFeedback(); pop(e, '✗', 'bad'); handleShotAttemptedIncrement('fg3Attempted') }}>✗</button>
+                    <button className="sp-btn missed" onClick={(e) => { tapFeedback(); fx(e, 'miss'); handleShotAttemptedIncrement('fg3Attempted') }}>✗</button>
                     <button className="qs-minus" aria-label="Retirer un raté" onClick={() => handleShotAttemptedDecrement('fg3Made', 'fg3Attempted')}>−</button>
                   </div>
                 </div>
@@ -8040,11 +8426,11 @@ export default function App() {
                   </div>
                   <span className="shot-pct">{stats.ftAttempted > 0 ? Math.round(stats.ftMade / stats.ftAttempted * 100) : 0}%</span>
                   <div className="shot-btn-wrap">
-                    <button className="sp-btn made" onClick={(e) => { tapFeedback(); pop(e, '+1'); handleFreeThrowMadeIncrement() }}>✓</button>
+                    <button className="sp-btn made" onClick={(e) => { tapFeedback(); fx(e, 'madeFT'); handleFreeThrowMadeIncrement() }}>✓</button>
                     <button className="qs-minus" aria-label="Retirer un réussi" onClick={() => handleFreeThrowMadeDecrement()}>−</button>
                   </div>
                   <div className="shot-btn-wrap">
-                    <button className="sp-btn missed" onClick={(e) => { tapFeedback(); pop(e, '✗', 'bad'); handleFreeThrowMissedIncrement() }}>✗</button>
+                    <button className="sp-btn missed" onClick={(e) => { tapFeedback(); fx(e, 'miss'); handleFreeThrowMissedIncrement() }}>✗</button>
                     <button className="qs-minus" aria-label="Retirer un raté" onClick={() => handleFreeThrowMissedDecrement()}>−</button>
                   </div>
                 </div>
@@ -8056,49 +8442,49 @@ export default function App() {
               <h4 className="stats-category-title">ACTIONS</h4>
               <div className="quick-stats-grid actions-grid">
                 <div className="quick-stat">
-                  <button className="qs-tap" onClick={(e) => { tapFeedback(); pop(e, '+1'); updateStatWithTime('offRebounds', 1) }}>
+                  <button className="qs-tap" onClick={(e) => { tapFeedback(); fx(e, 'offRebounds'); updateStatWithTime('offRebounds', 1) }}>
                     <span className="qs-label">Reb Off</span>
                     <span key={stats.offRebounds} className="qs-value bump">{stats.offRebounds}</span>
                   </button>
                   <button className="qs-minus" aria-label="Retirer" onClick={() => updateStatWithTime('offRebounds', -1)}>−</button>
                 </div>
                 <div className="quick-stat">
-                  <button className="qs-tap" onClick={(e) => { tapFeedback(); pop(e, '+1'); updateStatWithTime('defRebounds', 1) }}>
+                  <button className="qs-tap" onClick={(e) => { tapFeedback(); fx(e, 'defRebounds'); updateStatWithTime('defRebounds', 1) }}>
                     <span className="qs-label">Reb Def</span>
                     <span key={stats.defRebounds} className="qs-value bump">{stats.defRebounds}</span>
                   </button>
                   <button className="qs-minus" aria-label="Retirer" onClick={() => updateStatWithTime('defRebounds', -1)}>−</button>
                 </div>
                 <div className="quick-stat">
-                  <button className="qs-tap" onClick={(e) => { tapFeedback(); pop(e, '+1'); updateStatWithTime('assists', 1) }}>
+                  <button className="qs-tap" onClick={(e) => { tapFeedback(); fx(e, 'assists'); updateStatWithTime('assists', 1) }}>
                     <span className="qs-label">Passes</span>
                     <span key={stats.assists} className="qs-value bump">{stats.assists}</span>
                   </button>
                   <button className="qs-minus" aria-label="Retirer" onClick={() => updateStatWithTime('assists', -1)}>−</button>
                 </div>
                 <div className="quick-stat">
-                  <button className="qs-tap" onClick={(e) => { tapFeedback(); pop(e, '+1'); updateStatWithTime('steals', 1) }}>
+                  <button className="qs-tap" onClick={(e) => { tapFeedback(); fx(e, 'steals'); updateStatWithTime('steals', 1) }}>
                     <span className="qs-label">Inter</span>
                     <span key={stats.steals} className="qs-value bump">{stats.steals}</span>
                   </button>
                   <button className="qs-minus" aria-label="Retirer" onClick={() => updateStatWithTime('steals', -1)}>−</button>
                 </div>
                 <div className="quick-stat">
-                  <button className="qs-tap" onClick={(e) => { tapFeedback(); pop(e, '+1'); updateStatWithTime('blocks', 1) }}>
+                  <button className="qs-tap" onClick={(e) => { tapFeedback(); fx(e, 'blocks'); updateStatWithTime('blocks', 1) }}>
                     <span className="qs-label">Contres</span>
                     <span key={stats.blocks} className="qs-value bump">{stats.blocks}</span>
                   </button>
                   <button className="qs-minus" aria-label="Retirer" onClick={() => updateStatWithTime('blocks', -1)}>−</button>
                 </div>
                 <div className="quick-stat qs-negative">
-                  <button className="qs-tap" onClick={(e) => { tapFeedback(); pop(e, '+1', 'bad'); updateStatWithTime('turnovers', 1) }}>
+                  <button className="qs-tap" onClick={(e) => { tapFeedback(); fx(e, 'turnovers'); updateStatWithTime('turnovers', 1) }}>
                     <span className="qs-label">Pertes</span>
                     <span key={stats.turnovers} className="qs-value bump">{stats.turnovers}</span>
                   </button>
                   <button className="qs-minus" aria-label="Retirer" onClick={() => updateStatWithTime('turnovers', -1)}>−</button>
                 </div>
                 <div className="quick-stat qs-negative">
-                  <button className="qs-tap" onClick={(e) => { tapFeedback(); pop(e, '+1', 'bad'); updateStatWithTime('fouls', 1) }}>
+                  <button className="qs-tap" onClick={(e) => { tapFeedback(); fx(e, 'fouls'); updateStatWithTime('fouls', 1) }}>
                     <span className="qs-label">Fautes</span>
                     <span key={stats.fouls} className="qs-value bump">{stats.fouls}</span>
                   </button>
