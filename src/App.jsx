@@ -3680,6 +3680,11 @@ const styles = `
     text-align: center;
   }
 
+  /* Replay : une ligne par quart-temps affiché + une ligne match */
+  .replay-stats { flex-direction: column; gap: 10px; }
+  .replay-stats-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .replay-stats-label { min-width: 48px; font-weight: 800; color: var(--accent, #61dafb); }
+
   .replay-stat .stat-label {
     display: block;
     font-size: 0.8rem;

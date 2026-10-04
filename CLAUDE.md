@@ -326,8 +326,8 @@ git add -A && git commit -m "message" && git push origin main
   shotMarkers: [{
     x, y,           // Position sur le terrain (%)
     made,           // boolean
-    isThree,        // boolean
-    isFreeThrow,    // boolean
+    isThree,        // boolean (CourtMap) — PAS isThreePointer (sauf marqueurs LF : isThreePointer:false)
+    isFreeThrow,    // boolean — les LF ont aussi un marqueur : à exclure des stats de tirs
     quarter         // 1-4
   }],
   summary: {

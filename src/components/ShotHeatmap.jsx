@@ -14,10 +14,11 @@ export default function ShotHeatmap({ history, selectedMatchId }) {
   const courtWidth = 500
   const courtHeight = 470
 
-  // Calculate overall stats
-  const totalShots = markers.length
-  const totalMade = markers.filter(m => m.made).length
-  const twoPointers = markers.filter(m => !m.isThree)
+  // Calculate overall stats (tirs du terrain uniquement : les lancers francs ont aussi un marqueur)
+  const fieldShots = markers.filter(m => !m.isFreeThrow)
+  const totalShots = fieldShots.length
+  const totalMade = fieldShots.filter(m => m.made).length
+  const twoPointers = fieldShots.filter(m => !m.isThree)
   const threePointers = markers.filter(m => m.isThree)
   const twoMade = twoPointers.filter(m => m.made).length
   const threeMade = threePointers.filter(m => m.made).length

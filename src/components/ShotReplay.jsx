@@ -134,16 +134,22 @@ export default function ShotReplay({ shotMarkers, actionHistory, onClose }) {
     }
   }, [])
 
+  // Les marqueurs de la carte utilisent isThree (anciennement isThreePointer) ;
+  // les lancers francs ont un marqueur isFreeThrow
+  const isThree = s => !!(s.isThree ?? s.isThreePointer ?? s.type === '3pts')
+  const ftMarkers = shotMarkers.filter(m => m.isFreeThrow)
+
   // Combine shot markers with their timing from action history
-  const allShots = [...shotMarkers].sort((a, b) => {
+  const allShots = shotMarkers.filter(m => !m.isFreeThrow).sort((a, b) => {
     // Sort by quarter then by timeLeft (descending = chronological)
     if (a.quarter !== b.quarter) return a.quarter - b.quarter
     return b.timeLeft - a.timeLeft
   })
 
-  // Get free throws from action history
-  const freeThrows = actionHistory
-    .filter(a => a.type === 'ftMade' || a.type === 'ftAttempted')
+  // Lancers francs : marqueurs s'il y en a (matchs récents), sinon historique des actions
+  const freeThrows = (ftMarkers.length > 0
+    ? ftMarkers.map(m => ({ ...m, type: m.made ? 'ftMade' : 'ftAttempted' }))
+    : actionHistory.filter(a => a.type === 'ftMade' || a.type === 'ftAttempted'))
     .map(a => ({
       id: a.id,
       type: 'ft',
@@ -251,15 +257,26 @@ export default function ShotReplay({ shotMarkers, actionHistory, onClose }) {
     }
   }, [isPlaying, currentIndex, allEvents.length, speed, ballPhase])
 
-  // Stats summary
-  const stats = {
-    fg2Made: allShots.filter(s => !s.isThreePointer && s.made).length,
-    fg2Total: allShots.filter(s => !s.isThreePointer).length,
-    fg3Made: allShots.filter(s => s.isThreePointer && s.made).length,
-    fg3Total: allShots.filter(s => s.isThreePointer).length,
-    ftMade: freeThrows.filter(f => f.made).length,
-    ftTotal: freeThrows.length
+  // Stats : quart-temps affiché + total du match
+  const statsFor = (events) => {
+    const shots = events.filter(e => e.eventType === 'shot')
+    const fts = events.filter(e => e.eventType === 'ft')
+    const r = {
+      fg2Made: shots.filter(s => !isThree(s) && s.made).length,
+      fg2Total: shots.filter(s => !isThree(s)).length,
+      fg3Made: shots.filter(s => isThree(s) && s.made).length,
+      fg3Total: shots.filter(s => isThree(s)).length,
+      ftMade: fts.filter(f => f.made).length,
+      ftTotal: fts.length
+    }
+    r.points = r.fg2Made * 2 + r.fg3Made * 3 + r.ftMade
+    return r
   }
+  const shownQuarter = selectedQuarter ?? currentAction?.quarter ?? null
+  const statRows = [
+    shownQuarter && { label: `Q${shownQuarter}`, s: statsFor(allEvents.filter(e => e.quarter === shownQuarter)) },
+    { label: 'Match', s: statsFor(allEvents) }
+  ].filter(Boolean)
 
   return (
     <div className="replay-overlay" onClick={onClose}>
@@ -454,7 +471,7 @@ export default function ShotReplay({ shotMarkers, actionHistory, onClose }) {
                 <div className="action-type">
                   {currentAction.eventType === 'ft'
                     ? `Lancer Franc ${currentAction.made ? '✓' : '✗'}`
-                    : `${currentAction.isThreePointer ? '3PTS' : '2PTS'} ${currentAction.made ? '✓' : '✗'}`
+                    : `${isThree(currentAction) ? '3PTS' : '2PTS'} ${currentAction.made ? '✓' : '✗'}`
                   }
                 </div>
               </div>
@@ -478,18 +495,27 @@ export default function ShotReplay({ shotMarkers, actionHistory, onClose }) {
 
           {/* Stats summary */}
           <div className="replay-stats">
-            <div className="replay-stat">
-              <span className="stat-label">2PTS</span>
-              <span className="stat-value">{stats.fg2Made}/{stats.fg2Total}</span>
-            </div>
-            <div className="replay-stat">
-              <span className="stat-label">3PTS</span>
-              <span className="stat-value">{stats.fg3Made}/{stats.fg3Total}</span>
-            </div>
-            <div className="replay-stat">
-              <span className="stat-label">LF</span>
-              <span className="stat-value">{stats.ftMade}/{stats.ftTotal}</span>
-            </div>
+            {statRows.map(({ label, s: st }) => (
+              <div className="replay-stats-row" key={label}>
+                <span className="replay-stats-label">{label}</span>
+                <div className="replay-stat">
+                  <span className="stat-label">PTS</span>
+                  <span className="stat-value">{st.points}</span>
+                </div>
+                <div className="replay-stat">
+                  <span className="stat-label">2PTS</span>
+                  <span className="stat-value">{st.fg2Made}/{st.fg2Total}</span>
+                </div>
+                <div className="replay-stat">
+                  <span className="stat-label">3PTS</span>
+                  <span className="stat-value">{st.fg3Made}/{st.fg3Total}</span>
+                </div>
+                <div className="replay-stat">
+                  <span className="stat-label">LF</span>
+                  <span className="stat-value">{st.ftMade}/{st.ftTotal}</span>
+                </div>
+              </div>
+            ))}
           </div>
 
           {/* Quarter navigation */}

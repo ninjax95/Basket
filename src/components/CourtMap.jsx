@@ -105,7 +105,8 @@ export default function CourtMap({ onShotRecorded, onShotRemoved, quarter, timeL
 
   // Stats by quarter
   const getQuarterStats = (q) => {
-    const qMarkers = shotMarkers.filter(m => m.quarter === q)
+    // Les lancers francs ont aussi un marqueur (isFreeThrow) : ils ne comptent pas dans les tirs
+    const qMarkers = shotMarkers.filter(m => m.quarter === q && !m.isFreeThrow)
     return {
       made2: qMarkers.filter(m => m.made && !m.isThree).length,
       total2: qMarkers.filter(m => !m.isThree).length,
