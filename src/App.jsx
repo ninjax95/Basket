@@ -6957,6 +6957,10 @@ const styles = `
     100% { transform: scale(1) rotate(0); }
   }
 
+  /* Les écrans tactiles imposent 44px mini à tous les boutons (règle pointer: coarse plus haut) :
+     on l'annule pour les petits boutons, sinon ils recouvrent les chiffres */
+  #root .qs-minus, #root .sb-score-btns button, #root .help-btn, #root .edit-btn, #root .delete-btn { min-width: 0; min-height: 0; }
+
   /* Bulle BD en étoile */
   .pop {
     font-family: 'Bangers', system-ui, sans-serif;
