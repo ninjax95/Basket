@@ -211,9 +211,13 @@ git add -A && git commit -m "message" && git push origin main
 - Champ "Points forts" (ce qui a bien marché)
 - Champ "À améliorer" (axes de progression)
 
-### Thèmes
-- **Mode sombre** (défaut) : Fond foncé, texte clair
-- **Mode clair** : Fond clair, texte foncé avec bon contraste
+### Thèmes (16, choix dans Options > Apparence)
+- Liste `SKINS` en haut d'App.jsx (id, nom, emoji, mode sombre/clair, couleurs de l'aperçu). Stocké dans `basketSkin`, défaut `classic`
+- `body[data-skin]` = thème ; `body[data-theme]` = mode du thème (pilote les anciennes règles `[data-theme="light"]`)
+- CSS : MODERNISATION + BROADCAST = base commune (structure, tokens par défaut = thème Broadcast) ; bloc « THÈMES » en fin de `styles` = tokens + signatures par thème ; Cartoon = ses règles préfixées `body[data-skin="cartoon"]`
+- Thèmes : Classique (couleurs d'origine), Broadcast, Clair, Cartoon, Minimal, Néon, Rétro 80s, Arcade 8-bit, Playground, Tableau du coach, Parquet, Journal sportif, Violet & Or, Vert & Blanc, Rouge & Noir, Océan
+- Polices auto-hébergées (`@fontsource`, importées dans `main.jsx`) : Barlow Condensed, Bangers, Orbitron, Permanent Marker, Caveat, Press Start 2P, Playfair Display
+- Ajouter un thème : une entrée dans `SKINS` + un bloc `body[data-skin="id"] { --bg… }` dans la section THÈMES
 
 ### Gestion du temps de jeu
 - **Bouton Temps mort** (⏱️) : pause rapide du timer en 1 clic
@@ -297,7 +301,7 @@ git add -A && git commit -m "message" && git push origin main
 - `basketIsOnCourt` : boolean terrain/banc
 - `basketGithubToken` : token GitHub pour sync
 - `basketGistId` : ID du Gist pour sync
-- `basketTheme` : 'dark' | 'light'
+- `basketSkin` : id du thème (voir `SKINS`) — remplace l'ancien `basketTheme` ('dark' | 'light'), ignoré désormais
 - `basketGoals` : objectifs par match {points, rebounds, assists}
 - `basketShowTraining` : boolean afficher/masquer onglet entraînement
 

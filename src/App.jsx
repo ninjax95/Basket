@@ -6711,7 +6711,7 @@ const styles = `
      CARTOON — style BD (par-dessus BROADCAST) : contours encre,
      ombres décalées, couleurs flashy, trame de points, police Bangers
      ============================================================ */
-  body {
+  body[data-skin="cartoon"] {
     --font-display: 'Bangers', 'Barlow Condensed', system-ui, sans-serif;
     --ink: #120b2e;
     --bg: #23175a;
@@ -6743,7 +6743,7 @@ const styles = `
       var(--bg);
     background-attachment: fixed;
   }
-  body[data-theme="light"] {
+  body[data-skin="cartoon"][data-theme="light"] {
     --ink: #1a1033;
     --bg: #fff1c9;
     --surface: #ffffff;
@@ -6762,8 +6762,10 @@ const styles = `
   }
 
   /* Texte BD : contour + ombre */
-  #root h1, #root h2, #root h3 { font-weight: 400; letter-spacing: 0.04em; }
-  #root .app-header h1 {
+  body[data-skin="cartoon"] #root h1,
+  body[data-skin="cartoon"] #root h2,
+  body[data-skin="cartoon"] #root h3 { font-weight: 400; letter-spacing: 0.04em; }
+  body[data-skin="cartoon"] #root .app-header h1 {
     font-size: 2rem;
     font-weight: 400;
     color: var(--c-yellow);
@@ -6771,7 +6773,7 @@ const styles = `
     text-shadow: 3px 3px 0 var(--ink);
     transform: rotate(-2deg);
   }
-  #root .app-season {
+  body[data-skin="cartoon"] #root .app-season {
     background: var(--c-pink);
     color: #fff;
     border: 2.5px solid var(--ink);
@@ -6782,7 +6784,7 @@ const styles = `
     text-shadow: none;
     transform: rotate(3deg);
   }
-  #root .help-btn {
+  body[data-skin="cartoon"] #root .help-btn {
     background: var(--c-cyan);
     color: var(--ink);
     border: 3px solid var(--ink);
@@ -6792,18 +6794,18 @@ const styles = `
   }
 
   /* Cartes : contour encre + ombre décalée */
-  #root .match-header-compact,
-  #root .court-container,
-  #root .points-total-display,
-  #root .quick-stat,
-  #root .shot-col {
+  body[data-skin="cartoon"] #root .match-header-compact,
+  body[data-skin="cartoon"] #root .court-container,
+  body[data-skin="cartoon"] #root .points-total-display,
+  body[data-skin="cartoon"] #root .quick-stat,
+  body[data-skin="cartoon"] #root .shot-col {
     border: 3px solid var(--ink);
     box-shadow: 5px 5px 0 var(--ink);
     border-radius: 18px;
   }
 
   /* Étiquettes de section façon sticker */
-  #root .stats-category-title {
+  body[data-skin="cartoon"] #root .stats-category-title {
     display: inline-block;
     padding: 3px 12px;
     margin: 10px 0 10px 2px;
@@ -6816,10 +6818,10 @@ const styles = `
     box-shadow: 3px 3px 0 var(--ink);
     transform: rotate(-2deg);
   }
-  #root .stats-category-title::before { display: none; }
+  body[data-skin="cartoon"] #root .stats-category-title::before { display: none; }
 
   /* ---------- Scoreboard ---------- */
-  #root .scoreboard {
+  body[data-skin="cartoon"] #root .scoreboard {
     background:
       radial-gradient(rgba(18, 11, 46, 0.12) 1.4px, transparent 1.5px) 0 0 / 12px 12px,
       var(--c-yellow);
@@ -6830,12 +6832,12 @@ const styles = `
     --surface-2: #fff;
     --border: var(--ink);
   }
-  #root .scoreboard::before { height: 0; }
-  #root .sb-quarter { background: var(--ink); color: var(--c-yellow); font-weight: 400; font-size: 1.2rem; transform: rotate(-4deg); }
-  #root .sb-time { color: var(--ink); font-size: 1.9rem; font-weight: 400; letter-spacing: 0.06em; }
-  #root .sb-time.running { color: var(--ink); }
-  #root .sb-play { background: var(--c-pink); border: 3px solid var(--ink); box-shadow: 2px 2px 0 var(--ink); width: 38px; height: 38px; }
-  #root .sb-live {
+  body[data-skin="cartoon"] #root .scoreboard::before { height: 0; }
+  body[data-skin="cartoon"] #root .sb-quarter { background: var(--ink); color: var(--c-yellow); font-weight: 400; font-size: 1.2rem; transform: rotate(-4deg); }
+  body[data-skin="cartoon"] #root .sb-time { color: var(--ink); font-size: 1.9rem; font-weight: 400; letter-spacing: 0.06em; }
+  body[data-skin="cartoon"] #root .sb-time.running { color: var(--ink); }
+  body[data-skin="cartoon"] #root .sb-play { background: var(--c-pink); border: 3px solid var(--ink); box-shadow: 2px 2px 0 var(--ink); width: 38px; height: 38px; }
+  body[data-skin="cartoon"] #root .sb-live {
     color: #fff;
     background: var(--c-red);
     padding: 2px 8px;
@@ -6845,48 +6847,49 @@ const styles = `
     font-size: 1rem;
     animation: live-wiggle 1s ease-in-out infinite;
   }
-  #root .sb-live-dot { background: #fff; }
+  body[data-skin="cartoon"] #root .sb-live-dot { background: #fff; }
   @keyframes live-wiggle {
     0%, 100% { transform: rotate(-3deg); }
     50% { transform: rotate(3deg) scale(1.06); }
   }
-  #root .sb-paused { color: var(--ink); font-weight: 400; font-size: 1rem; opacity: 0.6; }
-  #root .sb-court { border: 2.5px solid var(--ink); box-shadow: 2px 2px 0 var(--ink); font-weight: 400; font-size: 1.05rem; }
-  #root .sb-court.on-court { background: var(--c-green); color: var(--ink); }
-  #root .sb-court.on-bench { background: #fff; color: var(--ink); }
-  #root .scoreboard .timeout-btn { border: 2.5px solid var(--ink); box-shadow: 2px 2px 0 var(--ink); background: #fff; color: var(--ink); font-family: var(--font-display); font-size: 1.05rem; letter-spacing: 0.04em; }
+  body[data-skin="cartoon"] #root .sb-paused { color: var(--ink); font-weight: 400; font-size: 1rem; opacity: 0.6; }
+  body[data-skin="cartoon"] #root .sb-court { border: 2.5px solid var(--ink); box-shadow: 2px 2px 0 var(--ink); font-weight: 400; font-size: 1.05rem; }
+  body[data-skin="cartoon"] #root .sb-court.on-court { background: var(--c-green); color: var(--ink); }
+  body[data-skin="cartoon"] #root .sb-court.on-bench { background: #fff; color: var(--ink); }
+  body[data-skin="cartoon"] #root .scoreboard .timeout-btn { border: 2.5px solid var(--ink); box-shadow: 2px 2px 0 var(--ink); background: #fff; color: var(--ink); font-family: var(--font-display); font-size: 1.05rem; letter-spacing: 0.04em; }
 
-  #root .sb-team-label { color: var(--ink); font-weight: 400; font-size: 1rem; letter-spacing: 0.12em; }
-  #root .sb-score-value {
+  body[data-skin="cartoon"] #root .sb-team-label { color: var(--ink); font-weight: 400; font-size: 1rem; letter-spacing: 0.12em; }
+  body[data-skin="cartoon"] #root .sb-score-value {
     font-weight: 400;
     font-size: 4rem;
     line-height: 0.9;
     -webkit-text-stroke: 2.5px var(--ink);
     text-shadow: 4px 4px 0 var(--ink);
   }
-  #root .sb-team.us .sb-score-value { background: none; -webkit-background-clip: border-box; background-clip: border-box; color: var(--c-orange); }
-  #root .sb-team.them .sb-score-value { color: var(--c-cyan); }
-  #root .sb-score-btns button { border: 2.5px solid var(--ink); box-shadow: 2px 2px 0 var(--ink); background: #fff; color: var(--ink); font-weight: 800; }
-  #root .sb-score-btns button:active { transform: translate(2px, 2px); box-shadow: none; }
-  #root .sb-diff { border: 2.5px solid var(--ink); background: #fff; color: var(--ink); font-weight: 400; font-size: 1.3rem; transform: rotate(-4deg); }
-  #root .sb-diff.up { background: var(--c-green); color: var(--ink); }
-  #root .sb-diff.down { background: var(--c-red); color: #fff; }
+  body[data-skin="cartoon"] #root .sb-team.us .sb-score-value { background: none; -webkit-background-clip: border-box; background-clip: border-box; color: var(--c-orange); }
+  body[data-skin="cartoon"] #root .sb-team.them .sb-score-value { color: var(--c-cyan); }
+  body[data-skin="cartoon"] #root .sb-score-btns button { border: 2.5px solid var(--ink); box-shadow: 2px 2px 0 var(--ink); background: #fff; color: var(--ink); font-weight: 800; }
+  body[data-skin="cartoon"] #root .sb-score-btns button:active { transform: translate(2px, 2px); box-shadow: none; }
+  body[data-skin="cartoon"] #root .sb-diff { border: 2.5px solid var(--ink); background: #fff; color: var(--ink); font-weight: 400; font-size: 1.3rem; transform: rotate(-4deg); }
+  body[data-skin="cartoon"] #root .sb-diff.up { background: var(--c-green); color: var(--ink); }
+  body[data-skin="cartoon"] #root .sb-diff.down { background: var(--c-red); color: #fff; }
 
-  #root .sb-player { border-top: 3px solid var(--ink); background: #fff; }
-  #root .sb-player-name { font-weight: 400; font-size: 1.3rem; letter-spacing: 0.04em; color: var(--ink); }
-  #root .sb-player-number { color: var(--c-pink); font-weight: 400; font-size: 1rem; }
-  #root .sb-pts-value { font-weight: 400; font-size: 2.4rem; color: var(--c-orange); -webkit-text-stroke: 1.5px var(--ink); text-shadow: 2px 2px 0 var(--ink); }
-  #root .sb-pts.hot .sb-pts-value { background: none; color: var(--c-red); filter: none; animation: hot-shake 0.5s ease-in-out infinite; }
+  body[data-skin="cartoon"] #root .sb-player { border-top: 3px solid var(--ink); background: #fff; }
+  body[data-skin="cartoon"] #root .sb-player-name { font-weight: 400; font-size: 1.3rem; letter-spacing: 0.04em; color: var(--ink); }
+  body[data-skin="cartoon"] #root .sb-player-number { color: var(--c-pink); font-weight: 400; font-size: 1rem; }
+  body[data-skin="cartoon"] #root .sb-pts-value { font-weight: 400; font-size: 2.4rem; color: var(--c-orange); -webkit-text-stroke: 1.5px var(--ink); text-shadow: 2px 2px 0 var(--ink); }
+  body[data-skin="cartoon"] #root .sb-pts.hot .sb-pts-value { background: none; color: var(--c-red); filter: none; animation: hot-shake 0.5s ease-in-out infinite; }
   @keyframes hot-shake {
     0%, 100% { transform: rotate(-4deg) scale(1.05); }
     50% { transform: rotate(4deg) scale(1.12); }
   }
-  #root .sb-pts-label, #root .sb-mini { color: var(--ink); font-weight: 400; letter-spacing: 0.06em; }
-  #root .sb-mini b { font-weight: 400; font-size: 1.3rem; }
-  #root .sb-streak { font-weight: 400; font-size: 1.2rem; color: var(--c-red); }
+  body[data-skin="cartoon"] #root .sb-pts-label,
+  body[data-skin="cartoon"] #root .sb-mini { color: var(--ink); font-weight: 400; letter-spacing: 0.06em; }
+  body[data-skin="cartoon"] #root .sb-mini b { font-weight: 400; font-size: 1.3rem; }
+  body[data-skin="cartoon"] #root .sb-streak { font-weight: 400; font-size: 1.2rem; color: var(--c-red); }
 
   /* Tremblement (tir raté) */
-  #root .scoreboard.shake { animation: board-shake 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97); }
+  body[data-skin="cartoon"] #root .scoreboard.shake { animation: board-shake 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97); }
   @keyframes board-shake {
     10%, 90% { transform: translateX(-2px) rotate(-0.5deg); }
     20%, 80% { transform: translateX(4px) rotate(0.5deg); }
@@ -6895,48 +6898,52 @@ const styles = `
   }
 
   /* ---------- Tirs ---------- */
-  #root .shot-col { background: var(--surface); padding: 10px 8px 10px; }
-  #root .shot-name { font-weight: 400; font-size: 1.4rem; letter-spacing: 0.04em; }
-  #root .shot-line { font-weight: 400; font-size: 1.3rem; }
-  #root .shot-pct { font-family: var(--font-display); font-weight: 400; font-size: 1rem; color: var(--muted); letter-spacing: 0.04em; }
-  #root .sp-btn {
+  body[data-skin="cartoon"] #root .shot-col { background: var(--surface); padding: 10px 8px 10px; }
+  body[data-skin="cartoon"] #root .shot-name { font-weight: 400; font-size: 1.4rem; letter-spacing: 0.04em; }
+  body[data-skin="cartoon"] #root .shot-line { font-weight: 400; font-size: 1.3rem; }
+  body[data-skin="cartoon"] #root .shot-pct { font-family: var(--font-display); font-weight: 400; font-size: 1rem; color: var(--muted); letter-spacing: 0.04em; }
+  body[data-skin="cartoon"] #root .sp-btn {
     font-family: var(--font-display);
     font-size: 2rem;
     border: 3px solid var(--ink);
     box-shadow: 4px 4px 0 var(--ink);
     transition: transform 0.08s ease, box-shadow 0.08s ease;
   }
-  #root .sp-btn.made { background: var(--c-green); color: var(--ink); box-shadow: 4px 4px 0 var(--ink); }
-  #root .sp-btn.missed { background: var(--c-red); color: #fff; border: 3px solid var(--ink); box-shadow: 4px 4px 0 var(--ink); }
-  #root .sp-btn:active { transform: translate(4px, 4px) scale(0.97, 0.9); box-shadow: 0 0 0 var(--ink); filter: none; }
-  #root .sp-btn.made + .qs-minus, #root .shot-btn-wrap .qs-minus { background: #fff; color: var(--ink); border: 2px solid var(--ink); }
+  body[data-skin="cartoon"] #root .sp-btn.made { background: var(--c-green); color: var(--ink); box-shadow: 4px 4px 0 var(--ink); }
+  body[data-skin="cartoon"] #root .sp-btn.missed { background: var(--c-red); color: #fff; border: 3px solid var(--ink); box-shadow: 4px 4px 0 var(--ink); }
+  body[data-skin="cartoon"] #root .sp-btn:active { transform: translate(4px, 4px) scale(0.97, 0.9); box-shadow: 0 0 0 var(--ink); filter: none; }
+  body[data-skin="cartoon"] #root .sp-btn.made + .qs-minus,
+  body[data-skin="cartoon"] #root .shot-btn-wrap .qs-minus { background: #fff; color: var(--ink); border: 2px solid var(--ink); }
 
   /* ---------- Tuiles actions : une couleur par stat ---------- */
-  #root .quick-stat { overflow: visible; transition: transform 0.08s ease, box-shadow 0.08s ease; }
-  #root .actions-grid .quick-stat:nth-child(1), #root .actions-grid .quick-stat:nth-child(2) { background: var(--c-cyan); }
-  #root .actions-grid .quick-stat:nth-child(3) { background: var(--c-yellow); }
-  #root .actions-grid .quick-stat:nth-child(4) { background: var(--c-green); }
-  #root .actions-grid .quick-stat:nth-child(5) { background: var(--c-pink); }
-  #root .actions-grid .quick-stat:nth-child(6), #root .actions-grid .quick-stat:nth-child(7) { background: #ff8a8a; }
-  #root .actions-grid .qs-label, #root .actions-grid .qs-value { color: var(--ink); }
-  #root .actions-grid .qs-negative .qs-label { color: var(--ink); }
-  #root .qs-label { font-weight: 400; font-size: 1rem; letter-spacing: 0.05em; }
-  #root .qs-value { font-weight: 400; font-size: 2.3rem; }
-  #root .qs-tap:active { background: transparent; transform: none; }
-  #root .quick-stat:has(.qs-tap:active) { transform: translate(4px, 4px) scale(0.97, 0.92); box-shadow: 0 0 0 var(--ink); }
-  #root .qs-minus { background: #fff; color: var(--ink); border: 2px solid var(--ink); font-weight: 800; }
+  body[data-skin="cartoon"] #root .quick-stat { overflow: visible; transition: transform 0.08s ease, box-shadow 0.08s ease; }
+  body[data-skin="cartoon"] #root .actions-grid .quick-stat:nth-child(1),
+  body[data-skin="cartoon"] #root .actions-grid .quick-stat:nth-child(2) { background: var(--c-cyan); }
+  body[data-skin="cartoon"] #root .actions-grid .quick-stat:nth-child(3) { background: var(--c-yellow); }
+  body[data-skin="cartoon"] #root .actions-grid .quick-stat:nth-child(4) { background: var(--c-green); }
+  body[data-skin="cartoon"] #root .actions-grid .quick-stat:nth-child(5) { background: var(--c-pink); }
+  body[data-skin="cartoon"] #root .actions-grid .quick-stat:nth-child(6),
+  body[data-skin="cartoon"] #root .actions-grid .quick-stat:nth-child(7) { background: #ff8a8a; }
+  body[data-skin="cartoon"] #root .actions-grid .qs-label,
+  body[data-skin="cartoon"] #root .actions-grid .qs-value { color: var(--ink); }
+  body[data-skin="cartoon"] #root .actions-grid .qs-negative .qs-label { color: var(--ink); }
+  body[data-skin="cartoon"] #root .qs-label { font-weight: 400; font-size: 1rem; letter-spacing: 0.05em; }
+  body[data-skin="cartoon"] #root .qs-value { font-weight: 400; font-size: 2.3rem; }
+  body[data-skin="cartoon"] #root .qs-tap:active { background: transparent; transform: none; }
+  body[data-skin="cartoon"] #root .quick-stat:has(.qs-tap:active) { transform: translate(4px, 4px) scale(0.97, 0.92); box-shadow: 0 0 0 var(--ink); }
+  body[data-skin="cartoon"] #root .qs-minus { background: #fff; color: var(--ink); border: 2px solid var(--ink); font-weight: 800; }
 
   /* Total + carte */
-  #root .points-total-display { background: var(--surface); }
-  #root .pts-value { background: none; -webkit-background-clip: border-box; background-clip: border-box; color: var(--c-yellow); -webkit-text-stroke: 1.5px var(--ink); text-shadow: 3px 3px 0 var(--ink); font-weight: 400; font-size: 2.4rem; }
-  #root .pts-label { font-weight: 400; font-size: 1.1rem; }
-  #root .court-container { background: var(--surface); }
+  body[data-skin="cartoon"] #root .points-total-display { background: var(--surface); }
+  body[data-skin="cartoon"] #root .pts-value { background: none; -webkit-background-clip: border-box; background-clip: border-box; color: var(--c-yellow); -webkit-text-stroke: 1.5px var(--ink); text-shadow: 3px 3px 0 var(--ink); font-weight: 400; font-size: 2.4rem; }
+  body[data-skin="cartoon"] #root .pts-label { font-weight: 400; font-size: 1.1rem; }
+  body[data-skin="cartoon"] #root .court-container { background: var(--surface); }
 
   /* ---------- Barre d'onglets ---------- */
-  #root .nav-tabs { border-top: 3px solid var(--ink); backdrop-filter: none; -webkit-backdrop-filter: none; }
-  #root .nav-label { font-weight: 400; font-size: 0.95rem; letter-spacing: 0.06em; }
-  #root .nav-tab.active { color: var(--text); }
-  #root .nav-tab.active .nav-icon {
+  body[data-skin="cartoon"] #root .nav-tabs { border-top: 3px solid var(--ink); backdrop-filter: none; -webkit-backdrop-filter: none; }
+  body[data-skin="cartoon"] #root .nav-label { font-weight: 400; font-size: 0.95rem; letter-spacing: 0.06em; }
+  body[data-skin="cartoon"] #root .nav-tab.active { color: var(--text); }
+  body[data-skin="cartoon"] #root .nav-tab.active .nav-icon {
     background: var(--c-yellow);
     border: 2.5px solid var(--ink);
     box-shadow: 2px 2px 0 var(--ink);
@@ -6946,11 +6953,11 @@ const styles = `
     0% { transform: scale(0.6) rotate(-10deg); }
     100% { transform: scale(1) rotate(0); }
   }
-  #root .nav-badge { background: var(--c-pink); border: 2px solid var(--ink); }
-  #root .match-select { border: 3px solid var(--ink); box-shadow: 3px 3px 0 var(--ink); }
+  body[data-skin="cartoon"] #root .nav-badge { background: var(--c-pink); border: 2px solid var(--ink); }
+  body[data-skin="cartoon"] #root .match-select { border: 3px solid var(--ink); box-shadow: 3px 3px 0 var(--ink); }
 
   /* ---------- Animations BD ---------- */
-  #root .bump { animation: cartoon-bump 0.45s cubic-bezier(0.34, 1.8, 0.64, 1); }
+  body[data-skin="cartoon"] #root .bump { animation: cartoon-bump 0.45s cubic-bezier(0.34, 1.8, 0.64, 1); }
   @keyframes cartoon-bump {
     0% { transform: scale(1.6) rotate(-8deg); }
     60% { transform: scale(0.92) rotate(3deg); }
@@ -6962,7 +6969,7 @@ const styles = `
   #root .qs-minus, #root .sb-score-btns button, #root .help-btn, #root .edit-btn, #root .delete-btn { min-width: 0; min-height: 0; }
 
   /* Bulle BD en étoile */
-  .pop {
+  body[data-skin="cartoon"] .pop {
     font-family: 'Bangers', system-ui, sans-serif;
     font-weight: 400;
     font-size: 2rem;
@@ -6975,7 +6982,7 @@ const styles = `
     animation: comic-pop 0.9s cubic-bezier(0.34, 1.6, 0.64, 1) forwards;
     isolation: isolate;
   }
-  .pop::before {
+  body[data-skin="cartoon"] .pop::before {
     content: '';
     position: absolute;
     inset: 0;
@@ -6984,13 +6991,17 @@ const styles = `
     filter: drop-shadow(3px 3px 0 #120b2e);
     clip-path: polygon(50% 0%, 61% 22%, 85% 8%, 78% 33%, 100% 38%, 82% 55%, 98% 75%, 72% 72%, 70% 100%, 52% 80%, 32% 98%, 30% 74%, 4% 82%, 18% 58%, 0% 40%, 22% 32%, 14% 8%, 38% 22%);
   }
-  .pop.good { --burst: #3ddc84; }
-  .pop.gold { --burst: #ffd23f; }
-  .pop.bad { --burst: #ff4757; }
-  .pop.cyan { --burst: #2ee6d6; }
-  .pop.pink { --burst: #ff4fa3; }
-  .pop.good, .pop.gold, .pop.bad, .pop.cyan, .pop.pink { color: #fff; }
-  .pop.small { font-size: 1.4rem; padding: 12px 16px; }
+  body[data-skin="cartoon"] .pop.good { --burst: #3ddc84; }
+  body[data-skin="cartoon"] .pop.gold { --burst: #ffd23f; }
+  body[data-skin="cartoon"] .pop.bad { --burst: #ff4757; }
+  body[data-skin="cartoon"] .pop.cyan { --burst: #2ee6d6; }
+  body[data-skin="cartoon"] .pop.pink { --burst: #ff4fa3; }
+  body[data-skin="cartoon"] .pop.good,
+  body[data-skin="cartoon"] .pop.gold,
+  body[data-skin="cartoon"] .pop.bad,
+  body[data-skin="cartoon"] .pop.cyan,
+  body[data-skin="cartoon"] .pop.pink { color: #fff; }
+  body[data-skin="cartoon"] .pop.small { font-size: 1.4rem; padding: 12px 16px; }
   @keyframes comic-pop {
     0% { opacity: 0; transform: translate(-50%, -50%) scale(0.2) rotate(var(--rot, 0deg)); }
     25% { opacity: 1; transform: translate(-50%, -90%) scale(1.25) rotate(var(--rot, 0deg)); }
@@ -7021,17 +7032,15 @@ const styles = `
     left: 50%;
     top: 42%;
     padding: 10px 26px;
-    font-family: 'Bangers', system-ui, sans-serif;
+    font-family: var(--font-display);
     font-size: 3rem;
     letter-spacing: 0.05em;
     white-space: nowrap;
-    color: #ffd23f;
-    -webkit-text-stroke: 2px #120b2e;
-    text-shadow: 4px 4px 0 #120b2e;
-    background: #ff4757;
-    border: 4px solid #120b2e;
+    color: #fff;
+    text-shadow: 0 3px 12px rgba(0, 0, 0, 0.35);
+    background: var(--grad);
     border-radius: 14px;
-    box-shadow: 8px 8px 0 #120b2e;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
     animation: fire-in 1.6s cubic-bezier(0.34, 1.6, 0.64, 1) forwards;
   }
   @keyframes fire-in {
@@ -7042,64 +7051,77 @@ const styles = `
     100% { opacity: 0; transform: translate(-50%, -80%) scale(0.9) rotate(-4deg); }
   }
 
+  body[data-skin="cartoon"] .fire-banner {
+    font-family: 'Bangers', system-ui, sans-serif;
+    color: #ffd23f;
+    -webkit-text-stroke: 2px #120b2e;
+    text-shadow: 4px 4px 0 #120b2e;
+    background: #ff4757;
+    border: 4px solid #120b2e;
+    box-shadow: 8px 8px 0 #120b2e;
+  }
+
   /* ============================================================
      CARTOON — AUTRES ONGLETS (Historique, Entraînement, Analyse,
      Options, bas de l'écran Match, fenêtres)
      ============================================================ */
 
   /* Grands panneaux */
-  #root .analysis-filter,
-  #root .history-filter,
-  #root .detailed-stats-section,
-  #root .shooting-stats,
-  #root .averages-inline,
-  #root .records-inline,
-  #root .rolling-averages,
-  #root .goals-section,
-  #root .compare-view,
-  #root .quarter-stats-display,
-  #root .playing-time-display,
-  #root .match-card,
-  #root .chart-container,
-  #root .options-section,
-  #root .timer-section,
-  #root .playing-time-section,
-  #root .quarter-stats-section,
-  #root .summary,
-  #root .save-match-section {
+  body[data-skin="cartoon"] #root .analysis-filter,
+  body[data-skin="cartoon"] #root .history-filter,
+  body[data-skin="cartoon"] #root .detailed-stats-section,
+  body[data-skin="cartoon"] #root .shooting-stats,
+  body[data-skin="cartoon"] #root .averages-inline,
+  body[data-skin="cartoon"] #root .records-inline,
+  body[data-skin="cartoon"] #root .rolling-averages,
+  body[data-skin="cartoon"] #root .goals-section,
+  body[data-skin="cartoon"] #root .compare-view,
+  body[data-skin="cartoon"] #root .quarter-stats-display,
+  body[data-skin="cartoon"] #root .playing-time-display,
+  body[data-skin="cartoon"] #root .match-card,
+  body[data-skin="cartoon"] #root .chart-container,
+  body[data-skin="cartoon"] #root .options-section,
+  body[data-skin="cartoon"] #root .timer-section,
+  body[data-skin="cartoon"] #root .playing-time-section,
+  body[data-skin="cartoon"] #root .quarter-stats-section,
+  body[data-skin="cartoon"] #root .summary,
+  body[data-skin="cartoon"] #root .save-match-section {
     background: var(--surface);
     border: 3px solid var(--ink);
     border-radius: 18px;
     box-shadow: 5px 5px 0 var(--ink);
     color: var(--text);
   }
-  #root .options-section .player-info { background: transparent; border: none; box-shadow: none; }
+  body[data-skin="cartoon"] #root .options-section .player-info { background: transparent; border: none; box-shadow: none; }
 
   /* Titres de section façon sticker */
-  #root .history-page h2, #root .analysis-page h2, #root .training-page h2, #root .options-page h2,
-  #root .history-page > h2 {
+  body[data-skin="cartoon"] #root .history-page h2,
+  body[data-skin="cartoon"] #root .analysis-page h2,
+  body[data-skin="cartoon"] #root .training-page h2,
+  body[data-skin="cartoon"] #root .options-page h2,
+  body[data-skin="cartoon"] #root .history-page > h2 {
     font-size: 2rem;
     color: var(--c-yellow);
     -webkit-text-stroke: 1.5px var(--ink);
     text-shadow: 3px 3px 0 var(--ink);
   }
-  #root .analysis-section > h3,
-  #root .options-section > h3,
-  #root .detailed-stats-section h3,
-  #root .records-inline h3,
-  #root .averages-inline h3,
-  #root .match-list-header h3,
-  #root .shooting-stats h3,
-  #root .goals-section h3,
-  #root .rolling-averages h3,
-  #root .chart-container h3,
-  #root .save-match-section h3,
-  #root .averages-inline h4,
-  #root .records-inline h4,
-  #root .rolling-averages h4,
-  #root .goals-section h4,
-  #root .shooting-stats h4,
-  #root .detailed-stats-section h4 {
+  body[data-skin="cartoon"] #root .analysis-section > h3,
+  body[data-skin="cartoon"] #root .options-section > h3,
+  body[data-skin="cartoon"] #root .detailed-stats-section h3,
+  body[data-skin="cartoon"] #root .records-inline h3,
+  body[data-skin="cartoon"] #root .averages-inline h3,
+  body[data-skin="cartoon"] #root .match-list-header h3,
+  body[data-skin="cartoon"] #root .shooting-stats h3,
+  body[data-skin="cartoon"] #root .goals-section h3,
+  body[data-skin="cartoon"] #root .rolling-averages h3,
+  body[data-skin="cartoon"] #root .chart-container h3,
+  body[data-skin="cartoon"] #root .save-match-section h3,
+  body[data-skin="cartoon"] #root .averages-inline h4,
+  body[data-skin="cartoon"] #root .records-inline h4,
+  body[data-skin="cartoon"] #root .rolling-averages h4,
+  body[data-skin="cartoon"] #root .goals-section h4,
+  body[data-skin="cartoon"] #root .shooting-stats h4,
+  body[data-skin="cartoon"] #root .detailed-stats-section h4 {
     display: inline-block;
     padding: 3px 12px;
     font-family: var(--font-display);
@@ -7115,61 +7137,94 @@ const styles = `
     -webkit-text-stroke: 0;
     text-shadow: none;
   }
-  #root .analysis-section > h3 { border-bottom: 2.5px solid var(--ink); }
-  #root .chart-container h3 { background: var(--c-cyan); }
+  body[data-skin="cartoon"] #root .analysis-section > h3 { border-bottom: 2.5px solid var(--ink); }
+  body[data-skin="cartoon"] #root .chart-container h3 { background: var(--c-cyan); }
 
   /* Tuiles de stats colorées */
-  #root .detailed-stat,
-  #root .advanced-stat,
-  #root .record-card,
-  #root .shooting-stat,
-  #root .training-stat,
-  #root .quarter-stat-card,
-  #root .playing-time-item,
-  #root .summary-item,
-  #root .heatmap-stat {
+  body[data-skin="cartoon"] #root .detailed-stat,
+  body[data-skin="cartoon"] #root .advanced-stat,
+  body[data-skin="cartoon"] #root .record-card,
+  body[data-skin="cartoon"] #root .shooting-stat,
+  body[data-skin="cartoon"] #root .training-stat,
+  body[data-skin="cartoon"] #root .quarter-stat-card,
+  body[data-skin="cartoon"] #root .playing-time-item,
+  body[data-skin="cartoon"] #root .summary-item,
+  body[data-skin="cartoon"] #root .heatmap-stat {
     background: var(--c-cyan);
     color: var(--ink);
     border: 2.5px solid var(--ink);
     border-radius: 14px;
     box-shadow: 3px 3px 0 var(--ink);
   }
-  #root .detailed-stat.big, #root .training-stat.total, #root .advanced-stat.streak, #root .quarter-stat-card.current { background: var(--c-yellow); }
-  #root .detailed-stat.negative, #root .advanced-stat.negative { background: #ff8a8a; }
-  #root .detailed-stat.efficiency { background: #b9a2ff; }
-  #root .detailed-stat.positive, #root .advanced-stat.positive { background: var(--c-green); }
-  #root .record-card { background: var(--c-yellow); }
-  #root .record-card:nth-child(odd) { transform: rotate(-1.5deg); }
-  #root .record-card:nth-child(even) { transform: rotate(1.5deg); background: var(--c-pink); }
-  #root .shooting-stat:nth-child(2) { background: var(--c-green); }
-  #root .shooting-stat:nth-child(3) { background: var(--c-pink); }
-  #root .summary-item:nth-child(even), #root .playing-time-item:nth-child(even) { background: var(--c-yellow); }
+  body[data-skin="cartoon"] #root .detailed-stat.big,
+  body[data-skin="cartoon"] #root .training-stat.total,
+  body[data-skin="cartoon"] #root .advanced-stat.streak,
+  body[data-skin="cartoon"] #root .quarter-stat-card.current { background: var(--c-yellow); }
+  body[data-skin="cartoon"] #root .detailed-stat.negative,
+  body[data-skin="cartoon"] #root .advanced-stat.negative { background: #ff8a8a; }
+  body[data-skin="cartoon"] #root .detailed-stat.efficiency { background: #b9a2ff; }
+  body[data-skin="cartoon"] #root .detailed-stat.positive,
+  body[data-skin="cartoon"] #root .advanced-stat.positive { background: var(--c-green); }
+  body[data-skin="cartoon"] #root .record-card { background: var(--c-yellow); }
+  body[data-skin="cartoon"] #root .record-card:nth-child(odd) { transform: rotate(-1.5deg); }
+  body[data-skin="cartoon"] #root .record-card:nth-child(even) { transform: rotate(1.5deg); background: var(--c-pink); }
+  body[data-skin="cartoon"] #root .shooting-stat:nth-child(2) { background: var(--c-green); }
+  body[data-skin="cartoon"] #root .shooting-stat:nth-child(3) { background: var(--c-pink); }
+  body[data-skin="cartoon"] #root .summary-item:nth-child(even),
+  body[data-skin="cartoon"] #root .playing-time-item:nth-child(even) { background: var(--c-yellow); }
 
   /* Chiffres et libellés dans les tuiles */
-  #root .ds-value, #root .adv-value, #root .record-value, #root .shooting-value,
-  #root .pt-value, #root .qs-points, #root .heatmap-stat-value, #root .stat-val,
-  #root .training-stat span:first-child, #root .summary-item span:first-child {
+  body[data-skin="cartoon"] #root .ds-value,
+  body[data-skin="cartoon"] #root .adv-value,
+  body[data-skin="cartoon"] #root .record-value,
+  body[data-skin="cartoon"] #root .shooting-value,
+  body[data-skin="cartoon"] #root .pt-value,
+  body[data-skin="cartoon"] #root .qs-points,
+  body[data-skin="cartoon"] #root .heatmap-stat-value,
+  body[data-skin="cartoon"] #root .stat-val,
+  body[data-skin="cartoon"] #root .training-stat span:first-child,
+  body[data-skin="cartoon"] #root .summary-item span:first-child {
     font-family: var(--font-display);
     font-weight: 400;
     letter-spacing: 0.03em;
   }
-  #root .detailed-stat .ds-value, #root .advanced-stat .adv-value, #root .record-card .record-value,
-  #root .shooting-stat .shooting-value, #root .playing-time-item .pt-value, #root .quarter-stat-card .qs-points,
-  #root .training-stat, #root .summary-item, #root .heatmap-stat .heatmap-stat-value {
+  body[data-skin="cartoon"] #root .detailed-stat .ds-value,
+  body[data-skin="cartoon"] #root .advanced-stat .adv-value,
+  body[data-skin="cartoon"] #root .record-card .record-value,
+  body[data-skin="cartoon"] #root .shooting-stat .shooting-value,
+  body[data-skin="cartoon"] #root .playing-time-item .pt-value,
+  body[data-skin="cartoon"] #root .quarter-stat-card .qs-points,
+  body[data-skin="cartoon"] #root .training-stat,
+  body[data-skin="cartoon"] #root .summary-item,
+  body[data-skin="cartoon"] #root .heatmap-stat .heatmap-stat-value {
     color: var(--ink);
     -webkit-text-stroke: 0;
     text-shadow: none;
   }
-  #root .detailed-stat .ds-value, #root .advanced-stat .adv-value, #root .record-card .record-value { font-size: 2.2rem; line-height: 1; }
-  #root .detailed-stat.big .ds-value { font-size: 3.2rem; }
-  #root .ds-label, #root .adv-label, #root .adv-desc, #root .record-label, #root .record-info,
-  #root .shooting-label, #root .shooting-pct, #root .pt-label, #root .qs-quarter, #root .qs-detail,
-  #root .heatmap-stat-label {
+  body[data-skin="cartoon"] #root .detailed-stat .ds-value,
+  body[data-skin="cartoon"] #root .advanced-stat .adv-value,
+  body[data-skin="cartoon"] #root .record-card .record-value { font-size: 2.2rem; line-height: 1; }
+  body[data-skin="cartoon"] #root .detailed-stat.big .ds-value { font-size: 3.2rem; }
+  body[data-skin="cartoon"] #root .ds-label,
+  body[data-skin="cartoon"] #root .adv-label,
+  body[data-skin="cartoon"] #root .adv-desc,
+  body[data-skin="cartoon"] #root .record-label,
+  body[data-skin="cartoon"] #root .record-info,
+  body[data-skin="cartoon"] #root .shooting-label,
+  body[data-skin="cartoon"] #root .shooting-pct,
+  body[data-skin="cartoon"] #root .pt-label,
+  body[data-skin="cartoon"] #root .qs-quarter,
+  body[data-skin="cartoon"] #root .qs-detail,
+  body[data-skin="cartoon"] #root .heatmap-stat-label {
     color: var(--ink);
     opacity: 0.8;
     font-weight: 700;
   }
-  #root .ds-label, #root .adv-label, #root .record-label, #root .shooting-label, #root .qs-quarter {
+  body[data-skin="cartoon"] #root .ds-label,
+  body[data-skin="cartoon"] #root .adv-label,
+  body[data-skin="cartoon"] #root .record-label,
+  body[data-skin="cartoon"] #root .shooting-label,
+  body[data-skin="cartoon"] #root .qs-quarter {
     font-family: var(--font-display);
     font-weight: 400;
     font-size: 0.95rem;
@@ -7177,19 +7232,21 @@ const styles = `
     opacity: 1;
   }
 
-  #root .training-stat, #root .training-stat * { color: var(--ink); }
-  #root .edit-btn { color: var(--muted); }
-  #root .option-toggle label, #root .training-desc { color: var(--text); }
-  #root .match-header { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
-  #root .match-header .match-opponent { flex-basis: 100%; }
-  #root .match-header .delete-btn { margin-left: auto; }
+  body[data-skin="cartoon"] #root .training-stat,
+  body[data-skin="cartoon"] #root .training-stat * { color: var(--ink); }
+  body[data-skin="cartoon"] #root .edit-btn { color: var(--muted); }
+  body[data-skin="cartoon"] #root .option-toggle label,
+  body[data-skin="cartoon"] #root .training-desc { color: var(--text); }
+  body[data-skin="cartoon"] #root .match-header { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+  body[data-skin="cartoon"] #root .match-header .match-opponent { flex-basis: 100%; }
+  body[data-skin="cartoon"] #root .match-header .delete-btn { margin-left: auto; }
 
   /* Cartes de match */
-  #root .match-card { padding: 14px; margin-bottom: 14px; }
-  #root .match-card.has-record { box-shadow: 5px 5px 0 var(--ink), 0 0 0 3px var(--c-yellow) inset; }
-  #root .match-opponent { font-family: var(--font-display); font-size: 1.5rem; letter-spacing: 0.03em; color: var(--text); }
-  #root .match-date { color: var(--muted); font-weight: 700; }
-  #root .match-score {
+  body[data-skin="cartoon"] #root .match-card { padding: 14px; margin-bottom: 14px; }
+  body[data-skin="cartoon"] #root .match-card.has-record { box-shadow: 5px 5px 0 var(--ink), 0 0 0 3px var(--c-yellow) inset; }
+  body[data-skin="cartoon"] #root .match-opponent { font-family: var(--font-display); font-size: 1.5rem; letter-spacing: 0.03em; color: var(--text); }
+  body[data-skin="cartoon"] #root .match-date { color: var(--muted); font-weight: 700; }
+  body[data-skin="cartoon"] #root .match-score {
     font-family: var(--font-display);
     font-size: 1.15rem;
     letter-spacing: 0.04em;
@@ -7200,9 +7257,9 @@ const styles = `
     transform: rotate(-2deg);
     display: inline-block;
   }
-  #root .match-score.win { background: var(--c-green); color: var(--ink); }
-  #root .match-score.loss { background: var(--c-red); color: #fff; }
-  #root .record-badge {
+  body[data-skin="cartoon"] #root .match-score.win { background: var(--c-green); color: var(--ink); }
+  body[data-skin="cartoon"] #root .match-score.loss { background: var(--c-red); color: #fff; }
+  body[data-skin="cartoon"] #root .record-badge {
     background: var(--c-yellow);
     color: var(--ink);
     border: 2px solid var(--ink);
@@ -7211,15 +7268,29 @@ const styles = `
     letter-spacing: 0.04em;
     transform: rotate(3deg);
   }
-  #root .match-stat .stat-val { font-size: 1.6rem; color: var(--text); }
-  #root .match-stat .stat-name { font-family: var(--font-display); letter-spacing: 0.06em; color: var(--muted); }
+  body[data-skin="cartoon"] #root .match-stat .stat-val { font-size: 1.6rem; color: var(--text); }
+  body[data-skin="cartoon"] #root .match-stat .stat-name { font-family: var(--font-display); letter-spacing: 0.06em; color: var(--muted); }
 
   /* Boutons */
-  #root .theme-btn, #root .gist-config-btn, #root .gist-action-btn, #root .options-btn, #root .toggle-btn,
-  #root .training-reset, #root .share-btn-history, #root .replay-btn-history,
-  #root .more-options-toggle, #root .location-btn, #root .save-btn, #root .action-btn,
-  #root .timer-btn, #root .time-adjust-btn, #root .settings-btn, #root .court-toggle,
-  #root .court-header-buttons button, #root .court-footer button, #root .undo-btn {
+  body[data-skin="cartoon"] #root .theme-btn,
+  body[data-skin="cartoon"] #root .gist-config-btn,
+  body[data-skin="cartoon"] #root .gist-action-btn,
+  body[data-skin="cartoon"] #root .options-btn,
+  body[data-skin="cartoon"] #root .toggle-btn,
+  body[data-skin="cartoon"] #root .training-reset,
+  body[data-skin="cartoon"] #root .share-btn-history,
+  body[data-skin="cartoon"] #root .replay-btn-history,
+  body[data-skin="cartoon"] #root .more-options-toggle,
+  body[data-skin="cartoon"] #root .location-btn,
+  body[data-skin="cartoon"] #root .save-btn,
+  body[data-skin="cartoon"] #root .action-btn,
+  body[data-skin="cartoon"] #root .timer-btn,
+  body[data-skin="cartoon"] #root .time-adjust-btn,
+  body[data-skin="cartoon"] #root .settings-btn,
+  body[data-skin="cartoon"] #root .court-toggle,
+  body[data-skin="cartoon"] #root .court-header-buttons button,
+  body[data-skin="cartoon"] #root .court-footer button,
+  body[data-skin="cartoon"] #root .undo-btn {
     font-family: var(--font-display);
     font-weight: 400;
     font-size: 1.05rem;
@@ -7232,46 +7303,81 @@ const styles = `
     transition: transform 0.08s ease, box-shadow 0.08s ease;
     opacity: 1;
   }
-  #root .theme-btn:active, #root .gist-config-btn:active, #root .gist-action-btn:active, #root .options-btn:active,
-  #root .toggle-btn:active, #root .training-reset:active, #root .share-btn-history:active,
-  #root .replay-btn-history:active, #root .more-options-toggle:active, #root .location-btn:active, #root .save-btn:active,
-  #root .action-btn:active, #root .timer-btn:active, #root .time-adjust-btn:active, #root .court-toggle:active {
+  body[data-skin="cartoon"] #root .theme-btn:active,
+  body[data-skin="cartoon"] #root .gist-config-btn:active,
+  body[data-skin="cartoon"] #root .gist-action-btn:active,
+  body[data-skin="cartoon"] #root .options-btn:active,
+  body[data-skin="cartoon"] #root .toggle-btn:active,
+  body[data-skin="cartoon"] #root .training-reset:active,
+  body[data-skin="cartoon"] #root .share-btn-history:active,
+  body[data-skin="cartoon"] #root .replay-btn-history:active,
+  body[data-skin="cartoon"] #root .more-options-toggle:active,
+  body[data-skin="cartoon"] #root .location-btn:active,
+  body[data-skin="cartoon"] #root .save-btn:active,
+  body[data-skin="cartoon"] #root .action-btn:active,
+  body[data-skin="cartoon"] #root .timer-btn:active,
+  body[data-skin="cartoon"] #root .time-adjust-btn:active,
+  body[data-skin="cartoon"] #root .court-toggle:active {
     transform: translate(3px, 3px);
     box-shadow: 0 0 0 var(--ink);
   }
-  #root .theme-btn.active, #root .toggle-btn.active, #root .location-btn.active, #root .timer-btn.primary { background: var(--c-yellow); }
-  #root .gist-action-btn.sync-btn, #root .save-btn { background: var(--c-green); }
-  #root .options-btn.danger, #root .action-btn.danger, #root .timer-btn.end-match, #root .delete-btn { background: var(--c-red); color: #fff; }
-  #root .gist-config-btn { background: var(--c-cyan); }
-  #root .more-options-toggle { width: 100%; background: var(--c-pink); color: #fff; -webkit-text-stroke: 0; }
-  #root .timer-btn.quarter-nav.disabled { opacity: 0.45; }
-  #root .delete-btn { border: 2px solid var(--ink); box-shadow: 2px 2px 0 var(--ink); }
+  body[data-skin="cartoon"] #root .theme-btn.active,
+  body[data-skin="cartoon"] #root .toggle-btn.active,
+  body[data-skin="cartoon"] #root .location-btn.active,
+  body[data-skin="cartoon"] #root .timer-btn.primary { background: var(--c-yellow); }
+  body[data-skin="cartoon"] #root .gist-action-btn.sync-btn,
+  body[data-skin="cartoon"] #root .save-btn { background: var(--c-green); }
+  body[data-skin="cartoon"] #root .options-btn.danger,
+  body[data-skin="cartoon"] #root .action-btn.danger,
+  body[data-skin="cartoon"] #root .timer-btn.end-match,
+  body[data-skin="cartoon"] #root .delete-btn { background: var(--c-red); color: #fff; }
+  body[data-skin="cartoon"] #root .gist-config-btn { background: var(--c-cyan); }
+  body[data-skin="cartoon"] #root .more-options-toggle { width: 100%; background: var(--c-pink); color: #fff; -webkit-text-stroke: 0; }
+  body[data-skin="cartoon"] #root .timer-btn.quarter-nav.disabled { opacity: 0.45; }
+  body[data-skin="cartoon"] #root .delete-btn { border: 2px solid var(--ink); box-shadow: 2px 2px 0 var(--ink); }
 
   /* Champs */
-  #root input:not([type="file"]):not([type="checkbox"]):not([type="range"]), #root textarea, #root select {
+  body[data-skin="cartoon"] #root input:not([type="file"]):not([type="checkbox"]):not([type="range"]),
+  body[data-skin="cartoon"] #root textarea,
+  body[data-skin="cartoon"] #root select {
     color: var(--text);
     background: var(--surface-2);
     border: 2.5px solid var(--ink);
     border-radius: 12px;
     box-shadow: inset 2px 2px 0 rgba(0, 0, 0, 0.15);
   }
-  #root input::placeholder, #root textarea::placeholder { color: var(--muted); opacity: 0.8; }
-  #root input:focus, #root textarea:focus, #root select:focus { outline: 3px solid var(--c-yellow); outline-offset: 1px; }
-  #root .match-select { box-shadow: 3px 3px 0 var(--ink); }
+  body[data-skin="cartoon"] #root input::placeholder,
+  body[data-skin="cartoon"] #root textarea::placeholder { color: var(--muted); opacity: 0.8; }
+  body[data-skin="cartoon"] #root input:focus,
+  body[data-skin="cartoon"] #root textarea:focus,
+  body[data-skin="cartoon"] #root select:focus { outline: 3px solid var(--c-yellow); outline-offset: 1px; }
+  body[data-skin="cartoon"] #root .match-select { box-shadow: 3px 3px 0 var(--ink); }
 
   /* Barres de progression (objectifs) */
-  #root .goal-bar { height: 14px; border: 2px solid var(--ink); border-radius: 999px; background: var(--surface-2); overflow: hidden; }
-  #root .goal-progress { background: repeating-linear-gradient(-45deg, var(--c-green), var(--c-green) 8px, #2fc472 8px, #2fc472 16px); border-radius: 999px; }
+  body[data-skin="cartoon"] #root .goal-bar { height: 14px; border: 2px solid var(--ink); border-radius: 999px; background: var(--surface-2); overflow: hidden; }
+  body[data-skin="cartoon"] #root .goal-progress { background: repeating-linear-gradient(-45deg, var(--c-green), var(--c-green) 8px, #2fc472 8px, #2fc472 16px); border-radius: 999px; }
 
   /* Fenêtres */
-  #root .help-modal, #root .gist-modal, #root .record-modal, #root .confirm-modal, #root .action-panel, #root .shot-modal-content {
+  body[data-skin="cartoon"] #root .help-modal,
+  body[data-skin="cartoon"] #root .gist-modal,
+  body[data-skin="cartoon"] #root .record-modal,
+  body[data-skin="cartoon"] #root .confirm-modal,
+  body[data-skin="cartoon"] #root .action-panel,
+  body[data-skin="cartoon"] #root .shot-modal-content {
     background: var(--surface) !important;
     color: var(--text);
     border: 4px solid var(--ink) !important;
     border-radius: 22px !important;
     box-shadow: 8px 8px 0 var(--ink) !important;
   }
-  #root .help-modal h2, #root .help-modal h3, #root .gist-modal h2, #root .gist-modal h3, #root .record-modal h2, #root .record-modal h3, #root .confirm-modal h3, #root .action-panel-header h3 {
+  body[data-skin="cartoon"] #root .help-modal h2,
+  body[data-skin="cartoon"] #root .help-modal h3,
+  body[data-skin="cartoon"] #root .gist-modal h2,
+  body[data-skin="cartoon"] #root .gist-modal h3,
+  body[data-skin="cartoon"] #root .record-modal h2,
+  body[data-skin="cartoon"] #root .record-modal h3,
+  body[data-skin="cartoon"] #root .confirm-modal h3,
+  body[data-skin="cartoon"] #root .action-panel-header h3 {
     font-family: var(--font-display);
     font-weight: 400;
     letter-spacing: 0.05em;
@@ -7279,12 +7385,470 @@ const styles = `
     -webkit-text-stroke: 1px var(--ink);
     text-shadow: 2px 2px 0 var(--ink);
   }
-  #root .record-modal { animation: fire-in-modal 0.5s cubic-bezier(0.34, 1.6, 0.64, 1); }
+  body[data-skin="cartoon"] #root .record-modal { animation: fire-in-modal 0.5s cubic-bezier(0.34, 1.6, 0.64, 1); }
   @keyframes fire-in-modal {
     0% { transform: scale(0.3) rotate(-12deg); }
     100% { transform: scale(1) rotate(0); }
   }
+
+  /* ============================================================
+     THÈMES (body[data-skin]) — Broadcast = base, chaque thème
+     redéfinit les tokens + quelques signatures visuelles.
+     Cartoon est défini plus haut (règles préfixées data-skin="cartoon").
+     ============================================================ */
+
+  /* Sélecteur de thème (Options) */
+  #root .skin-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 10px; }
+  #root .skin-card {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+    padding: 6px;
+    border-radius: 14px;
+    border: 2px solid var(--border);
+    background: var(--surface-2);
+    color: var(--text);
+    cursor: pointer;
+    min-height: 0;
+    min-width: 0;
+  }
+  #root .skin-card.active { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent); }
+  #root .skin-swatch {
+    position: relative;
+    height: 56px;
+    border-radius: 10px;
+    background:
+      linear-gradient(135deg, transparent 55%, var(--sk-b) 55% 70%, transparent 70%),
+      linear-gradient(135deg, var(--sk-bg) 0 45%, var(--sk-a) 45%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
+  }
+  #root .skin-emoji { font-size: 1.6rem; filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.4)); }
+  #root .skin-name { font-size: 0.8rem; font-weight: 700; text-align: center; line-height: 1.15; }
+  body[data-skin="cartoon"] #root .skin-card { border: 2.5px solid var(--ink); box-shadow: 3px 3px 0 var(--ink); background: #fff; color: var(--ink); }
+  body[data-skin="cartoon"] #root .skin-card.active { background: var(--c-yellow); }
+  body[data-skin="cartoon"] #root .skin-name { font-family: var(--font-display); font-weight: 400; font-size: 0.95rem; letter-spacing: 0.04em; }
+
+  /* ---------- Classique : les couleurs d'origine de l'app ---------- */
+  body[data-skin="classic"] {
+    --bg: #16213e;
+    --bg-glow: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    --surface: #222a4d;
+    --surface-2: #2c355e;
+    --border: rgba(255, 255, 255, 0.1);
+    --text: #ffffff;
+    --muted: #a8b3cf;
+    --accent: #61dafb;
+    --accent-soft: rgba(97, 218, 251, 0.15);
+    --good: #2ecc71;
+    --bad: #e74c3c;
+    --nav-bg: rgba(22, 33, 62, 0.95);
+    --shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+    --glow: 0 4px 14px rgba(0, 0, 0, 0.25);
+    --grad: linear-gradient(135deg, #61dafb, #3d7bd9);
+    --grad-good: linear-gradient(135deg, #2ecc71, #27ae60);
+    --font-display: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  body[data-skin="classic"] #root .app-header h1 { color: #ff6b35; text-transform: none; }
+  body[data-skin="classic"] #root .app-season { background: #ff6b35; }
+  body[data-skin="classic"] #root h2, body[data-skin="classic"] #root h3 { text-transform: none; }
+  body[data-skin="classic"] #root .stats-category-title { color: #61dafb; }
+  body[data-skin="classic"] #root .sb-score-value, body[data-skin="classic"] #root .sb-pts-value, body[data-skin="classic"] #root .qs-value { font-weight: 800; }
+
+  /* ---------- Minimal (façon app fitness) ---------- */
+  body[data-skin="minimal"] {
+    --bg: #000000;
+    --bg-glow: none;
+    --surface: #111113;
+    --surface-2: #1c1c1f;
+    --border: transparent;
+    --text: #ffffff;
+    --muted: #8e8e93;
+    --accent: #30d158;
+    --accent-soft: rgba(48, 209, 88, 0.16);
+    --good: #30d158;
+    --bad: #ff453a;
+    --nav-bg: rgba(0, 0, 0, 0.92);
+    --shadow: none;
+    --glow: none;
+    --grad: linear-gradient(90deg, #fa114f, #ff6b2c);
+    --grad-good: linear-gradient(135deg, #30d158, #30d158);
+    --font-display: -apple-system, 'SF Pro Display', system-ui, 'Segoe UI', Roboto, sans-serif;
+  }
+  body[data-skin="minimal"] #root .quick-stat,
+  body[data-skin="minimal"] #root .shot-col,
+  body[data-skin="minimal"] #root .match-header-compact,
+  body[data-skin="minimal"] #root .court-container,
+  body[data-skin="minimal"] #root .points-total-display { border-radius: 24px; }
+  body[data-skin="minimal"] #root .scoreboard::before { height: 0; }
+  body[data-skin="minimal"] #root h1, body[data-skin="minimal"] #root h2, body[data-skin="minimal"] #root h3,
+  body[data-skin="minimal"] #root .stats-category-title, body[data-skin="minimal"] #root .nav-label,
+  body[data-skin="minimal"] #root .qs-label { text-transform: none; letter-spacing: 0; }
+  body[data-skin="minimal"] #root .stats-category-title { font-size: 1.15rem; color: var(--text); }
+  body[data-skin="minimal"] #root .stats-category-title::before { display: none; }
+  body[data-skin="minimal"] #root .sp-btn.missed { border-color: #3a3a3c; color: var(--bad); }
+  body[data-skin="minimal"] #root .sb-team.us .sb-score-value { background: none; color: #fa114f; }
+  body[data-skin="minimal"] #root .sb-score-value, body[data-skin="minimal"] #root .qs-value, body[data-skin="minimal"] #root .sb-pts-value { font-weight: 700; }
+
+  /* ---------- Néon ---------- */
+  body[data-skin="neon"] {
+    --bg: #05010f;
+    --bg-glow: radial-gradient(700px 400px at 0% 0%, rgba(255, 0, 229, 0.18), transparent 70%), radial-gradient(700px 400px at 100% 10%, rgba(0, 240, 255, 0.16), transparent 70%);
+    --surface: #0c0820;
+    --surface-2: #17113a;
+    --border: rgba(0, 240, 255, 0.35);
+    --text: #e6fbff;
+    --muted: #7f8db3;
+    --accent: #00f0ff;
+    --accent-soft: rgba(0, 240, 255, 0.12);
+    --good: #39ff14;
+    --bad: #ff2a6d;
+    --nav-bg: rgba(5, 1, 15, 0.92);
+    --shadow: 0 0 0 1px rgba(0, 240, 255, 0.25), 0 0 18px rgba(0, 240, 255, 0.12);
+    --glow: 0 0 24px rgba(255, 0, 229, 0.35);
+    --grad: linear-gradient(90deg, #00f0ff, #ff00e5);
+    --grad-good: linear-gradient(135deg, #39ff14, #00c853);
+    --font-display: 'Orbitron', 'Barlow Condensed', sans-serif;
+  }
+  body[data-skin="neon"] #root .qs-value,
+  body[data-skin="neon"] #root .sb-score-value,
+  body[data-skin="neon"] #root .sb-pts-value,
+  body[data-skin="neon"] #root .app-header h1,
+  body[data-skin="neon"] #root .sb-time.running { text-shadow: 0 0 8px currentColor, 0 0 18px currentColor; }
+  body[data-skin="neon"] #root .sb-team.us .sb-score-value { background: none; color: #ff00e5; }
+  body[data-skin="neon"] #root .sb-team.them .sb-score-value { color: #00f0ff; }
+  body[data-skin="neon"] #root .sp-btn.made { background: transparent; border: 2px solid #39ff14; color: #39ff14; box-shadow: 0 0 14px rgba(57, 255, 20, 0.45), inset 0 0 12px rgba(57, 255, 20, 0.25); }
+  body[data-skin="neon"] #root .sp-btn.missed { border-color: #ff2a6d; box-shadow: 0 0 14px rgba(255, 42, 109, 0.4), inset 0 0 12px rgba(255, 42, 109, 0.2); }
+  body[data-skin="neon"] #root .sb-score-value { font-size: 2.6rem; }
+  body[data-skin="neon"] #root .qs-value { font-size: 1.4rem; }
+  body[data-skin="neon"] #root .qs-label, body[data-skin="neon"] #root .nav-label { font-size: 0.6rem; }
+  body[data-skin="neon"] #root .shot-name, body[data-skin="neon"] #root .shot-line { font-size: 0.85rem; }
+
+  /* ---------- Rétro 80s ---------- */
+  body[data-skin="synthwave"] {
+    --bg: #1a0b2e;
+    --surface: #241040;
+    --surface-2: #34175a;
+    --border: rgba(255, 41, 117, 0.3);
+    --text: #ffffff;
+    --muted: #c8a6e8;
+    --accent: #ff2975;
+    --accent-soft: rgba(255, 41, 117, 0.16);
+    --good: #2de2e6;
+    --bad: #ff2975;
+    --nav-bg: rgba(26, 11, 46, 0.94);
+    --shadow: 0 8px 24px rgba(140, 30, 255, 0.25);
+    --glow: 0 0 30px rgba(255, 41, 117, 0.35);
+    --grad: linear-gradient(135deg, #ffd319, #ff2975 50%, #8c1eff);
+    --grad-good: linear-gradient(135deg, #2de2e6, #1fa2ff);
+    background:
+      repeating-linear-gradient(0deg, rgba(255, 41, 200, 0.08) 0 1px, transparent 1px 34px),
+      repeating-linear-gradient(90deg, rgba(255, 41, 200, 0.08) 0 1px, transparent 1px 34px),
+      radial-gradient(500px 300px at 50% 0%, rgba(255, 211, 25, 0.25), transparent 70%),
+      linear-gradient(180deg, #120024 0%, #2b0b47 55%, #5b1360 100%);
+    background-attachment: fixed;
+  }
+  body[data-skin="synthwave"] #root .app-header h1,
+  body[data-skin="synthwave"] #root .sb-score-value,
+  body[data-skin="synthwave"] #root .sb-pts-value,
+  body[data-skin="synthwave"] #root .qs-value { font-style: italic; }
+  body[data-skin="synthwave"] #root .app-header h1 { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  body[data-skin="synthwave"] #root .sb-team.them .sb-score-value { color: #2de2e6; text-shadow: 0 0 14px rgba(45, 226, 230, 0.6); }
+
+  /* ---------- Arcade 8-bit ---------- */
+  body[data-skin="arcade"] {
+    --bg: #0f0f23;
+    --bg-glow: none;
+    --surface: #1d1d3b;
+    --surface-2: #2b2b55;
+    --border: #ffffff;
+    --text: #ffffff;
+    --muted: #a0a0d0;
+    --accent: #ffcc00;
+    --accent-soft: rgba(255, 204, 0, 0.18);
+    --good: #00b800;
+    --bad: #e40058;
+    --nav-bg: #0f0f23;
+    --shadow: 4px 4px 0 #000;
+    --glow: 4px 4px 0 #000;
+    --grad: linear-gradient(#ffcc00, #ffcc00);
+    --grad-good: linear-gradient(#00b800, #00b800);
+    --font-display: 'Press Start 2P', monospace;
+    background: repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.03) 0 2px, transparent 2px 4px), #0f0f23;
+  }
+  body[data-skin="arcade"] #root .quick-stat,
+  body[data-skin="arcade"] #root .shot-col,
+  body[data-skin="arcade"] #root .match-header-compact,
+  body[data-skin="arcade"] #root .court-container,
+  body[data-skin="arcade"] #root .points-total-display,
+  body[data-skin="arcade"] #root .sp-btn,
+  body[data-skin="arcade"] #root .qs-minus,
+  body[data-skin="arcade"] #root .sb-score-btns button,
+  body[data-skin="arcade"] #root .nav-icon,
+  body[data-skin="arcade"] #root .app-season,
+  body[data-skin="arcade"] #root .sb-play { border-radius: 0; }
+  body[data-skin="arcade"] #root .quick-stat,
+  body[data-skin="arcade"] #root .shot-col,
+  body[data-skin="arcade"] #root .match-header-compact { border: 3px solid #fff; }
+  body[data-skin="arcade"] #root .sp-btn { border: 3px solid #000; box-shadow: 4px 4px 0 #000; }
+  body[data-skin="arcade"] #root .sp-btn:active { transform: translate(4px, 4px); box-shadow: none; }
+  body[data-skin="arcade"] #root .app-header h1 { font-size: 0.95rem; color: var(--accent); line-height: 1.6; }
+  body[data-skin="arcade"] #root .app-season { font-size: 0.55rem; padding: 4px 6px; color: #000; }
+  body[data-skin="arcade"] #root .sb-time { font-size: 1rem; }
+  body[data-skin="arcade"] #root .sb-quarter { font-size: 0.7rem; }
+  body[data-skin="arcade"] #root .sb-score-value { font-size: 2rem; line-height: 1.2; }
+  body[data-skin="arcade"] #root .sb-team.us .sb-score-value { background: none; color: var(--accent); }
+  body[data-skin="arcade"] #root .sb-team-label, body[data-skin="arcade"] #root .sb-live, body[data-skin="arcade"] #root .sb-paused,
+  body[data-skin="arcade"] #root .sb-court, body[data-skin="arcade"] #root .sb-diff { font-size: 0.55rem; }
+  body[data-skin="arcade"] #root .sb-player-name { font-size: 0.7rem; }
+  body[data-skin="arcade"] #root .sb-player-number, body[data-skin="arcade"] #root .sb-pts-label { font-size: 0.5rem; }
+  body[data-skin="arcade"] #root .sb-pts-value { font-size: 1.3rem; }
+  body[data-skin="arcade"] #root .sb-mini { font-size: 0.45rem; gap: 6px; }
+  body[data-skin="arcade"] #root .sb-mini b { font-size: 0.75rem; }
+  body[data-skin="arcade"] #root .shot-name, body[data-skin="arcade"] #root .shot-line { font-size: 0.6rem; }
+  body[data-skin="arcade"] #root .shot-pct { font-size: 0.5rem; margin-top: 0; }
+  body[data-skin="arcade"] #root .qs-label { font-size: 0.45rem; line-height: 1.4; }
+  body[data-skin="arcade"] #root .qs-value { font-size: 1.1rem; }
+  body[data-skin="arcade"] #root .stats-category-title { font-size: 0.6rem; }
+  body[data-skin="arcade"] #root .nav-label { font-size: 0.42rem; }
+  body[data-skin="arcade"] #root h2, body[data-skin="arcade"] #root h3 { font-size: 0.8rem; line-height: 1.6; }
+  body[data-skin="arcade"] .pop, body[data-skin="arcade"] .fire-banner { font-size: 1rem; }
+  body[data-skin="arcade"] #root .sb-live-dot { border-radius: 0; }
+
+  /* ---------- Playground (street) ---------- */
+  body[data-skin="street"] {
+    --bg: #2b2b2b;
+    --surface: #363636;
+    --surface-2: #444444;
+    --border: rgba(255, 255, 255, 0.35);
+    --text: #f5f5f5;
+    --muted: #b5b5b5;
+    --accent: #ffe600;
+    --accent-soft: rgba(255, 230, 0, 0.16);
+    --good: #7cff4f;
+    --bad: #ff4d4d;
+    --nav-bg: rgba(30, 30, 30, 0.95);
+    --shadow: 0 6px 16px rgba(0, 0, 0, 0.45);
+    --glow: 0 6px 16px rgba(0, 0, 0, 0.45);
+    --grad: linear-gradient(135deg, #ffe600, #ff8a00);
+    --grad-good: linear-gradient(135deg, #7cff4f, #3ccf1a);
+    --font-display: 'Permanent Marker', 'Barlow Condensed', cursive;
+    background:
+      radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1.2px) 0 0 / 7px 7px,
+      radial-gradient(rgba(0, 0, 0, 0.25) 1px, transparent 1.2px) 3px 4px / 9px 9px,
+      #2b2b2b;
+    background-attachment: fixed;
+  }
+  body[data-skin="street"] #root .quick-stat,
+  body[data-skin="street"] #root .shot-col,
+  body[data-skin="street"] #root .match-header-compact,
+  body[data-skin="street"] #root .court-container { border: 2px dashed rgba(255, 255, 255, 0.4); }
+  body[data-skin="street"] #root .app-header h1 { color: var(--accent); transform: rotate(-3deg); text-shadow: 3px 3px 0 #000; }
+  body[data-skin="street"] #root .stats-category-title { color: var(--accent); font-size: 1.1rem; transform: rotate(-2deg); }
+  body[data-skin="street"] #root .stats-category-title::before { display: none; }
+  body[data-skin="street"] #root .qs-label, body[data-skin="street"] #root .nav-label { letter-spacing: 0.02em; }
+  body[data-skin="street"] #root .sb-team.us .sb-score-value { background: none; color: var(--accent); text-shadow: 3px 3px 0 #000; }
+  body[data-skin="street"] #root .quick-stat:nth-child(odd) { transform: rotate(-1deg); }
+  body[data-skin="street"] #root .quick-stat:nth-child(even) { transform: rotate(1deg); }
+
+  /* ---------- Tableau du coach (craie) ---------- */
+  body[data-skin="chalk"] {
+    --bg: #22392b;
+    --surface: #284433;
+    --surface-2: #31523e;
+    --border: rgba(243, 241, 232, 0.55);
+    --text: #f3f1e8;
+    --muted: #c9d2c4;
+    --accent: #ffe08a;
+    --accent-soft: rgba(255, 224, 138, 0.15);
+    --good: #b9f6a7;
+    --bad: #ff9e9e;
+    --nav-bg: rgba(30, 50, 38, 0.96);
+    --shadow: none;
+    --glow: none;
+    --grad: linear-gradient(#ffe08a, #ffe08a);
+    --grad-good: linear-gradient(rgba(185, 246, 167, 0.18), rgba(185, 246, 167, 0.18));
+    --font-display: 'Caveat', 'Comic Sans MS', cursive;
+    background:
+      radial-gradient(600px 300px at 20% 10%, rgba(255, 255, 255, 0.06), transparent 70%),
+      radial-gradient(500px 400px at 80% 70%, rgba(255, 255, 255, 0.04), transparent 70%),
+      #22392b;
+    background-attachment: fixed;
+  }
+  body[data-skin="chalk"] #root .quick-stat,
+  body[data-skin="chalk"] #root .shot-col,
+  body[data-skin="chalk"] #root .match-header-compact,
+  body[data-skin="chalk"] #root .court-container,
+  body[data-skin="chalk"] #root .points-total-display {
+    border: 2px solid var(--border);
+    border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  }
+  body[data-skin="chalk"] #root .scoreboard::before { height: 0; }
+  body[data-skin="chalk"] #root .sp-btn.made { color: var(--good); border: 2px solid var(--good); }
+  body[data-skin="chalk"] #root .sp-btn { border-radius: 40px 10px 40px 10px / 10px 40px 10px 40px; }
+  body[data-skin="chalk"] #root .qs-value, body[data-skin="chalk"] #root .sb-score-value, body[data-skin="chalk"] #root .sb-pts-value { font-size: 2.2rem; }
+  body[data-skin="chalk"] #root .sb-score-value { font-size: 3.6rem; }
+  body[data-skin="chalk"] #root .qs-label, body[data-skin="chalk"] #root .nav-label, body[data-skin="chalk"] #root .stats-category-title { text-transform: none; font-size: 1.05rem; letter-spacing: 0; }
+  body[data-skin="chalk"] #root .sb-team.us .sb-score-value { background: none; color: var(--accent); }
+  body[data-skin="chalk"] #root .app-header h1 { text-transform: none; font-size: 2rem; }
+
+  /* ---------- Parquet (clair) ---------- */
+  body[data-skin="parquet"] {
+    --bg: #e3bd85;
+    --surface: #fffaf0;
+    --surface-2: #f5e9d3;
+    --border: rgba(58, 36, 20, 0.15);
+    --text: #3a2414;
+    --muted: #8a6a4f;
+    --accent: #d35400;
+    --accent-soft: rgba(211, 84, 0, 0.12);
+    --good: #27ae60;
+    --bad: #c0392b;
+    --nav-bg: rgba(255, 250, 240, 0.95);
+    --shadow: 0 4px 12px rgba(58, 36, 20, 0.18);
+    --glow: 0 6px 18px rgba(58, 36, 20, 0.2);
+    --grad: linear-gradient(135deg, #e67e22, #d35400);
+    --grad-good: linear-gradient(135deg, #2ecc71, #27ae60);
+    background:
+      repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.06) 0 1px, transparent 1px 70px),
+      repeating-linear-gradient(90deg, #e8c58f 0 70px, #deb67c 70px 140px, #e3bd85 140px 210px, #d9b077 210px 280px);
+    background-attachment: fixed;
+  }
+  body[data-skin="parquet"] #root .app-header h1 { color: #3a2414; }
+
+  /* ---------- Journal sportif (clair) ---------- */
+  body[data-skin="journal"] {
+    --bg: #f4f1ea;
+    --surface: #fffdf8;
+    --surface-2: #ece6da;
+    --border: #111111;
+    --text: #111111;
+    --muted: #555555;
+    --accent: #c8102e;
+    --accent-soft: rgba(200, 16, 46, 0.1);
+    --good: #1b7f3b;
+    --bad: #c8102e;
+    --nav-bg: #fffdf8;
+    --shadow: none;
+    --glow: none;
+    --grad: linear-gradient(#111, #111);
+    --grad-good: linear-gradient(#1b7f3b, #1b7f3b);
+    --font-display: 'Playfair Display', Georgia, 'Times New Roman', serif;
+    background: radial-gradient(rgba(0, 0, 0, 0.06) 0.8px, transparent 1px) 0 0 / 5px 5px, #f4f1ea;
+  }
+  body[data-skin="journal"] #root .quick-stat,
+  body[data-skin="journal"] #root .shot-col,
+  body[data-skin="journal"] #root .match-header-compact,
+  body[data-skin="journal"] #root .court-container,
+  body[data-skin="journal"] #root .points-total-display,
+  body[data-skin="journal"] #root .sp-btn { border-radius: 2px; border: 1.5px solid #111; }
+  body[data-skin="journal"] #root .scoreboard::before { height: 6px; background: #c8102e; }
+  body[data-skin="journal"] #root .app-header h1 { font-weight: 900; text-transform: none; font-style: italic; letter-spacing: -0.02em; border-bottom: 3px double #111; }
+  body[data-skin="journal"] #root .app-season { background: #c8102e; border-radius: 0; font-family: Georgia, serif; }
+  body[data-skin="journal"] #root .sb-score-value, body[data-skin="journal"] #root .qs-value, body[data-skin="journal"] #root .sb-pts-value { font-weight: 900; }
+  body[data-skin="journal"] #root .stats-category-title { color: #c8102e; border-bottom: 1px solid #111; }
+  body[data-skin="journal"] #root .stats-category-title::before { display: none; }
+  body[data-skin="journal"] #root .sp-btn.missed { background: #fff; }
+
+  /* ---------- Violet & Or ---------- */
+  body[data-skin="purplegold"] {
+    --bg: #1d0b33;
+    --bg-glow: radial-gradient(900px 500px at 50% -200px, rgba(253, 185, 39, 0.16), transparent 70%);
+    --surface: #2a1248;
+    --surface-2: #3a1c60;
+    --border: rgba(253, 185, 39, 0.22);
+    --text: #ffffff;
+    --muted: #c7b6e0;
+    --accent: #fdb927;
+    --accent-soft: rgba(253, 185, 39, 0.16);
+    --good: #4ade80;
+    --bad: #f87171;
+    --nav-bg: rgba(29, 11, 51, 0.95);
+    --grad: linear-gradient(135deg, #ffd56b, #fdb927 50%, #e09b00);
+    --glow: 0 10px 30px rgba(253, 185, 39, 0.18);
+  }
+
+  /* ---------- Vert & Blanc (clair) ---------- */
+  body[data-skin="greenwhite"] {
+    --bg: #f2f7f3;
+    --bg-glow: radial-gradient(900px 500px at 50% -200px, rgba(0, 122, 51, 0.12), transparent 70%);
+    --surface: #ffffff;
+    --surface-2: #e3efe6;
+    --border: rgba(0, 122, 51, 0.18);
+    --text: #0b2e1a;
+    --muted: #4b6b57;
+    --accent: #007a33;
+    --accent-soft: rgba(0, 122, 51, 0.12);
+    --good: #007a33;
+    --bad: #c0392b;
+    --nav-bg: rgba(255, 255, 255, 0.95);
+    --shadow: 0 2px 10px rgba(11, 46, 26, 0.08);
+    --glow: 0 6px 18px rgba(0, 122, 51, 0.15);
+    --grad: linear-gradient(135deg, #00a14b, #007a33);
+    --grad-good: linear-gradient(135deg, #00a14b, #007a33);
+  }
+
+  /* ---------- Rouge & Noir ---------- */
+  body[data-skin="redblack"] {
+    --bg: #0a0a0a;
+    --bg-glow: radial-gradient(900px 500px at 50% -200px, rgba(206, 17, 65, 0.22), transparent 70%);
+    --surface: #161616;
+    --surface-2: #222222;
+    --border: rgba(255, 255, 255, 0.08);
+    --text: #ffffff;
+    --muted: #a3a3a3;
+    --accent: #ce1141;
+    --accent-soft: rgba(206, 17, 65, 0.16);
+    --good: #22c55e;
+    --bad: #ff2a4d;
+    --nav-bg: rgba(10, 10, 10, 0.95);
+    --grad: linear-gradient(135deg, #ff2a4d, #ce1141);
+    --glow: 0 10px 30px rgba(206, 17, 65, 0.25);
+  }
+
+  /* ---------- Océan ---------- */
+  body[data-skin="ocean"] {
+    --bg: #021a2b;
+    --bg-glow: radial-gradient(900px 500px at 20% -150px, rgba(45, 212, 191, 0.18), transparent 70%), radial-gradient(800px 500px at 100% 0, rgba(56, 189, 248, 0.16), transparent 70%);
+    --surface: #0a2a40;
+    --surface-2: #103a55;
+    --border: rgba(56, 189, 248, 0.18);
+    --text: #e6f6ff;
+    --muted: #8fb3c9;
+    --accent: #2dd4bf;
+    --accent-soft: rgba(45, 212, 191, 0.14);
+    --good: #34d399;
+    --bad: #fb7185;
+    --nav-bg: rgba(2, 26, 43, 0.94);
+    --grad: linear-gradient(135deg, #38bdf8, #2dd4bf);
+    --grad-good: linear-gradient(135deg, #34d399, #10b981);
+    --glow: 0 10px 30px rgba(45, 212, 191, 0.18);
+  }
 `
+
+// Thèmes disponibles : mode = sombre/clair (pilote aussi les anciennes règles [data-theme="light"])
+const SKINS = [
+  { id: 'classic', name: 'Classique', emoji: '🏀', mode: 'dark', colors: ['#16213e', '#61dafb', '#ff6b35'] },
+  { id: 'broadcast', name: 'Broadcast', emoji: '📺', mode: 'dark', colors: ['#0b1018', '#ff8a1f', '#8b5cf6'] },
+  { id: 'light', name: 'Clair', emoji: '☀️', mode: 'light', colors: ['#f3f5f9', '#ea580c', '#111827'] },
+  { id: 'cartoon', name: 'Cartoon', emoji: '💥', mode: 'dark', colors: ['#23175a', '#ffd23f', '#ff4fa3'] },
+  { id: 'minimal', name: 'Minimal', emoji: '⚪', mode: 'dark', colors: ['#000000', '#30d158', '#fa114f'] },
+  { id: 'neon', name: 'Néon', emoji: '⚡', mode: 'dark', colors: ['#05010f', '#00f0ff', '#ff00e5'] },
+  { id: 'synthwave', name: 'Rétro 80s', emoji: '🌆', mode: 'dark', colors: ['#2b0b47', '#ff2975', '#ffd319'] },
+  { id: 'arcade', name: 'Arcade 8-bit', emoji: '👾', mode: 'dark', colors: ['#0f0f23', '#ffcc00', '#e40058'] },
+  { id: 'street', name: 'Playground', emoji: '🛹', mode: 'dark', colors: ['#2b2b2b', '#ffe600', '#ff8a00'] },
+  { id: 'chalk', name: 'Tableau du coach', emoji: '📋', mode: 'dark', colors: ['#22392b', '#ffe08a', '#f3f1e8'] },
+  { id: 'parquet', name: 'Parquet', emoji: '🪵', mode: 'light', colors: ['#e3bd85', '#d35400', '#3a2414'] },
+  { id: 'journal', name: 'Journal sportif', emoji: '📰', mode: 'light', colors: ['#f4f1ea', '#c8102e', '#111111'] },
+  { id: 'purplegold', name: 'Violet & Or', emoji: '👑', mode: 'dark', colors: ['#1d0b33', '#fdb927', '#7c3aed'] },
+  { id: 'greenwhite', name: 'Vert & Blanc', emoji: '☘️', mode: 'light', colors: ['#f2f7f3', '#007a33', '#0b2e1a'] },
+  { id: 'redblack', name: 'Rouge & Noir', emoji: '🐂', mode: 'dark', colors: ['#0a0a0a', '#ce1141', '#ffffff'] },
+  { id: 'ocean', name: 'Océan', emoji: '🌊', mode: 'dark', colors: ['#021a2b', '#2dd4bf', '#38bdf8'] }
+]
 
 // Petite vibration au tap (ignorée si non supportée)
 const tapFeedback = () => { if (navigator.vibrate) navigator.vibrate(12) }
@@ -7318,7 +7882,8 @@ export default function App() {
     const saved = localStorage.getItem('basketMatchNotes')
     return saved ? JSON.parse(saved) : { strengths: '', improvements: '' }
   })
-  const [theme, setTheme] = useState(() => localStorage.getItem('basketTheme') || 'dark')
+  const [skin, setSkin] = useState(() => localStorage.getItem('basketSkin') || 'classic')
+  const skinDef = SKINS.find(sk => sk.id === skin) || SKINS[0]
   const [githubToken, setGithubToken] = useState(() => {
     const saved = localStorage.getItem('basketGithubToken')
     return saved ? atob(saved) : ''
@@ -7466,9 +8031,11 @@ export default function App() {
   }, [matchNotes])
 
   useEffect(() => {
-    localStorage.setItem('basketTheme', theme)
-    document.body.setAttribute('data-theme', theme)
-  }, [theme])
+    localStorage.setItem('basketSkin', skinDef.id)
+    document.body.setAttribute('data-skin', skinDef.id)
+    document.body.setAttribute('data-theme', skinDef.mode)
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', skinDef.colors[0])
+  }, [skinDef])
 
   useEffect(() => {
     localStorage.setItem('basketGoals', JSON.stringify(goals))
@@ -9218,21 +9785,22 @@ export default function App() {
             <div className="options-section">
               <h3>🎨 Apparence</h3>
               <p className="options-description">
-                Change le thème pour une meilleure visibilité selon l'environnement.
+                Choisis le style de l'app. Les thèmes clairs restent lisibles en plein soleil.
               </p>
-              <div className="theme-toggle">
-                <button
-                  className={`theme-btn ${theme === 'dark' ? 'active' : ''}`}
-                  onClick={() => setTheme('dark')}
-                >
-                  🌙 Sombre
-                </button>
-                <button
-                  className={`theme-btn ${theme === 'light' ? 'active' : ''}`}
-                  onClick={() => setTheme('light')}
-                >
-                  ☀️ Clair
-                </button>
+              <div className="skin-grid">
+                {SKINS.map(sk => (
+                  <button
+                    key={sk.id}
+                    className={`skin-card ${skin === sk.id ? 'active' : ''}`}
+                    onClick={() => setSkin(sk.id)}
+                    style={{ '--sk-bg': sk.colors[0], '--sk-a': sk.colors[1], '--sk-b': sk.colors[2] }}
+                  >
+                    <span className="skin-swatch">
+                      <span className="skin-emoji">{sk.emoji}</span>
+                    </span>
+                    <span className="skin-name">{sk.name}</span>
+                  </button>
+                ))}
               </div>
             </div>
 
