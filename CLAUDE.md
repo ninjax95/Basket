@@ -108,12 +108,12 @@ git add -A && git commit -m "message" && git push origin main
 
 ## Stack technique
 
-- **Framework** : React 18 avec Vite
+- **Framework** : React 19 avec Vite 8
 - **Mobile** : Capacitor (Android)
 - **Graphiques** : Recharts (LineChart, RadarChart)
-- **PWA** : vite-plugin-pwa (Service Worker + Manifest)
+- **PWA** : vite-plugin-pwa 2 (Service Worker + Manifest)
 - **Persistance** : localStorage
-- **Style** : CSS-in-JS avec clamp() pour le responsive
+- **Style** : CSS-in-JS avec clamp() pour le responsive. Couche « MODERNISATION 2026/2027 » en fin de `styles` (App.jsx) : variables `--bg`, `--surface`, `--accent`… sur `body` / `body[data-theme="light"]`, règles préfixées `#root` pour primer sur l'ancien CSS
 - **Java** : OpenJDK 21 (requis pour le build Android)
 
 ## Fonctionnalités principales
@@ -237,6 +237,9 @@ git add -A && git commit -m "message" && git push origin main
 - Sauvegarde automatique dans localStorage
 
 ### Layout responsive
+- **Barre d'onglets fixe en bas** (style app mobile), bouton Aide `?` dans l'en-tête
+- **Bandeau timer + score collant** en haut pendant le match
+- **Tuiles de stats** : taper la tuile = +1 (vibration), petit bouton − en coin
 - **Écran large (Fold déplié, tablette)** : terrain à gauche + stats à droite (côte à côte)
 - **Petit écran** : layout vertical classique
 

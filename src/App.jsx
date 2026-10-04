@@ -6085,7 +6085,295 @@ const styles = `
       padding-bottom: max(10px, env(safe-area-inset-bottom));
     }
   }
+
+  /* ============================================================
+     MODERNISATION 2026/2027 — couche de design par-dessus l'existant
+     Tokens sur body (thème via body[data-theme]) ; sélecteurs préfixés
+     par #root pour primer sur les anciennes règles (y compris thème clair).
+     ============================================================ */
+  body {
+    --bg: #0b1018;
+    --bg-glow: radial-gradient(1200px 600px at 50% -200px, rgba(255, 122, 26, 0.10), transparent 70%);
+    --surface: #141b26;
+    --surface-2: #1b2432;
+    --border: rgba(255, 255, 255, 0.07);
+    --text: #eef2f8;
+    --muted: #8b97aa;
+    --accent: #ff7a1a;
+    --accent-soft: rgba(255, 122, 26, 0.14);
+    --good: #22c55e;
+    --bad: #f05252;
+    --nav-bg: rgba(14, 19, 28, 0.88);
+    --shadow: 0 1px 0 rgba(255, 255, 255, 0.03) inset, 0 8px 24px rgba(0, 0, 0, 0.25);
+    --nav-h: 64px;
+    background: var(--bg-glow), var(--bg);
+    background-attachment: fixed;
+    color: var(--text);
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
+    padding: 12px max(12px, env(safe-area-inset-right)) calc(var(--nav-h) + 24px + env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+  }
+  body[data-theme="light"] {
+    --bg: #f3f5f9;
+    --surface: #ffffff;
+    --surface-2: #eef1f6;
+    --border: rgba(15, 23, 42, 0.08);
+    --text: #111827;
+    --muted: #5b6474;
+    --accent: #ea580c;
+    --accent-soft: rgba(234, 88, 12, 0.10);
+    --good: #16a34a;
+    --bad: #dc2626;
+    --nav-bg: rgba(255, 255, 255, 0.9);
+    --shadow: 0 1px 2px rgba(15, 23, 42, 0.06), 0 6px 18px rgba(15, 23, 42, 0.06);
+    background: var(--bg-glow), var(--bg);
+    color: var(--text);
+  }
+
+  /* En-tête */
+  #root .app-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 4px 2px 14px;
+  }
+  #root .app-header h1 {
+    margin: 0;
+    text-align: left;
+    font-size: 1.3rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--text);
+  }
+  #root .app-season {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    vertical-align: middle;
+    color: var(--accent);
+    background: var(--accent-soft);
+  }
+  #root .help-btn {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    font-weight: 700;
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+
+  /* Barre d'onglets en bas (style app mobile) */
+  #root .nav-tabs {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 100;
+    margin: 0;
+    gap: 0;
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: center;
+    padding: 6px max(8px, env(safe-area-inset-right)) calc(6px + env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+    background: var(--nav-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-top: 1px solid var(--border);
+  }
+  #root .nav-tab {
+    flex: 1 1 0;
+    min-width: 0;
+    max-width: 120px;
+    min-height: 52px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding: 4px 2px;
+    border: none;
+    border-radius: 12px;
+    background: transparent;
+    color: var(--muted);
+    font-size: 0.68rem;
+    font-weight: 600;
+    white-space: nowrap;
+    box-shadow: none;
+    animation: none;
+    transform: none;
+    overflow: visible;
+  }
+  #root .nav-tab::after { display: none; }
+  #root .nav-tab:hover { background: transparent; color: var(--text); transform: none; }
+  #root .nav-icon {
+    font-size: 1.25rem;
+    line-height: 1;
+    padding: 4px 14px;
+    border-radius: 999px;
+    transition: background 0.2s ease;
+  }
+  #root .nav-tab.active { color: var(--accent); background: transparent; box-shadow: none; }
+  #root .nav-tab.active .nav-icon { background: var(--accent-soft); }
+  #root .nav-badge {
+    position: absolute;
+    top: 2px;
+    left: calc(50% + 8px);
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 999px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 0.65rem;
+    font-weight: 700;
+    line-height: 18px;
+  }
+
+  /* Cartes */
+  #root .match-header-compact,
+  #root .court-container,
+  #root .points-total-display {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    box-shadow: var(--shadow);
+  }
+
+  /* Bandeau timer + score collant en haut pendant le match */
+  #root .match-header-compact {
+    position: sticky;
+    top: 8px;
+    z-index: 50;
+    padding: 10px 12px;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+  #root .score-value {
+    font-size: 1.9rem;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    color: var(--text);
+  }
+  #root .score-controls button {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--text);
+    font-size: 1.2rem;
+  }
+  #root .score-label { color: var(--muted); font-weight: 600; }
+
+  /* Tuiles de stats : on tape la tuile = +1, petit bouton − en coin */
+  #root .stats-category { margin-bottom: 10px; }
+  #root .stats-category-title {
+    background: none;
+    border: none;
+    padding: 0 2px;
+    margin: 6px 0;
+    color: var(--muted);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+  }
+  #root .quick-stats-grid { gap: 8px; }
+  #root .quick-stat {
+    position: relative;
+    padding: 0;
+    border-radius: 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  #root .qs-tap {
+    width: 100%;
+    min-height: 76px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 10px 4px;
+    border: none;
+    background: transparent;
+    color: var(--text);
+    cursor: pointer;
+    touch-action: manipulation;
+    transition: background 0.12s ease, transform 0.12s ease;
+  }
+  #root .qs-tap:active { background: var(--accent-soft); transform: scale(0.96); }
+  #root .qs-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  #root .qs-value {
+    font-size: 1.6rem;
+    font-weight: 800;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    color: var(--text);
+  }
+  #root .qs-positive .qs-label { color: var(--good); }
+  #root .qs-negative .qs-label { color: var(--bad); }
+  #root .qs-minus {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--muted);
+    font-size: 1rem;
+    line-height: 1;
+    cursor: pointer;
+  }
+  #root .qs-minus:active { color: var(--bad); }
+
+  /* Total points */
+  #root .points-total-display {
+    background: linear-gradient(135deg, var(--accent-soft), transparent 60%), var(--surface);
+  }
+  #root .pts-label { color: var(--muted); font-weight: 700; letter-spacing: 0.08em; }
+  #root .pts-value { color: var(--accent); font-weight: 800; font-variant-numeric: tabular-nums; }
+
+  /* Bouton Annuler flottant : au-dessus de la barre d'onglets */
+  #root .undo-floating {
+    bottom: calc(var(--nav-h) + 12px + env(safe-area-inset-bottom));
+    border-radius: 14px;
+  }
+
+  /* Sélecteurs (saison, match) */
+  #root .match-select {
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+  }
+
+  @media (min-width: 700px) {
+    #root .app-header h1 { font-size: 1.6rem; }
+  }
 `
+
+// Petite vibration au tap (ignorée si non supportée)
+const tapFeedback = () => { if (navigator.vibrate) navigator.vibrate(12) }
 
 export default function App() {
   const [isUnlocked, setIsUnlocked] = useState(true)
@@ -7200,50 +7488,53 @@ export default function App() {
     <>
       <style>{styles}</style>
       <div className="container">
-        <h1>🏀 Stats Basket {currentSeason}</h1>
+        <header className="app-header">
+          <h1>🏀 Stats Basket <span className="app-season">{currentSeason}</span></h1>
+          <button
+            className="help-btn"
+            onClick={() => setShowHelpModal(true)}
+            title="Aide & Légende"
+          >
+            ?
+          </button>
+        </header>
 
         {/* Navigation */}
-        <div className="nav-tabs">
+        <nav className="nav-tabs">
           <button
             className={`nav-tab ${activeTab === 'match' ? 'active' : ''}`}
             onClick={() => setActiveTab('match')}
           >
-            🎮 Match
+            <span className="nav-icon">🎮</span><span className="nav-label">Match</span>
           </button>
           <button
             className={`nav-tab ${activeTab === 'history' ? 'active' : ''}`}
             onClick={() => setActiveTab('history')}
           >
-            📋 Historique ({seasonHistory.length})
+            <span className="nav-icon">📋</span><span className="nav-label">Historique</span>
+            {seasonHistory.length > 0 && <span className="nav-badge">{seasonHistory.length}</span>}
           </button>
           {showTraining && (
             <button
               className={`nav-tab ${activeTab === 'training' ? 'active' : ''}`}
               onClick={() => setActiveTab('training')}
             >
-              🏋️ Entraîn.
+              <span className="nav-icon">🏋️</span><span className="nav-label">Entraîn.</span>
             </button>
           )}
           <button
             className={`nav-tab ${activeTab === 'analysis' ? 'active' : ''}`}
             onClick={() => setActiveTab('analysis')}
           >
-            📈 Analyse
+            <span className="nav-icon">📈</span><span className="nav-label">Analyse</span>
           </button>
           <button
             className={`nav-tab ${activeTab === 'options' ? 'active' : ''}`}
             onClick={() => setActiveTab('options')}
           >
-            ⚙️
+            <span className="nav-icon">⚙️</span><span className="nav-label">Options</span>
           </button>
-          <button
-            className="help-btn"
-            onClick={() => setShowHelpModal(true)}
-            title="Aide & Légende"
-          >
-            ❓
-          </button>
-        </div>
+        </nav>
 
         {activeTab === 'match' ? (
           <>
@@ -7340,52 +7631,46 @@ export default function App() {
               <h4 className="stats-category-title">ATTAQUE</h4>
               <div className="quick-stats-grid">
                 <div className="quick-stat">
-                  <span className="qs-label">2PTS</span>
-                  <div className="qs-controls">
-                    <button onClick={() => handleShotMadeDecrement('fg2Made', 'fg2Attempted', 2)}>-</button>
+                  <button className="qs-tap" onClick={() => { tapFeedback(); (() => handleShotMadeIncrement('fg2Made', 'fg2Attempted', 2))() }}>
+                    <span className="qs-label">2PTS</span>
                     <span className="qs-value">{stats.fg2Made}/{stats.fg2Attempted}</span>
-                    <button onClick={() => handleShotMadeIncrement('fg2Made', 'fg2Attempted', 2)}>+</button>
-                  </div>
+                  </button>
+                  <button className="qs-minus" aria-label="Retirer" onClick={() => handleShotMadeDecrement('fg2Made', 'fg2Attempted', 2)}>−</button>
                 </div>
                 <div className="quick-stat">
-                  <span className="qs-label">3PTS</span>
-                  <div className="qs-controls">
-                    <button onClick={() => handleShotMadeDecrement('fg3Made', 'fg3Attempted', 3)}>-</button>
+                  <button className="qs-tap" onClick={() => { tapFeedback(); (() => handleShotMadeIncrement('fg3Made', 'fg3Attempted', 3))() }}>
+                    <span className="qs-label">3PTS</span>
                     <span className="qs-value">{stats.fg3Made}/{stats.fg3Attempted}</span>
-                    <button onClick={() => handleShotMadeIncrement('fg3Made', 'fg3Attempted', 3)}>+</button>
-                  </div>
+                  </button>
+                  <button className="qs-minus" aria-label="Retirer" onClick={() => handleShotMadeDecrement('fg3Made', 'fg3Attempted', 3)}>−</button>
                 </div>
                 <div className="quick-stat qs-positive">
-                  <span className="qs-label">LF +</span>
-                  <div className="qs-controls">
-                    <button onClick={handleFreeThrowMadeDecrement}>-</button>
+                  <button className="qs-tap" onClick={() => { tapFeedback(); (handleFreeThrowMadeIncrement)() }}>
+                    <span className="qs-label">LF +</span>
                     <span className="qs-value">{stats.ftMade}</span>
-                    <button onClick={handleFreeThrowMadeIncrement}>+</button>
-                  </div>
+                  </button>
+                  <button className="qs-minus" aria-label="Retirer" onClick={handleFreeThrowMadeDecrement}>−</button>
                 </div>
                 <div className="quick-stat qs-negative">
-                  <span className="qs-label">LF -</span>
-                  <div className="qs-controls">
-                    <button onClick={handleFreeThrowMissedDecrement}>-</button>
+                  <button className="qs-tap" onClick={() => { tapFeedback(); (handleFreeThrowMissedIncrement)() }}>
+                    <span className="qs-label">LF -</span>
                     <span className="qs-value">{stats.ftAttempted - stats.ftMade}</span>
-                    <button onClick={handleFreeThrowMissedIncrement}>+</button>
-                  </div>
+                  </button>
+                  <button className="qs-minus" aria-label="Retirer" onClick={handleFreeThrowMissedDecrement}>−</button>
                 </div>
                 <div className="quick-stat">
-                  <span className="qs-label">REB OFF</span>
-                  <div className="qs-controls">
-                    <button onClick={() => updateStatWithTime('offRebounds', -1)}>-</button>
+                  <button className="qs-tap" onClick={() => { tapFeedback(); (() => updateStatWithTime('offRebounds', 1))() }}>
+                    <span className="qs-label">REB OFF</span>
                     <span className="qs-value">{stats.offRebounds}</span>
-                    <button onClick={() => updateStatWithTime('offRebounds', 1)}>+</button>
-                  </div>
+                  </button>
+                  <button className="qs-minus" aria-label="Retirer" onClick={() => updateStatWithTime('offRebounds', -1)}>−</button>
                 </div>
                 <div className="quick-stat">
-                  <span className="qs-label">Passes</span>
-                  <div className="qs-controls">
-                    <button onClick={() => updateStatWithTime('assists', -1)}>-</button>
+                  <button className="qs-tap" onClick={() => { tapFeedback(); (() => updateStatWithTime('assists', 1))() }}>
+                    <span className="qs-label">Passes</span>
                     <span className="qs-value">{stats.assists}</span>
-                    <button onClick={() => updateStatWithTime('assists', 1)}>+</button>
-                  </div>
+                  </button>
+                  <button className="qs-minus" aria-label="Retirer" onClick={() => updateStatWithTime('assists', -1)}>−</button>
                 </div>
               </div>
             </div>
@@ -7395,44 +7680,39 @@ export default function App() {
               <h4 className="stats-category-title">DÉFENSE</h4>
               <div className="quick-stats-grid">
                 <div className="quick-stat">
-                  <span className="qs-label">REB DEF</span>
-                  <div className="qs-controls">
-                    <button onClick={() => updateStatWithTime('defRebounds', -1)}>-</button>
+                  <button className="qs-tap" onClick={() => { tapFeedback(); (() => updateStatWithTime('defRebounds', 1))() }}>
+                    <span className="qs-label">REB DEF</span>
                     <span className="qs-value">{stats.defRebounds}</span>
-                    <button onClick={() => updateStatWithTime('defRebounds', 1)}>+</button>
-                  </div>
+                  </button>
+                  <button className="qs-minus" aria-label="Retirer" onClick={() => updateStatWithTime('defRebounds', -1)}>−</button>
                 </div>
                 <div className="quick-stat">
-                  <span className="qs-label">Inter</span>
-                  <div className="qs-controls">
-                    <button onClick={() => updateStatWithTime('steals', -1)}>-</button>
+                  <button className="qs-tap" onClick={() => { tapFeedback(); (() => updateStatWithTime('steals', 1))() }}>
+                    <span className="qs-label">Inter</span>
                     <span className="qs-value">{stats.steals}</span>
-                    <button onClick={() => updateStatWithTime('steals', 1)}>+</button>
-                  </div>
+                  </button>
+                  <button className="qs-minus" aria-label="Retirer" onClick={() => updateStatWithTime('steals', -1)}>−</button>
                 </div>
                 <div className="quick-stat">
-                  <span className="qs-label">Contres</span>
-                  <div className="qs-controls">
-                    <button onClick={() => updateStatWithTime('blocks', -1)}>-</button>
+                  <button className="qs-tap" onClick={() => { tapFeedback(); (() => updateStatWithTime('blocks', 1))() }}>
+                    <span className="qs-label">Contres</span>
                     <span className="qs-value">{stats.blocks}</span>
-                    <button onClick={() => updateStatWithTime('blocks', 1)}>+</button>
-                  </div>
+                  </button>
+                  <button className="qs-minus" aria-label="Retirer" onClick={() => updateStatWithTime('blocks', -1)}>−</button>
                 </div>
                 <div className="quick-stat qs-negative">
-                  <span className="qs-label">Pertes</span>
-                  <div className="qs-controls">
-                    <button onClick={() => updateStatWithTime('turnovers', -1)}>-</button>
+                  <button className="qs-tap" onClick={() => { tapFeedback(); (() => updateStatWithTime('turnovers', 1))() }}>
+                    <span className="qs-label">Pertes</span>
                     <span className="qs-value">{stats.turnovers}</span>
-                    <button onClick={() => updateStatWithTime('turnovers', 1)}>+</button>
-                  </div>
+                  </button>
+                  <button className="qs-minus" aria-label="Retirer" onClick={() => updateStatWithTime('turnovers', -1)}>−</button>
                 </div>
                 <div className="quick-stat qs-negative">
-                  <span className="qs-label">Fautes</span>
-                  <div className="qs-controls">
-                    <button onClick={() => updateStatWithTime('fouls', -1)}>-</button>
+                  <button className="qs-tap" onClick={() => { tapFeedback(); (() => updateStatWithTime('fouls', 1))() }}>
+                    <span className="qs-label">Fautes</span>
                     <span className="qs-value">{stats.fouls}</span>
-                    <button onClick={() => updateStatWithTime('fouls', 1)}>+</button>
-                  </div>
+                  </button>
+                  <button className="qs-minus" aria-label="Retirer" onClick={() => updateStatWithTime('fouls', -1)}>−</button>
                 </div>
               </div>
             </div>
@@ -7442,7 +7722,7 @@ export default function App() {
             {/* Points Total Display */}
             <div className="points-total-display">
               <span className="pts-label">TOTAL</span>
-              <span className="pts-value">{summary.points} PTS</span>
+              <span className="pts-value">{summary.totalPoints} PTS</span>
               <span className="pts-breakdown">({stats.fg2Made * 2} + {stats.fg3Made * 3} + {stats.ftMade})</span>
             </div>
 
