@@ -52,7 +52,7 @@ Application React/Capacitor pour tracker les statistiques d'un joueur de basketb
 ```
 Score kaiji/
 ├── src/
-│   ├── App.jsx              # Composant principal + tous les styles CSS (~7000 lignes)
+│   ├── App.jsx              # Composant principal + tous les styles CSS (~10000 lignes, dont thèmes)
 │   ├── main.jsx             # Point d'entrée React
 │   ├── components/
 │   │   ├── CourtMap.jsx     # Carte interactive du terrain (SVG) avec zones de tir
@@ -68,7 +68,7 @@ Score kaiji/
 │   │   ├── ShotReplay.jsx        # Replay animé des tirs du match
 │   │   └── PinLock.jsx           # Écran de verrouillage PIN 4 chiffres
 │   └── hooks/
-│       └── useStats.js      # Hooks personnalisés (~685 lignes)
+│       └── useStats.js      # Hooks personnalisés (~740 lignes)
 ├── public/
 │   ├── pwa-192x192.png      # Icône PWA 192px
 │   └── pwa-512x512.png      # Icône PWA 512px
