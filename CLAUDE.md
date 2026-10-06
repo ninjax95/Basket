@@ -365,6 +365,7 @@ git add -A && git commit -m "message" && git push origin main
 ## Pièges connus
 
 - **`@media (pointer: coarse)`** (base CSS) force `min-width/min-height: 44px` sur TOUS les boutons sur écran tactile. Invisible en test souris : tester avec émulation tactile (Playwright `isMobile: true, hasTouch: true`). Les petits boutons (`.qs-minus`…) l'annulent dans la couche CARTOON.
+- **Barre d'état Android (APK)** : Android 15+ (SDK 36) affiche l'app en plein écran sous la barre d'état. Avec `viewport-fit=cover`, Capacitor 8 (`SystemBars`) transmet les marges au WebView → toute marge haute/basse doit inclure `env(safe-area-inset-top|bottom)` (padding de `body`, `top` des éléments `sticky`).
 - **Mise à jour PWA** : `registerSW({ immediate: true })` dans `main.jsx` (virtual:pwa-register) recharge la page quand une nouvelle version s'active et relance `registration.update()` à chaque retour dans l'app. Avant, la PWA installée gardait l'ancienne version.
 - **kDrive** synchronise le dossier : le mettre en pause pendant les grosses modifs (il a écrasé `App.jsx` et créé des `App_conflict_*`), exclure `node_modules` et `android/app/build`.
 

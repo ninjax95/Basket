@@ -2231,7 +2231,7 @@ const styles = `
       min-width: 0;
       max-width: 55%;
       position: sticky;
-      top: 10px;
+      top: calc(10px + env(safe-area-inset-top));
     }
 
     .match-body-stats {
@@ -6164,7 +6164,7 @@ const styles = `
     font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
     -webkit-font-smoothing: antialiased;
     -webkit-tap-highlight-color: transparent;
-    padding: 12px max(12px, env(safe-area-inset-right)) calc(var(--nav-h) + 24px + env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+    padding: calc(12px + env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) calc(var(--nav-h) + 24px + env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
   }
   body[data-theme="light"] {
     --bg: #f3f5f9;
@@ -6303,7 +6303,7 @@ const styles = `
   /* Bandeau timer + score collant en haut pendant le match */
   #root .match-header-compact {
     position: sticky;
-    top: 8px;
+    top: calc(8px + env(safe-area-inset-top));
     z-index: 50;
     padding: 10px 12px;
     backdrop-filter: blur(12px);
