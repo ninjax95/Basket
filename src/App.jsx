@@ -1753,6 +1753,53 @@ const styles = `
     cursor: pointer;
   }
 
+  .as-counter {
+    text-align: center;
+    font-size: 4.5rem;
+    font-weight: 800;
+    line-height: 1;
+    margin: 10px 0 5px;
+    color: var(--accent, #61dafb);
+  }
+
+  .as-buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+
+  .as-buttons .training-reset {
+    margin-top: 0;
+    font-size: 1.3rem;
+    font-weight: bold;
+  }
+
+  .as-list {
+    list-style: none;
+    padding: 0;
+    margin: 15px 0 0;
+  }
+
+  .as-list li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    border-bottom: 1px solid var(--border, rgba(255, 255, 255, 0.1));
+  }
+
+  .as-list li span:first-child {
+    flex: 1;
+  }
+
+  .as-list button {
+    background: none;
+    border: none;
+    color: var(--muted, #888);
+    font-size: 1.1rem;
+    cursor: pointer;
+  }
+
   .match-photo-display {
     text-align: center;
     margin-bottom: 10px;
@@ -7908,6 +7955,11 @@ export default function App() {
   const [showActionPanel, setShowActionPanel] = useState(false)
   const [trainingMarkers, setTrainingMarkers] = useState([])
   const [trainingStats, setTrainingStats] = useState({ fg2Made: 0, fg2Attempted: 0, fg3Made: 0, fg3Attempted: 0, ftMade: 0, ftAttempted: 0 })
+  const [asSessions, setAsSessions] = useState(() => {
+    const saved = localStorage.getItem('basketAsSessions')
+    return saved ? JSON.parse(saved) : []
+  })
+  const [asPoints, setAsPoints] = useState(() => Number(localStorage.getItem('basketAsCurrent')) || 0)
   const [actionToDelete, setActionToDelete] = useState(null) // Action pending deletion confirmation
   const [showMoreOptions, setShowMoreOptions] = useState(false)
   const [lastActionTime, setLastActionTime] = useState(Date.now())
@@ -8049,6 +8101,14 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem('basketShowTraining', JSON.stringify(showTraining))
   }, [showTraining])
+
+  useEffect(() => {
+    localStorage.setItem('basketAsSessions', JSON.stringify(asSessions))
+  }, [asSessions])
+
+  useEffect(() => {
+    localStorage.setItem('basketAsCurrent', String(asPoints))
+  }, [asPoints])
 
 
   // Inactivity warning: if timer running + on court + no action for 2 min
@@ -9071,7 +9131,7 @@ export default function App() {
             className={`nav-tab ${activeTab === 'history' ? 'active' : ''}`}
             onClick={() => setActiveTab('history')}
           >
-            <span className="nav-icon">📋</span><span className="nav-label">Historique</span>
+            <span className="nav-icon">📋</span><span className="nav-label">Histo.</span>
             {seasonHistory.length > 0 && <span className="nav-badge">{seasonHistory.length}</span>}
           </button>
           {showTraining && (
@@ -9082,6 +9142,12 @@ export default function App() {
               <span className="nav-icon">🏋️</span><span className="nav-label">Entraîn.</span>
             </button>
           )}
+          <button
+            className={`nav-tab ${activeTab === 'as' ? 'active' : ''}`}
+            onClick={() => setActiveTab('as')}
+          >
+            <span className="nav-icon">🏫</span><span className="nav-label">AS</span>
+          </button>
           <button
             className={`nav-tab ${activeTab === 'analysis' ? 'active' : ''}`}
             onClick={() => setActiveTab('analysis')}
@@ -9602,6 +9668,62 @@ export default function App() {
             >
               🔄 Réinitialiser
             </button>
+          </div>
+        )}
+
+        {activeTab === 'as' && (
+          <div className="training-page">
+            <h2>🏫 AS de l'école</h2>
+            <p className="training-desc">Note les points marqués pendant la séance</p>
+            <div className="as-counter">{asPoints}</div>
+            <p className="training-desc">points</p>
+            <div className="as-buttons">
+              <button className="training-reset" onClick={() => setAsPoints(p => Math.max(0, p - 1))}>−1</button>
+              <button className="training-reset" onClick={() => setAsPoints(p => p + 1)}>+1</button>
+              <button className="training-reset" onClick={() => setAsPoints(p => p + 2)}>+2</button>
+              <button className="training-reset" onClick={() => setAsPoints(p => p + 3)}>+3</button>
+            </div>
+            <button
+              className="training-reset"
+              onClick={() => {
+                setAsSessions(prev => [{ id: Date.now(), date: new Date().toISOString(), points: asPoints }, ...prev])
+                setAsPoints(0)
+              }}
+            >
+              💾 Enregistrer la séance
+            </button>
+
+            {asSessions.length > 0 && (
+              <>
+                <div className="training-stats">
+                  <div className="training-stat">
+                    <span className="ts-label">Séances</span>
+                    <span className="ts-value">{asSessions.length}</span>
+                  </div>
+                  <div className="training-stat">
+                    <span className="ts-label">Total</span>
+                    <span className="ts-value">{asSessions.reduce((t, s) => t + s.points, 0)}</span>
+                  </div>
+                  <div className="training-stat">
+                    <span className="ts-label">Moyenne</span>
+                    <span className="ts-value">{(asSessions.reduce((t, s) => t + s.points, 0) / asSessions.length).toFixed(1)}</span>
+                  </div>
+                  <div className="training-stat total">
+                    <span className="ts-label">Record</span>
+                    <span className="ts-value">{Math.max(...asSessions.map(s => s.points))}</span>
+                  </div>
+                </div>
+                <ul className="as-list">
+                  {asSessions.map(s => (
+                    <li key={s.id}>
+                      <span>{new Date(s.date).toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                      <strong>{s.points} pts</strong>
+                      <button onClick={() => confirm('Supprimer cette séance ?') && setAsSessions(prev => prev.filter(x => x.id !== s.id))}>×</button>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
           </div>
         )}
 

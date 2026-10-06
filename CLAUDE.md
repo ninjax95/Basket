@@ -123,9 +123,10 @@ git add -A && git commit -m "message" && git push origin main
 1. **Match** : Écran principal pour tracker les stats en temps réel
 2. **Historique** : Liste des matchs sauvegardés avec stats détaillées
 3. **Entraînement** : Mode tir simplifié (activable/désactivable dans Options)
-4. **Analyse** : Graphiques et visualisations avancées
-5. **Options** : Paramètres (thème, sync, objectifs, affichage, durée QT)
-6. **Aide** : Guide d'utilisation
+4. **AS** : points marqués par séance d'AS (école) — compteur −1/+1/+2/+3, enregistrer, liste + séances/total/moyenne/record
+5. **Analyse** : Graphiques et visualisations avancées
+6. **Options** : Paramètres (thème, sync, objectifs, affichage, durée QT)
+7. **Aide** : Guide d'utilisation
 
 > Note: la reconnaissance vocale (Web Speech API) a été testée et retirée — les navigateurs mobiles jouent un bip à chaque restart du micro, inutilisable en match.
 
@@ -304,6 +305,8 @@ git add -A && git commit -m "message" && git push origin main
 - `basketSkin` : id du thème (voir `SKINS`) — remplace l'ancien `basketTheme` ('dark' | 'light'), ignoré désormais
 - `basketGoals` : objectifs par match {points, rebounds, assists}
 - `basketShowTraining` : boolean afficher/masquer onglet entraînement
+- `basketAsSessions` : séances d'AS `[{id, date, points}]` (plus récente en premier) — pas synchronisé avec le Gist
+- `basketAsCurrent` : points de la séance d'AS en cours (survit à la fermeture de l'app)
 
 ## Structure d'un match sauvegardé
 
