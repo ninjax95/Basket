@@ -99,8 +99,8 @@ npm run build && npx cap sync android && cd android && ./gradlew assembleDebug
 # Copier APK à la racine
 cp android/app/build/outputs/apk/debug/app-debug.apk ./StatsBasket.apk
 
-# Émulateur Android (S24 Ultra)
-~/Android/Sdk/emulator/emulator -avd S24Ultra -gpu auto
+# Émulateur Android 16 (AVD Test36, Pixel 7) — headless : ajouter -no-window -no-audio
+~/Android/Sdk/emulator/emulator -avd Test36 -gpu swiftshader_indirect
 ~/Android/Sdk/platform-tools/adb install -r StatsBasket.apk
 
 # Push sur GitHub (déclenche auto-deploy Vercel)
@@ -365,7 +365,7 @@ git add -A && git commit -m "message" && git push origin main
 ## Pièges connus
 
 - **`@media (pointer: coarse)`** (base CSS) force `min-width/min-height: 44px` sur TOUS les boutons sur écran tactile. Invisible en test souris : tester avec émulation tactile (Playwright `isMobile: true, hasTouch: true`). Les petits boutons (`.qs-minus`…) l'annulent dans la couche CARTOON.
-- **Barre d'état Android (APK)** : Android 15+ (SDK 36) affiche l'app en plein écran sous la barre d'état. Avec `viewport-fit=cover`, Capacitor 8 (`SystemBars`) transmet les marges au WebView → toute marge haute doit utiliser `max(env(safe-area-inset-top), var(--safe-area-inset-top, 0px))` (env() vaut 0 sur le WebView du Fold Z7 ; la variable est injectée par Capacitor) (padding de `body`, `top` des éléments `sticky`).
+- **Barre d'état Android (APK)** : Android 15+ (SDK 36) affiche l'app sous les barres système. Le CSS (`env(safe-area-inset-top)` / variable injectée par Capacitor) ne marchait PAS sur le Fold Z7 (WebView Samsung). Solution native : `SystemBars.insetsHandling: "disable"` + `style: "DARK"` dans `capacitor.config.json`, et `MainActivity` pose un padding = barres système/encoche/clavier sur `android.R.id.content` (fond `#0b1018`). Ne pas réactiver la gestion Capacitor sans tester sur le Fold.
 - **Mise à jour PWA** : `registerSW({ immediate: true })` dans `main.jsx` (virtual:pwa-register) recharge la page quand une nouvelle version s'active et relance `registration.update()` à chaque retour dans l'app. Avant, la PWA installée gardait l'ancienne version.
 - **kDrive** synchronise le dossier : le mettre en pause pendant les grosses modifs (il a écrasé `App.jsx` et créé des `App_conflict_*`), exclure `node_modules` et `android/app/build`.
 
