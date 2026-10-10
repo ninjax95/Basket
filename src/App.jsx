@@ -6486,7 +6486,10 @@ const styles = `
     border-radius: 6px;
     background: var(--text);
     color: var(--bg);
+    border: none;
+    cursor: pointer;
   }
+  #root .sb-quarter:disabled { cursor: default; opacity: 1; }
   #root .sb-time {
     font-family: var(--font-display);
     font-weight: 700;
@@ -8747,6 +8750,17 @@ export default function App() {
     return backupData
   }
 
+  // Passage au QT suivant (bandeau du haut + Timer)
+  const handleNextQuarter = () => {
+    timer.nextQuarter()
+    const onCourt = confirm('Sur le terrain ?')
+    if (onCourt !== playingTime.isOnCourt) playingTime.toggleOnCourt()
+    // Sync Gist au changement de QT
+    if (githubToken && gistId && history.length > 0) {
+      pushToGist(history).catch(() => {})
+    }
+  }
+
   // Push local history to Gist
   const pushToGist = async (historyToSave) => {
     const backupData = {
@@ -9167,7 +9181,14 @@ export default function App() {
             {/* Scoreboard façon broadcast (collant en haut) */}
             <div className={`match-header-compact scoreboard ${shake ? 'shake' : ''}`}>
               <div className="sb-top">
-                <span className="sb-quarter">Q{timer.quarter}</span>
+                <button
+                  className="sb-quarter"
+                  disabled={timer.quarter >= 4}
+                  onClick={() => confirm(`Passer au Q${timer.quarter + 1} ?`) && handleNextQuarter()}
+                  aria-label="Quart-temps suivant"
+                >
+                  Q{timer.quarter}{timer.quarter < 4 && ' ›'}
+                </button>
                 <span className={`sb-time ${timer.isRunning ? 'running' : ''}`}>{timer.formatTime()}</span>
                 <button className="sb-play" onClick={timer.toggleTimer} aria-label={timer.isRunning ? 'Pause' : 'Lecture'}>
                   {timer.isRunning ? '⏸' : '▶'}
@@ -9417,15 +9438,7 @@ export default function App() {
                   quarterDuration={timer.quarterDuration}
                   onToggle={timer.toggleTimer}
                   onReset={timer.resetQuarter}
-                  onNext={() => {
-                    timer.nextQuarter()
-                    const onCourt = confirm('Sur le terrain ?')
-                    if (onCourt !== playingTime.isOnCourt) playingTime.toggleOnCourt()
-                    // Sync Gist au changement de QT
-                    if (githubToken && gistId && history.length > 0) {
-                      pushToGist(history).catch(() => {})
-                    }
-                  }}
+                  onNext={handleNextQuarter}
                   onPrev={timer.prevQuarter}
                   onDurationChange={timer.updateQuarterDuration}
                   onEndMatch={() => {
