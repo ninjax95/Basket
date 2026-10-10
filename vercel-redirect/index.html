@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Stats Basket a déménagé</title>
+  <style>
+    body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #0b1018; color: #fff; font-family: system-ui, sans-serif; text-align: center; padding: 16px; }
+    a { color: #ff8a1f; font-size: 1.2rem; }
+  </style>
+</head>
+<body>
+  <div>
+    <p style="font-size:3rem;margin:0">🏀</p>
+    <h1>Stats Basket a déménagé</h1>
+    <p><a href="https://stats-basket-2517f.web.app">stats-basket-2517f.web.app</a></p>
+  </div>
+  <script>
+    // Ancienne adresse (Vercel) : on retire l'app en cache puis on part vers la nouvelle adresse
+    const TARGET = 'https://stats-basket-2517f.web.app'
+    Promise.all([
+      navigator.serviceWorker ? navigator.serviceWorker.getRegistrations().then(rs => Promise.all(rs.map(r => r.unregister()))) : null,
+      window.caches ? caches.keys().then(ks => Promise.all(ks.map(k => caches.delete(k)))) : null,
+    ]).finally(() => location.replace(TARGET))
+  </script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+{
+  "installCommand": "echo 'Ancienne adresse : page de redirection seulement'",
+  "buildCommand": "echo 'Pas de build'",
+  "outputDirectory": "vercel-redirect",
+  "headers": [
+    { "source": "/(.*)", "headers": [{ "key": "Cache-Control", "value": "no-cache" }] }
+  ],
+  "rewrites": [
+    { "source": "/((?!sw\\.js$).*)", "destination": "/index.html" }
+  ]
+}

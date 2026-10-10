@@ -44,7 +44,7 @@ Application React/Capacitor pour tracker les statistiques d'un joueur de basketb
 
 - **Repo GitHub** : https://github.com/ninjax95/Basket
 - **Hébergement Web** : Firebase Hosting (action GitHub `.github/workflows/firebase-deploy.yml` à chaque push sur `main`)
-- **URL Production** : https://stats-basket-2517f.web.app — l'ancienne https://basket-roan.vercel.app (Vercel Hobby, usage commercial interdit) reste en place pendant la transition
+- **URL Production** : https://stats-basket-2517f.web.app — l'ancienne https://basket-roan.vercel.app (Vercel Hobby, usage commercial interdit) ne sert plus que `vercel-redirect/` (`vercel.json`) : page + `sw.js` qui désinstallent l'ancienne PWA en cache et renvoient vers la nouvelle adresse. Garder ce projet Vercel quelques mois
 - **Firebase** : projet `stats-basket-2517f` (forfait Spark gratuit), Auth e-mail/mot de passe + Firestore `europe-west9`. Console : https://console.firebase.google.com/project/stats-basket-2517f
 - **Clé de déploiement** : compte de service `deploy-statsbasket` (rôle Administrateur Firebase), clé dans `.secrets/stats-basket-deploy.json` (dans le projet, sauvegardée par kDrive, ignorée par git via `.gitignore`) et en secret GitHub `FIREBASE_SERVICE_ACCOUNT_STATS_BASKET`. Ne jamais la committer
 
@@ -123,7 +123,7 @@ npx -y firebase-tools@14 emulators:start --only auth,firestore --project stats-b
 VITE_EMULATORS=1 npx vite build --outDir /tmp/dist-emu && npx vite preview --outDir /tmp/dist-emu
 # Ne PAS déployer un build fait avec VITE_EMULATORS
 
-# Push sur GitHub (déclenche le déploiement Firebase Hosting + Vercel)
+# Push sur GitHub (déclenche le déploiement Firebase Hosting)
 git add -A && git commit -m "message" && git push origin main
 ```
 
@@ -393,11 +393,11 @@ git add -A && git commit -m "message" && git push origin main
 
 ## Déploiement
 
-À chaque push sur `main`, l'action GitHub `Déploiement Firebase` construit et publie sur https://stats-basket-2517f.web.app (et Vercel publie encore https://basket-roan.vercel.app tant qu'il n'est pas coupé). Les règles Firestore se déploient à la main (voir Commandes).
+À chaque push sur `main`, l'action GitHub `Déploiement Firebase` construit et publie sur https://stats-basket-2517f.web.app (Vercel ne publie plus que la page de redirection `vercel-redirect/`). Les règles Firestore se déploient à la main (voir Commandes).
 
 ```bash
 git add -A
 git commit -m "Description des changements"
 git push origin main
-# → Firebase Hosting (action GitHub) + Vercel, en ~1-2 minutes
+# → Firebase Hosting (action GitHub), en ~1-2 minutes
 ```
