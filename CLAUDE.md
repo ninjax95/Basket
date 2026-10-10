@@ -43,9 +43,10 @@ Sans cette confirmation explicite, **REFUSE TOUTE OPÉRATION EXTERNE**.
 Application React/Capacitor pour tracker les statistiques d'un joueur de basketball pendant un match. Disponible en web (PWA) et Android (APK).
 
 - **Repo GitHub** : https://github.com/ninjax95/Basket
-- **Hébergement Web** : Vercel (auto-deploy depuis GitHub)
-- **URL Production** : https://basket-roan.vercel.app
-- **Gist ID (sync)** : bf483a09e37ffa5ffe84cb46109c6890
+- **Hébergement Web** : Firebase Hosting (action GitHub `.github/workflows/firebase-deploy.yml` à chaque push sur `main`)
+- **URL Production** : https://stats-basket-2517f.web.app — l'ancienne https://basket-roan.vercel.app (Vercel Hobby, usage commercial interdit) reste en place pendant la transition
+- **Firebase** : projet `stats-basket-2517f` (forfait Spark gratuit), Auth e-mail/mot de passe + Firestore `europe-west9`. Console : https://console.firebase.google.com/project/stats-basket-2517f
+- **Clé de déploiement** : compte de service `deploy-statsbasket` (rôle Administrateur Firebase), clé dans `~/.config/firebase/stats-basket-deploy.json` (HORS projet : kDrive synchronise le dossier) et en secret GitHub `FIREBASE_SERVICE_ACCOUNT_STATS_BASKET`. Ne jamais la committer
 
 ## Structure du projet
 
@@ -66,9 +67,12 @@ Score kaiji/
 │   │   ├── ShotHeatmap.jsx       # Carte des tirs historique
 │   │   ├── ThermalHeatmap.jsx    # Carte thermique zones chaudes/froides
 │   │   ├── ShotReplay.jsx        # Replay animé des tirs du match
-│   │   └── PinLock.jsx           # Écran de verrouillage PIN 4 chiffres
+│   │   ├── PinLock.jsx           # Écran de verrouillage PIN 4 chiffres
+│   │   └── AuthScreen.jsx        # Connexion / création de compte / mot de passe oublié
+│   ├── firebase.js          # Init Firebase (auth IndexedDB, Firestore cache persistant, émulateurs si VITE_EMULATORS)
 │   └── hooks/
-│       └── useStats.js      # Hooks personnalisés (~740 lignes)
+│       ├── useStats.js      # Hooks personnalisés (~740 lignes)
+│       └── useCloud.js      # Compte, joueurs, sync des matchs avec Firestore
 ├── public/
 │   ├── pwa-192x192.png      # Icône PWA 192px
 │   └── pwa-512x512.png      # Icône PWA 512px
@@ -109,7 +113,17 @@ cp android/app/build/outputs/apk/debug/app-debug.apk ./StatsBasket.apk
 # Publier l'APK (lien fixe : https://github.com/ninjax95/Basket/releases/latest/download/StatsBasket.apk)
 gh release create v<versionName> StatsBasket.apk --title "Stats Basket <versionName>" --notes "..." --target main
 
-# Push sur GitHub (déclenche auto-deploy Vercel)
+# Déploiement manuel Firebase (règles Firestore, ou site sans passer par GitHub)
+export GOOGLE_APPLICATION_CREDENTIALS=~/.config/firebase/stats-basket-deploy.json
+npx -y firebase-tools@14 deploy --only firestore:rules,hosting --project stats-basket-2517f --non-interactive
+
+# Tests locaux sans toucher la vraie base (émulateurs, Java requis)
+export JAVA_HOME=~/Android/jdk21 PATH=~/Android/jdk21/bin:$PATH
+npx -y firebase-tools@14 emulators:start --only auth,firestore --project stats-basket-2517f
+VITE_EMULATORS=1 npx vite build --outDir /tmp/dist-emu && npx vite preview --outDir /tmp/dist-emu
+# Ne PAS déployer un build fait avec VITE_EMULATORS
+
+# Push sur GitHub (déclenche le déploiement Firebase Hosting + Vercel)
 git add -A && git commit -m "message" && git push origin main
 ```
 
@@ -119,7 +133,7 @@ git add -A && git commit -m "message" && git push origin main
 - **Mobile** : Capacitor 8 (Android 16 / SDK 36, minSdk 24)
 - **Graphiques** : Recharts (LineChart, RadarChart)
 - **PWA** : vite-plugin-pwa 2 (Service Worker + Manifest)
-- **Persistance** : localStorage
+- **Persistance** : Firestore (comptes, joueurs, matchs) + localStorage (match en cours, réglages, cache de l'historique)
 - **Style** : CSS-in-JS avec clamp() pour le responsive. Couche « MODERNISATION 2026/2027 » en fin de `styles` (App.jsx) : variables `--bg`, `--surface`, `--accent`… sur `body` / `body[data-theme="light"]`, règles préfixées `#root` pour primer sur l'ancien CSS
 - **Java** : OpenJDK 21 Temurin dans `~/Android/jdk21` (requis pour le build Android)
 
@@ -184,7 +198,7 @@ git add -A && git commit -m "message" && git push origin main
 - Saison déduite de la date du match : 1er août → 31 juillet (`getSeason(date)` → `"2026/2027"`)
 - Sélecteur « Saison » en haut des onglets Historique et Analyse (saison en cours par défaut, anciennes = archive)
 - Historique, moyennes, tendances, records, graphiques : filtrés sur la saison sélectionnée
-- Archive non destructive : `basketMatchHistory`, Gist, export/import gardent toutes les saisons
+- Archive non destructive : `basketMatchHistory`, Firestore, export/import gardent toutes les saisons
 
 ### Historique des matchs
 - Liste des matchs sauvegardés
@@ -241,16 +255,16 @@ git add -A && git commit -m "message" && git push origin main
 - Stats de tirs en temps réel (2PTS/3PTS/LF + total + %)
 - Bouton réinitialiser
 
-### Synchronisation
-- **Sync bidirectionnelle** : compare local vs Gist, montre les différences
-- **Détection de conflits** : matchs nouveaux, modifiés, communs
-- **Sync au changement de QT** : push automatique vers le Gist
-- **Sync après sauvegarde match** : sur confirmation
-- **Sync auto à l'ouverture** (silencieuse) : ajoute les matchs du Gist absents en local, renvoie au Gist si des matchs locaux y manquent. Les matchs modifiés des deux côtés restent au bouton Synchroniser
-- **Bouton Synchroniser** : sync manuelle avec rapport détaillé
-- **Bouton Forcer envoi** : écrase le Gist avec le local
-- **Import fichier avec fusion** : déduplique par ID, trie par date
-- Sauvegarde automatique dans localStorage
+### Comptes et synchronisation (Firebase)
+- **Connexion obligatoire** : e-mail + mot de passe (`AuthScreen`), mot de passe oublié par e-mail. Session gardée hors-ligne
+- **Données** : `users/{uid}/players/{playerId}` {name, number, createdAt} et `users/{uid}/matches/{matchId}` (match complet + `playerId`). Règles `firestore.rules` : chaque compte n'accède qu'à `users/{uid}`
+- **Plusieurs joueurs par compte** : Options > Joueur (choix, ➕, 🗑️ avec ses matchs). `history` ne contient que les matchs du joueur actif ; le nom/numéro du joueur actif est recopié dans `basketPlayer`
+- **Sync** (`useCloud`) : écoute Firestore → `importHistory` ; chaque changement de `history` → `setDoc`/`deleteDoc` des matchs différents (comparaison JSON à clés triées). Hors-ligne : cache persistant Firestore, envoi au retour du réseau
+- **Photos** : jamais envoyées (pas d'hébergement de fichiers, Cloud Storage exige Blaze) — gardées sur l'appareil et rattachées à l'import
+- **1re connexion sur un appareil** : propose d'ajouter au compte les matchs déjà en local (`basketMigrated_<uid>`)
+- **Déconnexion** vide l'historique local ; **Supprimer mon compte** (mot de passe redemandé) efface joueurs, matchs et compte (exigence Google Play)
+- **Import fichier avec fusion** : déduplique par ID, trie par date (envoyé ensuite en ligne)
+- L'ancienne synchro GitHub Gist est retirée (les classes CSS `.gist-*` servent encore à la section Compte)
 
 ### Layout responsive
 - **Barre d'onglets fixe en bas** (style app mobile), bouton Aide `?` dans l'en-tête
@@ -310,8 +324,8 @@ git add -A && git commit -m "message" && git push origin main
 - `basketPlayingTime` : temps sur le terrain (secondes)
 - `basketBenchTime` : temps sur le banc (secondes)
 - `basketIsOnCourt` : boolean terrain/banc
-- `basketGithubToken` : token GitHub pour sync
-- `basketGistId` : ID du Gist pour sync
+- `basketActivePlayer` : id Firestore du joueur actif
+- `basketMigrated_<uid>` : import des matchs locaux déjà proposé pour ce compte sur cet appareil
 - `basketSkin` : id du thème (voir `SKINS`) — remplace l'ancien `basketTheme` ('dark' | 'light'), ignoré désormais
 - `basketGoals` : objectifs par match {points, rebounds, assists}
 - `basketShowTraining` : boolean afficher/masquer onglet entraînement
@@ -379,13 +393,11 @@ git add -A && git commit -m "message" && git push origin main
 
 ## Déploiement
 
-Le déploiement sur Vercel est automatique à chaque push sur la branche `main` de GitHub.
+À chaque push sur `main`, l'action GitHub `Déploiement Firebase` construit et publie sur https://stats-basket-2517f.web.app (et Vercel publie encore https://basket-roan.vercel.app tant qu'il n'est pas coupé). Les règles Firestore se déploient à la main (voir Commandes).
 
 ```bash
-# Workflow complet
 git add -A
 git commit -m "Description des changements"
 git push origin main
-# → Vercel détecte le push et déploie automatiquement
-# → Visible sur https://basket-roan.vercel.app en ~1 minute
+# → Firebase Hosting (action GitHub) + Vercel, en ~1-2 minutes
 ```

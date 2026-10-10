@@ -25,6 +25,8 @@ export function useCloud({ history, importHistory, player, updatePlayer }) {
   const remoteRef = useRef(null) // id → JSON du match en ligne ; null tant que la 1re lecture n'est pas faite
   const historyRef = useRef(history)
   historyRef.current = history
+  const playerRef = useRef(player) // valeur à jour pour les callbacks Firestore (le nom peut être saisi avant la création du joueur)
+  playerRef.current = player
   const deletingRef = useRef(false)
 
   useEffect(() => onAuthStateChanged(auth, setUser), [])
@@ -38,7 +40,7 @@ export function useCloud({ history, importHistory, player, updatePlayer }) {
     const col = collection(db, 'users', user.uid, 'players')
     return onSnapshot(query(col, orderBy('createdAt')), snap => {
       if (snap.empty && !snap.metadata.fromCache && !deletingRef.current) {
-        addDoc(col, { name: player.name || 'Mon joueur', number: player.number || '', createdAt: Date.now() })
+        addDoc(col, { name: playerRef.current.name || 'Mon joueur', number: playerRef.current.number || '', createdAt: Date.now() })
         return
       }
       setPlayers(snap.docs.map(d => ({ id: d.id, ...d.data() })))
