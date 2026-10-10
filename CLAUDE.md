@@ -103,6 +103,9 @@ cp android/app/build/outputs/apk/debug/app-debug.apk ./StatsBasket.apk
 ~/Android/Sdk/emulator/emulator -avd Test36 -gpu swiftshader_indirect
 ~/Android/Sdk/platform-tools/adb install -r StatsBasket.apk
 
+# Version : versionName de android/app/build.gradle = seule source, affichée dans Options (web + APK)
+# via __APP_VERSION__ / __BUILD_DATE__ (define dans vite.config.js) → l'incrémenter à chaque livraison
+
 # Publier l'APK (lien fixe : https://github.com/ninjax95/Basket/releases/latest/download/StatsBasket.apk)
 gh release create v<versionName> StatsBasket.apk --title "Stats Basket <versionName>" --notes "..." --target main
 

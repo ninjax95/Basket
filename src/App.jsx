@@ -6490,6 +6490,7 @@ const styles = `
     cursor: pointer;
   }
   #root .sb-quarter:disabled { cursor: default; opacity: 1; }
+  #root .app-version { text-align: center; font-size: 0.8rem; color: var(--muted); margin: 16px 0 0; }
   #root .sb-time {
     font-family: var(--font-display);
     font-weight: 700;
@@ -10049,6 +10050,8 @@ export default function App() {
                 </div>
               </div>
             </div>
+
+            <p className="app-version">Version {__APP_VERSION__} · {__BUILD_DATE__}</p>
           </div>
         )}
 
