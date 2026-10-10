@@ -75,7 +75,12 @@ Score kaiji/
 │       └── useCloud.js      # Compte, joueurs, sync des matchs avec Firestore
 ├── public/
 │   ├── pwa-192x192.png      # Icône PWA 192px
-│   └── pwa-512x512.png      # Icône PWA 512px
+│   ├── pwa-512x512.png      # Icône PWA 512px
+│   ├── confidentialite.html # Politique de confidentialité (exigée par Google Play)
+│   └── suppression-compte.html # Procédure de suppression de compte (exigée par Google Play)
+├── store/                   # Publication Play Store : FICHE-PLAY-STORE.md, icon.svg, visuels, captures, .aab (hors git)
+├── assets/                  # Sources PNG de l'icône et du splash (générées depuis store/icon.svg)
+├── .secrets/                # HORS GIT (kDrive) : clé de déploiement Firebase, clé d'importation Play, compte de revue Google
 ├── android/                 # Projet Capacitor Android
 │   ├── app/
 │   │   └── build.gradle
@@ -109,6 +114,14 @@ cp android/app/build/outputs/apk/debug/app-debug.apk ./StatsBasket.apk
 
 # Version : versionName de android/app/build.gradle = seule source, affichée dans Options (web + APK)
 # via __APP_VERSION__ / __BUILD_DATE__ (define dans vite.config.js) → l'incrémenter à chaque livraison
+
+# Bundle Play Store signé (clé d'importation dans .secrets/, voir store/FICHE-PLAY-STORE.md)
+cd android && ./gradlew bundleRelease && cp app/build/outputs/bundle/release/app-release.aab ../store/StatsBasket-<versionName>.aab
+
+# Icône / splash : modifier store/icon.svg puis
+node store/render-assets.mjs store/icon.svg assets
+npx @capacitor/assets@3 generate --android --iconBackgroundColor '#0b1018' --splashBackgroundColor '#0b1018'
+git checkout android/app/src/main/AndroidManifest.xml   # l'outil reformate le manifeste
 
 # Publier l'APK (lien fixe : https://github.com/ninjax95/Basket/releases/latest/download/StatsBasket.apk)
 gh release create v<versionName> StatsBasket.apk --title "Stats Basket <versionName>" --notes "..." --target main

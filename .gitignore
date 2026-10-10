@@ -26,3 +26,6 @@ npm-debug.log*
 
 # Clés et secrets (jamais dans git)
 .secrets/
+
+# Bundles Play Store (gros fichiers, reconstruits à chaque version)
+*.aab

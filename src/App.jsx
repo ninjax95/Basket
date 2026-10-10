@@ -6446,6 +6446,7 @@ const styles = `
     cursor: pointer;
   }
   #root .sb-quarter:disabled { cursor: default; opacity: 1; }
+  #root .sb-quarter { white-space: nowrap; flex-shrink: 0; }
   #root .badges-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 8px; }
   #root .badge-item { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 10px 6px; border-radius: 12px; background: var(--surface); border: 1px solid var(--border); text-align: center; }
   #root .badge-item.locked { opacity: 0.35; filter: grayscale(1); }
@@ -6470,6 +6471,7 @@ const styles = `
   #root .auth-error { margin: 0; color: #ff5c7a; font-size: 0.9rem; }
   #root .auth-submit { padding: 14px; border: none; border-radius: 12px; background: var(--grad, var(--accent)); color: #fff; font-weight: 700; font-size: 1rem; cursor: pointer; }
   #root .auth-link { background: none; border: none; color: var(--accent); font-size: 0.9rem; cursor: pointer; padding: 4px; }
+  #root .app-version a { color: var(--muted); }
   #root .app-version { text-align: center; font-size: 0.8rem; color: var(--muted); margin: 16px 0 0; }
   #root .sb-time {
     font-family: var(--font-display);
@@ -9883,7 +9885,10 @@ export default function App() {
               </div>
             </div>
 
-            <p className="app-version">Version {__APP_VERSION__} · {__BUILD_DATE__}</p>
+            <p className="app-version">
+              Version {__APP_VERSION__} · {__BUILD_DATE__} ·{' '}
+              <a href="https://stats-basket-2517f.web.app/confidentialite.html" target="_blank" rel="noreferrer">Confidentialité</a>
+            </p>
           </div>
         )}
 

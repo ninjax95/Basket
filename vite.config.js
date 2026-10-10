@@ -48,6 +48,8 @@ export default defineConfig({
         skipWaiting: true,
         clientsClaim: true,
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
+        // Pages légales : servies telles quelles, pas par l'app
+        navigateFallbackDenylist: [/^\/(confidentialite|suppression-compte)\.html$/],
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
