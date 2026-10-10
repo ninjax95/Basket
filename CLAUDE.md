@@ -46,7 +46,7 @@ Application React/Capacitor pour tracker les statistiques d'un joueur de basketb
 - **Hébergement Web** : Firebase Hosting (action GitHub `.github/workflows/firebase-deploy.yml` à chaque push sur `main`)
 - **URL Production** : https://stats-basket-2517f.web.app — l'ancienne https://basket-roan.vercel.app (Vercel Hobby, usage commercial interdit) reste en place pendant la transition
 - **Firebase** : projet `stats-basket-2517f` (forfait Spark gratuit), Auth e-mail/mot de passe + Firestore `europe-west9`. Console : https://console.firebase.google.com/project/stats-basket-2517f
-- **Clé de déploiement** : compte de service `deploy-statsbasket` (rôle Administrateur Firebase), clé dans `~/.config/firebase/stats-basket-deploy.json` (HORS projet : kDrive synchronise le dossier) et en secret GitHub `FIREBASE_SERVICE_ACCOUNT_STATS_BASKET`. Ne jamais la committer
+- **Clé de déploiement** : compte de service `deploy-statsbasket` (rôle Administrateur Firebase), clé dans `.secrets/stats-basket-deploy.json` (dans le projet, sauvegardée par kDrive, ignorée par git via `.gitignore`) et en secret GitHub `FIREBASE_SERVICE_ACCOUNT_STATS_BASKET`. Ne jamais la committer
 
 ## Structure du projet
 
@@ -114,7 +114,7 @@ cp android/app/build/outputs/apk/debug/app-debug.apk ./StatsBasket.apk
 gh release create v<versionName> StatsBasket.apk --title "Stats Basket <versionName>" --notes "..." --target main
 
 # Déploiement manuel Firebase (règles Firestore, ou site sans passer par GitHub)
-export GOOGLE_APPLICATION_CREDENTIALS=~/.config/firebase/stats-basket-deploy.json
+export GOOGLE_APPLICATION_CREDENTIALS=.secrets/stats-basket-deploy.json
 npx -y firebase-tools@14 deploy --only firestore:rules,hosting --project stats-basket-2517f --non-interactive
 
 # Tests locaux sans toucher la vraie base (émulateurs, Java requis)
@@ -393,7 +393,7 @@ git add -A && git commit -m "message" && git push origin main
 
 ## Déploiement
 
-À chaque push sur `main`, l'action GitHub `Déploiement Firebase` construit et publie sur https://stats-basket-2517f.web.app (et Vercel publie encore https://basket-roan.vercel.app tant qu'il n'est pas coupé). Les règles Firestore se déploient à la main (voir Commandes).
+À chaque push sur `main`, l'action GitHub `Déploiement Firebase` (à pousser : nécessite `gh auth refresh -s workflow`) construit et publie sur https://stats-basket-2517f.web.app (et Vercel publie encore https://basket-roan.vercel.app tant qu'il n'est pas coupé). Les règles Firestore se déploient à la main (voir Commandes).
 
 ```bash
 git add -A

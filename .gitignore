@@ -23,3 +23,6 @@ Thumbs.db
 *.log
 npm-debug.log*
 .firebase/
+
+# Clés et secrets (jamais dans git)
+.secrets/
