@@ -103,6 +103,9 @@ cp android/app/build/outputs/apk/debug/app-debug.apk ./StatsBasket.apk
 ~/Android/Sdk/emulator/emulator -avd Test36 -gpu swiftshader_indirect
 ~/Android/Sdk/platform-tools/adb install -r StatsBasket.apk
 
+# Publier l'APK (lien fixe : https://github.com/ninjax95/Basket/releases/latest/download/StatsBasket.apk)
+gh release create v<versionName> StatsBasket.apk --title "Stats Basket <versionName>" --notes "..." --target main
+
 # Push sur GitHub (déclenche auto-deploy Vercel)
 git add -A && git commit -m "message" && git push origin main
 ```
