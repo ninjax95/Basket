@@ -393,7 +393,7 @@ git add -A && git commit -m "message" && git push origin main
 
 ## Déploiement
 
-À chaque push sur `main`, l'action GitHub `Déploiement Firebase` (à pousser : nécessite `gh auth refresh -s workflow`) construit et publie sur https://stats-basket-2517f.web.app (et Vercel publie encore https://basket-roan.vercel.app tant qu'il n'est pas coupé). Les règles Firestore se déploient à la main (voir Commandes).
+À chaque push sur `main`, l'action GitHub `Déploiement Firebase` construit et publie sur https://stats-basket-2517f.web.app (et Vercel publie encore https://basket-roan.vercel.app tant qu'il n'est pas coupé). Les règles Firestore se déploient à la main (voir Commandes).
 
 ```bash
 git add -A
