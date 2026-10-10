@@ -12,6 +12,8 @@ import PerformanceRadar from './components/PerformanceRadar'
 import ShotHeatmap from './components/ShotHeatmap'
 import ThermalHeatmap from './components/ThermalHeatmap'
 import { KeepAwake } from '@capacitor-community/keep-awake'
+import { useCloud } from './hooks/useCloud'
+import AuthScreen from './components/AuthScreen'
 
 const styles = `
   * {
@@ -6456,6 +6458,18 @@ const styles = `
   #root .opp-table th { color: var(--muted); font-size: 0.75rem; }
   #root .opp-note { font-size: 0.75rem; color: var(--muted); margin: 6px 0 0; }
   #root .season-share-btn { width: 100%; padding: 14px; border: none; border-radius: 12px; background: var(--grad, var(--accent)); color: #fff; font-weight: 700; font-size: 1rem; cursor: pointer; }
+  #root .player-switch { display: flex; gap: 8px; align-items: center; margin-bottom: 12px; }
+  #root .player-switch .match-select { flex: 1; min-width: 0; }
+  #root .player-switch .options-btn { width: auto; margin: 0; padding: 10px 14px; }
+  #root .auth-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 16px; }
+  #root .auth-card { width: 100%; max-width: 360px; display: flex; flex-direction: column; gap: 12px; padding: 28px 22px; border-radius: 18px; background: var(--surface); border: 1px solid var(--border); text-align: center; }
+  #root .auth-logo { font-size: 3rem; }
+  #root .auth-card h1 { margin: 0; color: var(--text); font-size: 1.8rem; }
+  #root .auth-sub { margin: 0 0 8px; color: var(--muted); }
+  #root .auth-card input { padding: 14px; border-radius: 12px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 1rem; }
+  #root .auth-error { margin: 0; color: #ff5c7a; font-size: 0.9rem; }
+  #root .auth-submit { padding: 14px; border: none; border-radius: 12px; background: var(--grad, var(--accent)); color: #fff; font-weight: 700; font-size: 1rem; cursor: pointer; }
+  #root .auth-link { background: none; border: none; color: var(--accent); font-size: 0.9rem; cursor: pointer; padding: 4px; }
   #root .app-version { text-align: center; font-size: 0.8rem; color: var(--muted); margin: 16px 0 0; }
   #root .sb-time {
     font-family: var(--font-display);
@@ -7943,11 +7957,6 @@ export default function App() {
   })
   const [skin, setSkin] = useState(() => localStorage.getItem('basketSkin') || 'classic')
   const skinDef = SKINS.find(sk => sk.id === skin) || SKINS[0]
-  const [githubToken, setGithubToken] = useState(() => {
-    const saved = localStorage.getItem('basketGithubToken')
-    return saved ? atob(saved) : ''
-  })
-  const [gistId, setGistId] = useState(() => localStorage.getItem('basketGistId') || '')
   const [goals, setGoals] = useState(() => {
     const saved = localStorage.getItem('basketGoals')
     return saved ? JSON.parse(saved) : { points: '', rebounds: '', assists: '' }
@@ -7956,9 +7965,6 @@ export default function App() {
     const saved = localStorage.getItem('basketShowTraining')
     return saved ? JSON.parse(saved) : true
   })
-  const [showGistSettings, setShowGistSettings] = useState(false)
-  const [gistLoading, setGistLoading] = useState(false)
-  const [tempToken, setTempToken] = useState('')
   const [showActionPanel, setShowActionPanel] = useState(false)
   const [trainingMarkers, setTrainingMarkers] = useState([])
   const [trainingStats, setTrainingStats] = useState({ fg2Made: 0, fg2Attempted: 0, fg3Made: 0, fg3Attempted: 0, ftMade: 0, ftAttempted: 0 })
@@ -7977,6 +7983,7 @@ export default function App() {
   const { player, updatePlayer } = usePlayer()
   const timer = useTimer()
   const { history, seasonHistory, season, setSeason, seasons, currentSeason, saveMatch, deleteMatch, updateMatchOpponent, updateMatchScore, updateMatchPhoto, clearHistory, importHistory, getAverages, getRecentAverages, getRecords, checkNewRecords } = useMatchHistory()
+  const cloud = useCloud({ history, importHistory, player, updatePlayer })
   const playingTime = usePlayingTime()
 
   const summary = getSummary()
@@ -8331,17 +8338,6 @@ export default function App() {
       setRecordNotification({ records: newRecords })
     } else {
       alert('Match sauvegardé !')
-    }
-
-    // Proposer sync vers Gist si configuré
-    if (githubToken && gistId) {
-      if (confirm('Synchroniser avec le Gist ?')) {
-        pushToGist(updatedHistory).then(() => {
-          alert('✅ Gist mis à jour !')
-        }).catch(err => {
-          alert(`Erreur sync: ${err.message}`)
-        })
-      }
     }
 
     // Reset for next match
@@ -8734,296 +8730,12 @@ export default function App() {
     input.click()
   }
 
-  // GitHub Gist functions
-  const saveGithubToken = (token) => {
-    const cleanToken = token.trim()
-    setGithubToken(cleanToken)
-    if (cleanToken) {
-      localStorage.setItem('basketGithubToken', btoa(cleanToken))
-    } else {
-      localStorage.removeItem('basketGithubToken')
-    }
-  }
-
-  const saveToGist = async () => {
-    if (!githubToken) {
-      setShowGistSettings(true)
-      return
-    }
-
-    setGistLoading(true)
-    const backupData = {
-      exportDate: new Date().toISOString(),
-      player: player,
-      matchCount: history.length,
-      history: history
-    }
-
-    try {
-      const gistData = {
-        description: `Stats Basket - Backup ${player.name || 'joueur'}`,
-        public: false,
-        files: {
-          'stats_basket_backup.json': {
-            content: JSON.stringify(backupData, null, 2)
-          }
-        }
-      }
-
-      let response
-      if (gistId) {
-        // Update existing gist
-        response = await fetch(`https://api.github.com/gists/${gistId}`, {
-          method: 'PATCH',
-          headers: {
-            'Authorization': `token ${githubToken}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(gistData)
-        })
-      } else {
-        // Create new gist
-        response = await fetch('https://api.github.com/gists', {
-          method: 'POST',
-          headers: {
-            'Authorization': `token ${githubToken}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(gistData)
-        })
-      }
-
-      if (response.ok) {
-        const data = await response.json()
-        setGistId(data.id)
-        localStorage.setItem('basketGistId', data.id)
-        alert(`Sauvegardé sur GitHub Gist !\nID: ${data.id}`)
-      } else {
-        const error = await response.json()
-        alert(`Erreur: ${error.message || 'Impossible de sauvegarder'}`)
-      }
-    } catch (err) {
-      alert(`Erreur: ${err.message}`)
-    } finally {
-      setGistLoading(false)
-    }
-  }
-
-  // Fetch Gist data without modifying anything
-  const fetchGistData = async () => {
-    const targetGistId = gistId || prompt('Entre l\'ID du Gist :')
-    if (!targetGistId) return null
-
-    const response = await fetch(`https://api.github.com/gists/${targetGistId}`, {
-      headers: { 'Authorization': `token ${githubToken}` }
-    })
-
-    if (!response.ok) {
-      const errData = await response.json().catch(() => null)
-      throw new Error(`${response.status}: ${errData?.message || 'Gist non trouvé ou accès refusé.'}`)
-    }
-
-    const data = await response.json()
-    const fileContent = data.files['stats_basket_backup.json']?.content
-    if (!fileContent) throw new Error('Fichier stats_basket_backup.json non trouvé dans le Gist.')
-
-    const backupData = JSON.parse(fileContent)
-    if (!backupData.history || !Array.isArray(backupData.history)) {
-      throw new Error('Fichier de backup invalide.')
-    }
-
-    if (!gistId) {
-      setGistId(targetGistId)
-      localStorage.setItem('basketGistId', targetGistId)
-    }
-
-    return backupData
-  }
-
   // Passage au QT suivant (bandeau du haut + Timer)
   const handleNextQuarter = () => {
     timer.nextQuarter()
     const onCourt = confirm('Sur le terrain ?')
     if (onCourt !== playingTime.isOnCourt) playingTime.toggleOnCourt()
-    // Sync Gist au changement de QT
-    if (githubToken && gistId && history.length > 0) {
-      pushToGist(history).catch(() => {})
-    }
   }
-
-  // Push local history to Gist
-  const pushToGist = async (historyToSave) => {
-    const backupData = {
-      exportDate: new Date().toISOString(),
-      player: player,
-      matchCount: historyToSave.length,
-      history: historyToSave
-    }
-
-    const response = await fetch(`https://api.github.com/gists/${gistId}`, {
-      method: 'PATCH',
-      headers: {
-        'Authorization': `token ${githubToken}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        description: `Stats Basket - Backup ${player.name || 'joueur'} (${historyToSave.length} matchs)`,
-        files: {
-          'stats_basket_backup.json': {
-            content: JSON.stringify(backupData, null, 2)
-          }
-        }
-      })
-    })
-
-    if (!response.ok) throw new Error('Échec du push vers le Gist')
-    return true
-  }
-
-  // Sync auto à l'ouverture (silencieuse). Matchs modifiés des deux côtés : laissés au bouton Synchroniser.
-  useEffect(() => {
-    if (!githubToken || !gistId) return
-    fetchGistData().then(remoteData => {
-      const remoteIds = new Set(remoteData.history.map(m => m.id))
-      const localIds = new Set(history.map(m => m.id))
-      const onlyRemote = remoteData.history.filter(m => !localIds.has(m.id))
-      const onlyLocal = history.filter(m => !remoteIds.has(m.id))
-      const merged = [...history, ...onlyRemote].sort((a, b) => new Date(a.date) - new Date(b.date))
-      if (onlyRemote.length > 0) importHistory(merged)
-      if (onlyLocal.length > 0) pushToGist(merged).catch(() => {})
-    }).catch(() => {})
-  }, [])
-
-  // Compare two match objects to detect modifications
-  const matchDiffers = (local, remote) => {
-    // Compare key fields that can be edited after save
-    if (local.opponent !== remote.opponent) return true
-    if (JSON.stringify(local.score) !== JSON.stringify(remote.score)) return true
-    if (local.photo !== remote.photo) return true
-    if (JSON.stringify(local.notes) !== JSON.stringify(remote.notes)) return true
-    // Compare stats in case of any correction
-    if (local.summary.points !== remote.summary.points) return true
-    if (local.summary.rebounds !== remote.summary.rebounds) return true
-    return false
-  }
-
-  // Describe differences for a match
-  const describeDiff = (local, remote) => {
-    const diffs = []
-    if (local.opponent !== remote.opponent) diffs.push(`Adversaire: "${local.opponent || '—'}" vs "${remote.opponent || '—'}"`)
-    if (JSON.stringify(local.score) !== JSON.stringify(remote.score)) {
-      const ls = local.score ? `${local.score.team}-${local.score.opponent}` : '—'
-      const rs = remote.score ? `${remote.score.team}-${remote.score.opponent}` : '—'
-      diffs.push(`Score: ${ls} vs ${rs}`)
-    }
-    if (local.summary.points !== remote.summary.points) diffs.push(`Points: ${local.summary.points} vs ${remote.summary.points}`)
-    if (local.photo && !remote.photo) diffs.push('Photo ajoutée localement')
-    if (!local.photo && remote.photo) diffs.push('Photo sur le Gist')
-    if (JSON.stringify(local.notes) !== JSON.stringify(remote.notes)) diffs.push('Notes différentes')
-    return diffs
-  }
-
-  // Full bidirectional sync
-  const handleSync = async () => {
-    if (!githubToken) {
-      setShowGistSettings(true)
-      return
-    }
-
-    setGistLoading(true)
-    try {
-      const remoteData = await fetchGistData()
-      if (!remoteData) return
-
-      const remoteHistory = remoteData.history
-      const localMap = new Map(history.map(m => [m.id, m]))
-      const remoteMap = new Map(remoteHistory.map(m => [m.id, m]))
-
-      // Categorize differences
-      const onlyLocal = history.filter(m => !remoteMap.has(m.id))
-      const onlyRemote = remoteHistory.filter(m => !localMap.has(m.id))
-      const modified = []
-
-      for (const [id, local] of localMap) {
-        const remote = remoteMap.get(id)
-        if (remote && matchDiffers(local, remote)) {
-          modified.push({ id, local, remote, diffs: describeDiff(local, remote) })
-        }
-      }
-
-      // Build sync report
-      const hasChanges = onlyLocal.length > 0 || onlyRemote.length > 0 || modified.length > 0
-
-      if (!hasChanges) {
-        alert(`✅ Tout est synchronisé !\n\nLocal: ${history.length} match(s)\nGist: ${remoteHistory.length} match(s)`)
-        return
-      }
-
-      let report = `📊 Rapport de synchronisation\n\n`
-      report += `Local: ${history.length} match(s) | Gist: ${remoteHistory.length} match(s)\n\n`
-
-      if (onlyLocal.length > 0) {
-        report += `➕ ${onlyLocal.length} match(s) uniquement en local:\n`
-        onlyLocal.forEach(m => {
-          report += `  • ${m.opponent || 'Match'} (${m.summary.points} pts)\n`
-        })
-        report += '\n'
-      }
-
-      if (onlyRemote.length > 0) {
-        report += `⬇️ ${onlyRemote.length} match(s) uniquement sur le Gist:\n`
-        onlyRemote.forEach(m => {
-          report += `  • ${m.opponent || 'Match'} (${m.summary.points} pts)\n`
-        })
-        report += '\n'
-      }
-
-      if (modified.length > 0) {
-        report += `⚠️ ${modified.length} match(s) modifié(s) (local vs Gist):\n`
-        modified.forEach(({ local, diffs }) => {
-          report += `  • ${local.opponent || 'Match'}: ${diffs.join(', ')}\n`
-        })
-        report += '\n'
-      }
-
-      report += `Fusionner ? (local prioritaire pour les conflits)`
-
-      if (confirm(report)) {
-        // Merge: start with local, add remote-only, for conflicts keep local
-        const merged = [...history]
-
-        // Add remote-only matches
-        onlyRemote.forEach(m => merged.push(m))
-
-        // Sort by date
-        merged.sort((a, b) => new Date(a.date) - new Date(b.date))
-
-        // Update local
-        importHistory(merged)
-
-        // Restore player info if needed
-        if (remoteData.player) {
-          if (remoteData.player.name && !player.name) updatePlayer('name', remoteData.player.name)
-          if (remoteData.player.number && !player.number) updatePlayer('number', remoteData.player.number)
-        }
-
-        // Push merged result to Gist
-        if (confirm('Envoyer le résultat fusionné vers le Gist ?')) {
-          await pushToGist(merged)
-          alert(`✅ Sync terminée ! ${merged.length} match(s) synchronisés.`)
-        } else {
-          alert(`✅ Fusion locale terminée ! ${merged.length} match(s). Gist non mis à jour.`)
-        }
-      }
-    } catch (err) {
-      alert(`Erreur sync: ${err.message}`)
-    } finally {
-      setGistLoading(false)
-    }
-  }
-
-  // Legacy loadFromGist redirects to handleSync
-  const loadFromGist = handleSync
 
   const exportData = () => {
     const data = {
@@ -9211,6 +8923,13 @@ export default function App() {
       deleteAction(action.id)
     }
     setActionToDelete(null)
+  }
+
+  if (cloud.user === undefined) {
+    return <><style>{styles}</style><div className="auth-screen"><div className="auth-logo">🏀</div></div></>
+  }
+  if (!cloud.user) {
+    return <><style>{styles}</style><AuthScreen /></>
   }
 
   return (
@@ -10007,6 +9726,34 @@ export default function App() {
             {/* Player Info Section */}
             <div className="options-section">
               <h3>👤 Joueur</h3>
+              <div className="player-switch">
+                <select
+                  className="match-select"
+                  value={cloud.activePlayer?.id || ''}
+                  onChange={e => cloud.setActivePlayerId(e.target.value)}
+                >
+                  {cloud.players.map(p => (
+                    <option key={p.id} value={p.id}>{p.name || 'Sans nom'}{p.number ? ` #${p.number}` : ''}</option>
+                  ))}
+                </select>
+                <button
+                  className="options-btn"
+                  onClick={() => {
+                    const name = prompt('Nom du nouveau joueur :')
+                    if (name?.trim()) cloud.addPlayer(name.trim())
+                  }}
+                >
+                  ➕ Ajouter
+                </button>
+                {cloud.players.length > 1 && (
+                  <button
+                    className="options-btn danger"
+                    onClick={() => confirm(`Supprimer ${player.name || 'ce joueur'} et tous ses matchs ?`) && cloud.deletePlayer(cloud.activePlayer.id)}
+                  >
+                    🗑️
+                  </button>
+                )}
+              </div>
               <PlayerInfo
                 name={player.name}
                 number={player.number}
@@ -10038,41 +9785,33 @@ export default function App() {
               </div>
             </div>
 
-            {/* GitHub Gist Sync Section */}
+            {/* Compte */}
             <div className="options-section">
-              <h3>☁️ Synchronisation GitHub</h3>
+              <h3>☁️ Compte</h3>
               <p className="options-description">
-                Sauvegarde et synchronise tes stats sur GitHub Gist pour y accéder depuis n'importe où.
+                Tes matchs sont enregistrés en ligne et synchronisés sur tous tes appareils, même hors-ligne.
               </p>
               <div className="gist-config">
                 <div className="gist-status-line">
-                  {githubToken ? (
-                    <span className="gist-status connected">✓ Token configuré</span>
-                  ) : (
-                    <span className="gist-status">✗ Non configuré</span>
-                  )}
-                  <button
-                    className="gist-config-btn"
-                    onClick={() => { setTempToken(githubToken); setShowGistSettings(true) }}
-                  >
-                    {githubToken ? 'Modifier' : 'Configurer'}
-                  </button>
+                  <span className="gist-status connected">✓ {cloud.user.email}</span>
                 </div>
               </div>
               <div className="gist-actions">
-                <button
-                  className="gist-action-btn sync-btn"
-                  onClick={handleSync}
-                  disabled={gistLoading || !githubToken}
-                >
-                  {gistLoading ? '⏳' : '🔄'} Synchroniser
+                <button className="gist-action-btn" onClick={() => confirm('Se déconnecter ?') && cloud.logout()}>
+                  🚪 Se déconnecter
                 </button>
                 <button
                   className="gist-action-btn"
-                  onClick={saveToGist}
-                  disabled={gistLoading || history.length === 0 || !githubToken}
+                  onClick={async () => {
+                    if (!confirm('Supprimer définitivement ton compte, tous tes joueurs et tous tes matchs ?')) return
+                    try {
+                      if (await cloud.deleteAccount()) alert('Compte supprimé.')
+                    } catch (err) {
+                      alert(err.code === 'auth/invalid-credential' ? 'Mot de passe incorrect.' : `Erreur : ${err.message}`)
+                    }
+                  }}
                 >
-                  {gistLoading ? '⏳' : '⬆️'} Forcer envoi
+                  🗑️ Supprimer mon compte
                 </button>
               </div>
             </div>
@@ -10203,56 +9942,6 @@ export default function App() {
                   Oui, supprimer
                 </button>
                 <button className="confirm-btn no" onClick={() => setActionToDelete(null)}>
-                  Annuler
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Gist Settings Modal */}
-        {showGistSettings && (
-          <div className="gist-modal-overlay" onClick={() => setShowGistSettings(false)}>
-            <div className="gist-modal" onClick={e => e.stopPropagation()}>
-              <h3>GitHub Gist Configuration</h3>
-              <div className="gist-modal-info">
-                Pour sauvegarder tes stats sur GitHub Gist, tu as besoin d'un token personnel.<br/>
-                Va sur <strong>github.com/settings/tokens</strong> et crée un token avec le scope "gist".
-              </div>
-              <div className="gist-input-group">
-                <label>Token GitHub</label>
-                <input
-                  type="password"
-                  placeholder="ghp_xxxxxxxxxxxx"
-                  value={tempToken}
-                  onChange={e => setTempToken(e.target.value)}
-                />
-              </div>
-              {gistId && (
-                <div className="gist-input-group">
-                  <label>ID du Gist actuel</label>
-                  <input
-                    type="text"
-                    value={gistId}
-                    onChange={e => setGistId(e.target.value)}
-                    placeholder="ID du Gist (optionnel)"
-                  />
-                </div>
-              )}
-              <div className="gist-modal-buttons">
-                <button
-                  className="gist-btn save"
-                  onClick={() => {
-                    saveGithubToken(tempToken)
-                    setShowGistSettings(false)
-                  }}
-                >
-                  Enregistrer
-                </button>
-                <button
-                  className="gist-btn cancel"
-                  onClick={() => setShowGistSettings(false)}
-                >
                   Annuler
                 </button>
               </div>
