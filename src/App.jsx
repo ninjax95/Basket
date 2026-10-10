@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { useStats, usePlayer, useTimer, useMatchHistory, usePlayingTime } from './hooks/useStats'
+import { useStats, usePlayer, useTimer, useMatchHistory, usePlayingTime, getSeason } from './hooks/useStats'
 import StatCounter from './components/StatCounter'
 import Timer from './components/Timer'
 import PlayerInfo from './components/PlayerInfo'
@@ -11,6 +11,7 @@ import EvolutionChart from './components/EvolutionChart'
 import PerformanceRadar from './components/PerformanceRadar'
 import ShotHeatmap from './components/ShotHeatmap'
 import ThermalHeatmap from './components/ThermalHeatmap'
+import { KeepAwake } from '@capacitor-community/keep-awake'
 
 const styles = `
   * {
@@ -6443,6 +6444,18 @@ const styles = `
     cursor: pointer;
   }
   #root .sb-quarter:disabled { cursor: default; opacity: 1; }
+  #root .badges-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 8px; }
+  #root .badge-item { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 10px 6px; border-radius: 12px; background: var(--surface); border: 1px solid var(--border); text-align: center; }
+  #root .badge-item.locked { opacity: 0.35; filter: grayscale(1); }
+  #root .badge-emoji { font-size: 1.8rem; line-height: 1.2; }
+  #root .badge-name { font-size: 0.8rem; font-weight: 700; color: var(--text); }
+  #root .badge-date { font-size: 0.7rem; color: var(--muted); }
+  #root .opp-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; color: var(--text); }
+  #root .opp-table th, #root .opp-table td { padding: 8px 4px; text-align: center; border-bottom: 1px solid var(--border); }
+  #root .opp-table th:first-child, #root .opp-table td:first-child { text-align: left; }
+  #root .opp-table th { color: var(--muted); font-size: 0.75rem; }
+  #root .opp-note { font-size: 0.75rem; color: var(--muted); margin: 6px 0 0; }
+  #root .season-share-btn { width: 100%; padding: 14px; border: none; border-radius: 12px; background: var(--grad, var(--accent)); color: #fff; font-weight: 700; font-size: 1rem; cursor: pointer; }
   #root .app-version { text-align: center; font-size: 0.8rem; color: var(--muted); margin: 16px 0 0; }
   #root .sb-time {
     font-family: var(--font-display);
@@ -7862,6 +7875,43 @@ const SKINS = [
 // Petite vibration au tap (ignorée si non supportée)
 const tapFeedback = () => { if (navigator.vibrate) navigator.vibrate(12) }
 
+// Badges : débloqués par le premier match qui remplit la condition (tout l'historique, toutes saisons)
+const BADGES = [
+  { id: 'first', emoji: '🏀', name: 'Premier match', test: () => true },
+  { id: 'win', emoji: '✌️', name: 'Première victoire', test: m => m.score && m.score.team > m.score.opponent },
+  { id: 'pts10', emoji: '🔟', name: '10 points', test: m => m.summary.points >= 10 },
+  { id: 'pts20', emoji: '⭐', name: '20 points', test: m => m.summary.points >= 20 },
+  { id: 'pts30', emoji: '🌟', name: '30 points', test: m => m.summary.points >= 30 },
+  { id: 'reb10', emoji: '🧲', name: '10 rebonds', test: m => m.summary.rebounds >= 10 },
+  { id: 'ast5', emoji: '🎁', name: '5 passes D.', test: m => m.summary.assists >= 5 },
+  { id: 'stl5', emoji: '🥷', name: '5 interceptions', test: m => m.summary.steals >= 5 },
+  { id: 'blk3', emoji: '🖐️', name: '3 contres', test: m => m.summary.blocks >= 3 },
+  { id: 'three3', emoji: '🎯', name: '3 tirs à 3 pts', test: m => (m.stats?.fg3Made || 0) >= 3 },
+  { id: 'ftPerfect', emoji: '💯', name: 'LF parfaits (4+)', test: m => (m.stats?.ftAttempted || 0) >= 4 && m.stats.ftMade === m.stats.ftAttempted },
+  { id: 'sniper', emoji: '🏹', name: '60 % aux tirs (5+)', test: m => {
+    const st = m.stats || {}
+    const att = (st.fg2Attempted || 0) + (st.fg3Attempted || 0)
+    return att >= 5 && ((st.fg2Made || 0) + (st.fg3Made || 0)) / att >= 0.6
+  } },
+  { id: 'fire5', emoji: '🔥', name: 'Série de 5 tirs', test: m => (m.streaks?.bestStreak || 0) >= 5 },
+  { id: 'clean', emoji: '🧼', name: '0 perte de balle', test: m => m.summary.turnovers === 0 && m.summary.points > 0 },
+  { id: 'dd', emoji: '💪', name: 'Double-double', test: m => tenCount(m) >= 2 },
+  { id: 'td', emoji: '👑', name: 'Triple-double', test: m => tenCount(m) >= 3 },
+  { id: 'games10', emoji: '📅', name: '10 matchs joués', test: (m, i) => i >= 9 },
+  { id: 'games25', emoji: '🏟️', name: '25 matchs joués', test: (m, i) => i >= 24 },
+]
+
+function tenCount(m) {
+  const sm = m.summary
+  return [sm.points, sm.rebounds, sm.assists, sm.steals, sm.blocks].filter(v => v >= 10).length
+}
+
+// Chaque badge + le match qui l'a débloqué (null si pas encore)
+function getBadges(history) {
+  const sorted = [...history].sort((a, b) => new Date(a.date) - new Date(b.date))
+  return BADGES.map(b => ({ ...b, match: sorted.find((m, i) => b.test(m, i)) || null }))
+}
+
 export default function App() {
   const [isUnlocked, setIsUnlocked] = useState(true)
   const [activeTab, setActiveTab] = useState('match')
@@ -8004,6 +8054,18 @@ export default function App() {
   useEffect(() => {
     return playingTime.trackTime(timer.isRunning)
   }, [timer.isRunning, playingTime.isOnCourt])
+
+  // Écran toujours allumé pendant que le chrono tourne (le verrou web saute quand on quitte l'app → on le reprend au retour)
+  useEffect(() => {
+    if (!timer.isRunning) {
+      KeepAwake.allowSleep().catch(() => {})
+      return
+    }
+    const lock = () => { if (document.visibilityState === 'visible') KeepAwake.keepAwake().catch(() => {}) }
+    lock()
+    document.addEventListener('visibilitychange', lock)
+    return () => document.removeEventListener('visibilitychange', lock)
+  }, [timer.isRunning])
 
   // Save shot markers to localStorage
   useEffect(() => {
@@ -8259,6 +8321,11 @@ export default function App() {
     const updatedHistory = [...history, savedMatch]
     backupHistory(updatedHistory)
 
+    const newBadges = getBadges(updatedHistory).filter(b => b.match?.id === savedMatch.id)
+    if (newBadges.length > 0) {
+      alert(`🏅 Nouveau${newBadges.length > 1 ? 'x' : ''} badge${newBadges.length > 1 ? 's' : ''} !\n\n${newBadges.map(b => `${b.emoji} ${b.name}`).join('\n')}`)
+    }
+
     // Show records notification if any
     if (newRecords.length > 0) {
       setRecordNotification({ records: newRecords })
@@ -8458,6 +8525,88 @@ export default function App() {
         }
       } else {
         downloadBlob(blob, `stats_${match.opponent || 'match'}.png`)
+      }
+    }, 'image/png')
+  }
+
+  // Image « bilan de saison » (saison sélectionnée), partagée comme l'image d'un match
+  const handleShareSeason = () => {
+    const ms = seasonHistory
+    const sum = key => ms.reduce((t, m) => t + (m.summary[key] || 0), 0)
+    const st = key => ms.reduce((t, m) => t + (m.stats?.[key] || 0), 0)
+    const avg = key => (sum(key) / ms.length).toFixed(1)
+    const pct = (made, att) => att > 0 ? Math.round(made / att * 100) + ' %' : '—'
+    const wins = ms.filter(m => m.score && m.score.team > m.score.opponent).length
+    const losses = ms.filter(m => m.score && m.score.team < m.score.opponent).length
+    const best = ms.reduce((b, m) => m.summary.points > b.summary.points ? m : b, ms[0])
+    const badges = getBadges(history).filter(b => b.match && getSeason(b.match.date) === season)
+
+    const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d')
+    canvas.width = 600
+    canvas.height = 860
+    ctx.fillStyle = '#1a1a2e'
+    ctx.fillRect(0, 0, 600, 860)
+    ctx.textAlign = 'center'
+
+    ctx.fillStyle = '#61dafb'
+    ctx.font = 'bold 28px sans-serif'
+    ctx.fillText('🏀 Bilan de saison', 300, 50)
+    ctx.fillStyle = '#ff6b35'
+    ctx.font = 'bold 24px sans-serif'
+    ctx.fillText(season, 300, 85)
+    ctx.fillStyle = '#fff'
+    ctx.font = '20px sans-serif'
+    ctx.fillText(`${player.name || 'Joueur'} #${player.number || '0'}`, 300, 120)
+
+    ctx.font = 'bold 22px sans-serif'
+    ctx.fillText(`${ms.length} matchs · ${wins} V – ${losses} D`, 300, 165)
+
+    const tiles = [
+      [sum('points'), 'POINTS'], [avg('points'), 'PTS / MATCH'], [avg('rebounds'), 'REB / MATCH'],
+      [avg('assists'), 'PD / MATCH'], [avg('steals'), 'INT / MATCH'], [avg('blocks'), 'CTR / MATCH'],
+      [pct(st('fg2Made') + st('fg3Made'), st('fg2Attempted') + st('fg3Attempted')), 'AUX TIRS'],
+      [st('fg3Made'), 'TIRS À 3 PTS'], [pct(st('ftMade'), st('ftAttempted')), 'AUX LF'],
+    ]
+    tiles.forEach(([value, label], i) => {
+      const x = 105 + (i % 3) * 195
+      const y = 200 + Math.floor(i / 3) * 120
+      ctx.fillStyle = 'rgba(255,255,255,0.06)'
+      ctx.fillRect(x - 85, y, 170, 100)
+      ctx.fillStyle = '#61dafb'
+      ctx.font = 'bold 34px sans-serif'
+      ctx.fillText(String(value), x, y + 52)
+      ctx.fillStyle = 'rgba(255,255,255,0.6)'
+      ctx.font = '14px sans-serif'
+      ctx.fillText(label, x, y + 80)
+    })
+
+    ctx.fillStyle = '#fff'
+    ctx.font = 'bold 20px sans-serif'
+    ctx.fillText('⭐ Meilleur match', 300, 595)
+    ctx.font = '18px sans-serif'
+    const bestDate = new Date(best.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' })
+    ctx.fillText(`${best.summary.points} pts${best.opponent?.trim() ? ` vs ${best.opponent.trim()}` : ''} · ${bestDate}`, 300, 625)
+
+    ctx.font = 'bold 20px sans-serif'
+    ctx.fillText(`🏅 Badges débloqués : ${badges.length}`, 300, 690)
+    ctx.font = '28px sans-serif'
+    ctx.fillText(badges.slice(0, 12).map(b => b.emoji).join(' '), 300, 735)
+
+    ctx.fillStyle = 'rgba(255,255,255,0.4)'
+    ctx.font = '13px sans-serif'
+    ctx.fillText('Stats Basket', 300, 835)
+
+    const filename = `bilan_${season.replace('/', '-')}.png`
+    canvas.toBlob(async (blob) => {
+      if (navigator.share && navigator.canShare) {
+        try {
+          await navigator.share({ title: `Bilan saison ${season}`, files: [new File([blob], filename, { type: 'image/png' })] })
+        } catch {
+          downloadBlob(blob, filename)
+        }
+      } else {
+        downloadBlob(blob, filename)
       }
     }, 'image/png')
   }
@@ -8730,6 +8879,20 @@ export default function App() {
     if (!response.ok) throw new Error('Échec du push vers le Gist')
     return true
   }
+
+  // Sync auto à l'ouverture (silencieuse). Matchs modifiés des deux côtés : laissés au bouton Synchroniser.
+  useEffect(() => {
+    if (!githubToken || !gistId) return
+    fetchGistData().then(remoteData => {
+      const remoteIds = new Set(remoteData.history.map(m => m.id))
+      const localIds = new Set(history.map(m => m.id))
+      const onlyRemote = remoteData.history.filter(m => !localIds.has(m.id))
+      const onlyLocal = history.filter(m => !remoteIds.has(m.id))
+      const merged = [...history, ...onlyRemote].sort((a, b) => new Date(a.date) - new Date(b.date))
+      if (onlyRemote.length > 0) importHistory(merged)
+      if (onlyLocal.length > 0) pushToGist(merged).catch(() => {})
+    }).catch(() => {})
+  }, [])
 
   // Compare two match objects to detect modifications
   const matchDiffers = (local, remote) => {
@@ -9779,6 +9942,58 @@ export default function App() {
                       )
                     }
                   })()}
+                </div>
+
+                {/* Badges (toutes saisons) */}
+                <div className="analysis-section">
+                  <h3>🏅 Badges</h3>
+                  <div className="badges-grid">
+                    {getBadges(history).map(b => (
+                      <div key={b.id} className={`badge-item ${b.match ? 'earned' : 'locked'}`}>
+                        <span className="badge-emoji">{b.emoji}</span>
+                        <span className="badge-name">{b.name}</span>
+                        <span className="badge-date">
+                          {b.match ? new Date(b.match.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: '2-digit' }) : '🔒'}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Stats par adversaire (saison sélectionnée) */}
+                <div className="analysis-section">
+                  <h3>🆚 Par adversaire</h3>
+                  <table className="opp-table">
+                    <thead>
+                      <tr><th>Adversaire</th><th>M</th><th>V-D</th><th>PTS</th><th>REB</th><th>PD</th></tr>
+                    </thead>
+                    <tbody>
+                      {Object.values(seasonHistory.reduce((acc, m) => {
+                        const name = (m.opponent || '').trim() || 'Sans nom'
+                        const key = name.toLowerCase()
+                        acc[key] = acc[key] || { name, matches: [] }
+                        acc[key].matches.push(m)
+                        return acc
+                      }, {})).sort((a, b) => b.matches.length - a.matches.length).map(({ name, matches }) => {
+                        const avgOf = k => (matches.reduce((t, m) => t + m.summary[k], 0) / matches.length).toFixed(1)
+                        const w = matches.filter(m => m.score && m.score.team > m.score.opponent).length
+                        const l = matches.filter(m => m.score && m.score.team < m.score.opponent).length
+                        return (
+                          <tr key={name}>
+                            <td>{name}</td><td>{matches.length}</td><td>{w}-{l}</td>
+                            <td>{avgOf('points')}</td><td>{avgOf('rebounds')}</td><td>{avgOf('assists')}</td>
+                          </tr>
+                        )
+                      })}
+                    </tbody>
+                  </table>
+                  <p className="opp-note">Moyennes par match.</p>
+                </div>
+
+                {/* Bilan de saison */}
+                <div className="analysis-section">
+                  <h3>📸 Bilan de saison</h3>
+                  <button className="season-share-btn" onClick={handleShareSeason}>Partager le bilan {season}</button>
                 </div>
               </>
             )}

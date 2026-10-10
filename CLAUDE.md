@@ -212,6 +212,9 @@ git add -A && git commit -m "message" && git push origin main
 - **Replay des tirs** : Animation des tirs du match
 - Moyennes par match
 - Records personnels avec date et adversaire
+- **Badges** (`BADGES` / `getBadges(history)` en haut d'App.jsx) : débloqués par le 1er match qui remplit la condition, toutes saisons ; alerte « Nouveau badge » à la sauvegarde. Ajouter un badge = une entrée `{ id, emoji, name, test: (match, index) => bool }`
+- **Par adversaire** : tableau (saison sélectionnée) matchs, V-D, moyennes PTS/REB/PD — adversaires regroupés sans casse ni espaces
+- **Bilan de saison** : image Canvas 600×860 (`handleShareSeason`), partagée comme l'image d'un match
 
 ### Notes de match
 - Champ "Points forts" (ce qui a bien marché)
@@ -226,6 +229,7 @@ git add -A && git commit -m "message" && git push origin main
 - Ajouter un thème : une entrée dans `SKINS` + un bloc `body[data-skin="id"] { --bg… }` dans la section THÈMES
 
 ### Gestion du temps de jeu
+- **Écran toujours allumé** tant que le chrono tourne : `@capacitor-community/keep-awake` (APK : flag natif `KEEP_SCREEN_ON` ; web : Wake Lock API, repris au retour dans l'app)
 - **Bouton Temps mort** (⏱️) : pause rapide du timer en 1 clic
 - **Alerte inactivité** : si aucune action depuis 2 min + timer actif, demande "Toujours sur le terrain ?"
 - **Prompt au changement de QT** : demande si le joueur est sur le terrain
@@ -242,6 +246,7 @@ git add -A && git commit -m "message" && git push origin main
 - **Détection de conflits** : matchs nouveaux, modifiés, communs
 - **Sync au changement de QT** : push automatique vers le Gist
 - **Sync après sauvegarde match** : sur confirmation
+- **Sync auto à l'ouverture** (silencieuse) : ajoute les matchs du Gist absents en local, renvoie au Gist si des matchs locaux y manquent. Les matchs modifiés des deux côtés restent au bouton Synchroniser
 - **Bouton Synchroniser** : sync manuelle avec rapport détaillé
 - **Bouton Forcer envoi** : écrase le Gist avec le local
 - **Import fichier avec fusion** : déduplique par ID, trie par date
