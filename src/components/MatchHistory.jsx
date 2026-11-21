@@ -1,5 +1,104 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import ShotReplay from './ShotReplay'
+
+const EDIT_FIELDS = [
+  ['fg2Made', '2PTS réussis'], ['fg2Attempted', '2PTS tentés'],
+  ['fg3Made', '3PTS réussis'], ['fg3Attempted', '3PTS tentés'],
+  ['ftMade', 'LF réussis'], ['ftAttempted', 'LF tentés'],
+  ['offRebounds', 'Rebonds off.'], ['defRebounds', 'Rebonds déf.'],
+  ['assists', 'Passes déc.'], ['steals', 'Interceptions'],
+  ['blocks', 'Contres'], ['fouls', 'Fautes'],
+  ['turnovers', 'Pertes de balle']
+]
+
+// Stats par quart-temps : mêmes clés que match.quarterStats, sauf fg "réussis/tentés" scindé en deux
+const QUARTER_FIELDS = [
+  ['points', 'PTS'], ['fgMade', 'Tirs réussis'], ['fgAtt', 'Tirs tentés'],
+  ['rebounds', 'REB'], ['assists', 'PD'], ['steals', 'INT'],
+  ['blocks', 'CTR'], ['fouls', 'FTE'], ['turnovers', 'PDB']
+]
+
+const quarterToValues = (q) => {
+  const [fgMade, fgAtt] = String(q.fg || '0/0').split('/')
+  const values = { fgMade: String(parseInt(fgMade, 10) || 0), fgAtt: String(parseInt(fgAtt, 10) || 0) }
+  QUARTER_FIELDS.forEach(([key]) => { if (!(key in values)) values[key] = String(q[key] ?? 0) })
+  return values
+}
+
+// Totaux du match auxquels la somme des quart-temps doit correspondre
+const quarterTotals = (v) => {
+  const n = (key) => parseInt(v[key], 10) || 0
+  return {
+    points: n('fg2Made') * 2 + n('fg3Made') * 3 + n('ftMade'),
+    fgMade: n('fg2Made') + n('fg3Made'),
+    fgAtt: n('fg2Attempted') + n('fg3Attempted'),
+    fg2Made: n('fg2Made'), fg2Att: n('fg2Attempted'), fg3Made: n('fg3Made'), fg3Att: n('fg3Attempted'),
+    ftMade: n('ftMade'), ftAtt: n('ftAttempted'),
+    rebounds: n('offRebounds') + n('defRebounds'),
+    assists: n('assists'), steals: n('steals'), blocks: n('blocks'),
+    fouls: n('fouls'), turnovers: n('turnovers')
+  }
+}
+
+// Carte des tirs : mêmes coordonnées que CourtMap (500 × 470)
+const shotIsThree = (s) => !!(s.isThree ?? s.isThreePointer ?? s.type === '3pts')
+
+// Même géométrie que la ligne à 3 points de CourtMap
+const isThreeZone = (x, y) => {
+  const cornerY = 50 + Math.sqrt(238 * 238 - 220 * 220)
+  if (y < cornerY) return x < 30 || x > 470
+  return Math.hypot(x - 250, y - 50) > 238
+}
+
+// Position d'un toucher dans le repère du terrain
+const courtPoint = (el, clientX, clientY) => {
+  const rect = el.getBoundingClientRect()
+  return { x: ((clientX - rect.left) / rect.width) * 500, y: ((clientY - rect.top) / rect.height) * 470 }
+}
+
+// Index du tir (hors LF) le plus proche du point, ou null au-delà de 22 unités
+const nearestShot = (shots, x, y) => {
+  let nearest = null
+  shots.forEach((s, i) => {
+    if (s.isFreeThrow) return
+    const d = Math.hypot(s.x - x, s.y - y)
+    if (d <= 22 && (nearest === null || d < nearest.d)) nearest = { i, d }
+  })
+  return nearest ? nearest.i : null
+}
+
+// Décompte des marqueurs de la carte (2PTS / 3PTS hors lancers francs, LF à part)
+const shotCounts = (shots) => {
+  const field = shots.filter(s => !s.isFreeThrow)
+  return {
+    count: field.length,
+    made2: field.filter(s => !shotIsThree(s) && s.made).length,
+    total2: field.filter(s => !shotIsThree(s)).length,
+    made3: field.filter(s => shotIsThree(s) && s.made).length,
+    total3: field.filter(s => shotIsThree(s)).length,
+    madeFT: shots.filter(s => s.isFreeThrow && s.made).length,
+    totalFT: shots.filter(s => s.isFreeThrow).length
+  }
+}
+
+// Séries recalculées depuis la carte, même règle que getStreaks (useStats) : un raté remet à zéro.
+// Ordre : par quart-temps, puis ordre d'enregistrement (un tir ajouté après coup arrive en fin de son quart-temps)
+const shotStreaks = (shots) => {
+  let current = 0, bestStreak = 0, points = 0, bestPointsStreak = 0
+  const ordered = [...shots].sort((a, b) => (a.quarter || 0) - (b.quarter || 0))
+  for (const s of ordered) {
+    if (s.made) {
+      current++
+      points += s.isFreeThrow ? 1 : shotIsThree(s) ? 3 : 2
+      bestStreak = Math.max(bestStreak, current)
+      bestPointsStreak = Math.max(bestPointsStreak, points)
+    } else {
+      current = 0
+      points = 0
+    }
+  }
+  return { bestStreak, bestPointsStreak }
+}
 
 export default function MatchHistory({
   history,
@@ -11,6 +110,7 @@ export default function MatchHistory({
   onDelete,
   onEditOpponent,
   onEditScore,
+  onEditStats,
   onAddPhoto,
   onShare,
   onExportPDF
@@ -18,6 +118,213 @@ export default function MatchHistory({
   const [selectedMatchId, setSelectedMatchId] = useState('all') // 'all' or match id
   const [compareMatchId, setCompareMatchId] = useState(null)
   const [showReplay, setShowReplay] = useState(false)
+  const [editMatch, setEditMatch] = useState(null)
+  const [editValues, setEditValues] = useState({})
+  const [editPM, setEditPM] = useState('0')
+  const [editQuarters, setEditQuarters] = useState([])
+  const [editShots, setEditShots] = useState([])
+  const [selectedShot, setSelectedShot] = useState(null) // index dans editShots
+
+  const openEditStats = (match) => {
+    const values = {}
+    EDIT_FIELDS.forEach(([key]) => { values[key] = String(match.stats?.[key] ?? 0) })
+    setEditValues(values)
+    setEditPM(String(match.plusMinus || 0))
+    setEditQuarters((match.quarterStats || []).map(quarterToValues))
+    setEditShots(match.shotMarkers || [])
+    setSelectedShot(null)
+    setEditMatch(match)
+  }
+
+  const setQuarterValue = (index, key, value) => {
+    setEditQuarters(prev => prev.map((q, i) => i === index ? { ...q, [key]: value } : q))
+  }
+
+  // Remplit PTS et tirs réussis/tentés de chaque quart-temps d'après les marqueurs de la carte (LF = 1 pt, hors tirs)
+  const recalcQuarters = () => {
+    setEditQuarters(prev => prev.map((q, i) => {
+      const shots = editShots.filter(s => s.quarter === editMatch.quarterStats[i].quarter)
+      const field = shots.filter(s => !s.isFreeThrow)
+      const points = shots.reduce((sum, s) => sum + (!s.made ? 0 : s.isFreeThrow ? 1 : shotIsThree(s) ? 3 : 2), 0)
+      return { ...q, points: String(points), fgMade: String(field.filter(s => s.made).length), fgAtt: String(field.length) }
+    }))
+  }
+
+  // Remplit les totaux 2PTS, 3PTS et LF (réussis/tentés) d'après les marqueurs de la carte
+  const recalcTotals = () => {
+    const c = shotCounts(editShots)
+    setEditValues(v => ({
+      ...v,
+      fg2Made: String(c.made2), fg2Attempted: String(c.total2),
+      fg3Made: String(c.made3), fg3Attempted: String(c.total3),
+      ftMade: String(c.madeFT), ftAttempted: String(c.totalFT)
+    }))
+  }
+
+  const editTotals = quarterTotals(editValues)
+  const editShotCounts = shotCounts(editShots)
+  const shotsChanged = !!editMatch && JSON.stringify(editShots) !== JSON.stringify(editMatch.shotMarkers || [])
+  const editStreaks = shotStreaks(editShots)
+
+  const courtRef = useRef(null)
+  const dragRef = useRef(null) // tir saisi au dernier appui : { index, dx, dy, startX, startY, active, moving }
+  const shotsRef = useRef(editShots)
+  shotsRef.current = editShots
+
+  // Un doigt posé sur un tir ne doit pas faire défiler la fenêtre (écouteur non passif, impossible via onTouchStart)
+  useEffect(() => {
+    const el = courtRef.current
+    if (!el) return
+    const onTouchStart = (ev) => {
+      const { x, y } = courtPoint(el, ev.touches[0].clientX, ev.touches[0].clientY)
+      if (nearestShot(shotsRef.current, x, y) !== null) ev.preventDefault()
+    }
+    el.addEventListener('touchstart', onTouchStart, { passive: false })
+    return () => el.removeEventListener('touchstart', onTouchStart)
+  }, [editMatch])
+
+  // Appui sur un tir : sélection, puis déplacement si le doigt glisse
+  const handleCourtDown = (e) => {
+    const { x, y } = courtPoint(e.currentTarget, e.clientX, e.clientY)
+    const index = nearestShot(editShots, x, y)
+    if (index === null) { dragRef.current = null; return }
+    setSelectedShot(index)
+    dragRef.current = { index, dx: editShots[index].x - x, dy: editShots[index].y - y, startX: x, startY: y, active: true, moving: false }
+    e.currentTarget.setPointerCapture(e.pointerId)
+  }
+
+  const handleCourtMove = (e) => {
+    const d = dragRef.current
+    if (!d || !d.active) return
+    const { x, y } = courtPoint(e.currentTarget, e.clientX, e.clientY)
+    if (!d.moving && Math.hypot(x - d.startX, y - d.startY) < 6) return
+    d.moving = true
+    const nx = Math.min(500, Math.max(0, x + d.dx))
+    const ny = Math.min(470, Math.max(0, y + d.dy))
+    setEditShots(prev => prev.map((s, i) => {
+      if (i !== d.index) return s
+      // Le type suit la zone seulement quand le tir franchit la ligne à 3 points
+      const three = isThreeZone(nx, ny)
+      const crossed = isThreeZone(s.x, s.y) !== three
+      return { ...s, x: nx, y: ny, ...(crossed ? { isThree: three, type: three ? '3pts' : '2pts' } : {}) }
+    }))
+  }
+
+  const handleCourtUp = () => {
+    if (dragRef.current) dragRef.current.active = false
+  }
+
+  // Toucher le terrain vide ajoute un tir (un appui sur un tir est géré par handleCourtDown)
+  const handleCourtTap = (e) => {
+    if (dragRef.current) { dragRef.current = null; return }
+    const { x, y } = courtPoint(e.currentTarget, e.clientX, e.clientY)
+    const isThree = isThreeZone(x, y)
+    const quarter = selectedShot !== null ? editShots[selectedShot].quarter : 1
+    setSelectedShot(editShots.length)
+    setEditShots(prev => [...prev, { id: Date.now(), x, y, isThree, type: isThree ? '3pts' : '2pts', made: true, quarter, timeLeft: 0 }])
+  }
+
+  // Même marqueur que pendant un match : posé sur la ligne des lancers francs
+  const addFreeThrow = () => {
+    const quarter = selectedShot !== null ? editShots[selectedShot].quarter : 1
+    setSelectedShot(editShots.length)
+    setEditShots(prev => [...prev, {
+      id: Date.now(),
+      x: 250 + (Math.random() - 0.5) * 20,
+      y: 190 + (Math.random() - 0.5) * 10,
+      made: true,
+      isThreePointer: false,
+      isFreeThrow: true,
+      quarter
+    }])
+  }
+
+  const updateShot = (patch) => {
+    setEditShots(prev => prev.map((s, i) => i === selectedShot ? { ...s, ...patch } : s))
+  }
+
+  const deleteShot = () => {
+    setEditShots(prev => prev.filter((_, i) => i !== selectedShot))
+    setSelectedShot(null)
+  }
+
+  const saveEditStats = () => {
+    const stats = {}
+    for (const [key, label] of EDIT_FIELDS) {
+      const n = parseInt(editValues[key], 10)
+      if (isNaN(n) || n < 0) { alert(`Valeur invalide : ${label}`); return }
+      stats[key] = n
+    }
+    for (const [made, att, label] of [['fg2Made', 'fg2Attempted', '2PTS'], ['fg3Made', 'fg3Attempted', '3PTS'], ['ftMade', 'ftAttempted', 'LF']]) {
+      if (stats[made] > stats[att]) { alert(`${label} : plus de réussis que de tentés`); return }
+    }
+    const plusMinus = parseInt(editPM, 10)
+    if (isNaN(plusMinus)) { alert('Valeur invalide : +/-'); return }
+
+    const oldQuarters = editMatch.quarterStats || []
+    const quarters = []
+    for (let i = 0; i < editQuarters.length; i++) {
+      const q = {}
+      for (const [key, label] of QUARTER_FIELDS) {
+        const n = parseInt(editQuarters[i][key], 10)
+        if (isNaN(n) || n < 0) { alert(`Valeur invalide : Q${oldQuarters[i].quarter} ${label}`); return }
+        q[key] = n
+      }
+      if (q.fgMade > q.fgAtt) { alert(`Q${oldQuarters[i].quarter} : plus de tirs réussis que de tentés`); return }
+      quarters.push(q)
+    }
+
+    const changes = EDIT_FIELDS
+      .filter(([key]) => stats[key] !== (editMatch.stats?.[key] ?? 0))
+      .map(([key, label]) => `${label} : ${editMatch.stats?.[key] ?? 0} → ${stats[key]}`)
+    if (plusMinus !== (editMatch.plusMinus || 0)) changes.push(`+/- : ${editMatch.plusMinus || 0} → ${plusMinus}`)
+    quarters.forEach((q, i) => {
+      const before = quarterToValues(oldQuarters[i])
+      QUARTER_FIELDS.forEach(([key, label]) => {
+        if (String(q[key]) !== before[key]) changes.push(`Q${oldQuarters[i].quarter} ${label} : ${before[key]} → ${q[key]}`)
+      })
+    })
+    if (shotsChanged) {
+      const b = shotCounts(editMatch.shotMarkers || [])
+      const a = editShotCounts
+      const parts = [['2PTS', 'made2', 'total2'], ['3PTS', 'made3', 'total3'], ['LF', 'madeFT', 'totalFT']]
+        .filter(([, m, t]) => b[m] !== a[m] || b[t] !== a[t])
+        .map(([label, m, t]) => `${label} ${b[m]}/${b[t]} → ${a[m]}/${a[t]}`)
+      changes.push(parts.length === 0 ? 'Carte des tirs : tirs modifiés' : `Carte des tirs : ${parts.join(', ')}`)
+      const old = editMatch.streaks || {}
+      if ((old.bestStreak || 0) !== editStreaks.bestStreak || (old.bestPointsStreak || 0) !== editStreaks.bestPointsStreak) {
+        changes.push(`Meilleure série : ${old.bestStreak || 0} tirs / ${old.bestPointsStreak || 0} pts → ${editStreaks.bestStreak} tirs / ${editStreaks.bestPointsStreak} pts`)
+      }
+    }
+    if (changes.length === 0) { setEditMatch(null); return }
+
+    const totals = quarterTotals(stats)
+    const gaps = quarters.length === 0 ? [] : QUARTER_FIELDS
+      .map(([key, label]) => [label, quarters.reduce((sum, q) => sum + q[key], 0), totals[key]])
+      .filter(([, sum, total]) => sum !== total)
+      .map(([label, sum, total]) => `${label} : ${sum} par quart-temps, ${total} au total`)
+    let warning = gaps.length > 0 ? `\n\n⚠️ Quart-temps différents des totaux :\n${gaps.join('\n')}` : ''
+    const shotGaps = editShots.length === 0 ? [] : [
+      ['2PTS', editShotCounts.made2, editShotCounts.total2, stats.fg2Made, stats.fg2Attempted],
+      ['3PTS', editShotCounts.made3, editShotCounts.total3, stats.fg3Made, stats.fg3Attempted],
+      ['LF', editShotCounts.madeFT, editShotCounts.totalFT, stats.ftMade, stats.ftAttempted]
+    ].filter(([, m, t, sm, st]) => m !== sm || t !== st)
+      .map(([label, m, t, sm, st]) => `${label} : ${m}/${t} sur la carte, ${sm}/${st} au total`)
+    if (shotGaps.length > 0) warning += `\n\n⚠️ Carte des tirs différente des totaux :\n${shotGaps.join('\n')}`
+
+    if (confirm(`Modifier ce match ?\n\n${changes.join('\n')}${warning}`)) {
+      const extra = { plusMinus }
+      if (quarters.length > 0) {
+        extra.quarterStats = quarters.map(({ fgMade, fgAtt, ...rest }, i) => ({ ...oldQuarters[i], ...rest, fg: `${fgMade}/${fgAtt}` }))
+      }
+      if (shotsChanged) {
+        extra.shotMarkers = editShots
+        extra.streaks = { ...editMatch.streaks, ...editStreaks }
+      }
+      onEditStats(editMatch.id, stats, extra)
+      setEditMatch(null)
+    }
+  }
 
   // Trend indicator: compare recent average vs global average
   const getTrend = (stat, recent, global) => {
@@ -639,6 +946,13 @@ export default function MatchHistory({
                   </button>
                   <button
                     className="edit-btn"
+                    onClick={(e) => { e.stopPropagation(); openEditStats(match); }}
+                    title="Modifier les stats"
+                  >
+                    🔢
+                  </button>
+                  <button
+                    className="edit-btn"
                     onClick={(e) => { e.stopPropagation(); onAddPhoto(match.id); }}
                     title={match.photo ? 'Changer la photo' : 'Ajouter une photo'}
                   >
@@ -713,6 +1027,176 @@ export default function MatchHistory({
           </div>
         )}
       </div>
+
+      {/* Modification des stats d'un match */}
+      {editMatch && (
+        <div className="edit-stats-overlay" onClick={() => setEditMatch(null)}>
+          <div className="edit-stats-box" onClick={e => e.stopPropagation()}>
+            <h3>🔢 Modifier les stats</h3>
+            <p className="edit-stats-sub">
+              {new Date(editMatch.date).toLocaleDateString('fr-FR')}{editMatch.opponent ? ` · vs ${editMatch.opponent}` : ''}
+            </p>
+            <div className="edit-stats-grid">
+              {EDIT_FIELDS.map(([key, label]) => (
+                <label key={key}>
+                  {label}
+                  <input
+                    type="number"
+                    inputMode="numeric"
+                    min="0"
+                    value={editValues[key]}
+                    onChange={e => setEditValues(v => ({ ...v, [key]: e.target.value }))}
+                  />
+                </label>
+              ))}
+              <label>
+                +/-
+                <span className="edit-pm">
+                  <input type="number" value={editPM} onChange={e => setEditPM(e.target.value)} />
+                  <button type="button" title="Changer le signe" onClick={() => setEditPM(v => String(-(parseInt(v, 10) || 0)))}>±</button>
+                </span>
+              </label>
+            </div>
+            {editQuarters.length > 0 && (
+              <>
+                <h4 className="edit-q-title">Par quart-temps</h4>
+                <div className="edit-q-grid" style={{ gridTemplateColumns: `auto repeat(${editQuarters.length}, 1fr) auto` }}>
+                  <span />
+                  {editMatch.quarterStats.map(q => <span key={q.quarter} className="edit-q-head">Q{q.quarter}</span>)}
+                  <span className="edit-q-head">Σ / total</span>
+                  {QUARTER_FIELDS.map(([key, label]) => {
+                    const sum = editQuarters.reduce((acc, q) => acc + (parseInt(q[key], 10) || 0), 0)
+                    return [
+                      <span key={key} className="edit-q-label">{label}</span>,
+                      ...editQuarters.map((q, i) => (
+                        <input
+                          key={`${key}-${i}`}
+                          type="number"
+                          inputMode="numeric"
+                          min="0"
+                          aria-label={`Q${editMatch.quarterStats[i].quarter} ${label}`}
+                          value={q[key]}
+                          onChange={e => setQuarterValue(i, key, e.target.value)}
+                        />
+                      )),
+                      <span key={`${key}-sum`} className={`edit-q-sum ${sum === editTotals[key] ? '' : 'edit-q-bad'}`}>{sum} / {editTotals[key]}</span>
+                    ]
+                  })}
+                </div>
+                <div className="edit-shot-row edit-q-recalc">
+                  <button type="button" onClick={recalcQuarters} disabled={editShots.length === 0}>
+                    ↻ Recalculer PTS et tirs depuis la carte
+                  </button>
+                </div>
+              </>
+            )}
+            <h4 className="edit-q-title">Carte des tirs</h4>
+            <p className="edit-stats-sub">Touche le terrain pour ajouter un tir, ou un tir pour le modifier ; fais-le glisser pour le déplacer. Les lancers francs se gèrent sous le terrain.</p>
+            <svg
+              ref={courtRef}
+              className="edit-court"
+              viewBox="0 0 500 470"
+              onClick={handleCourtTap}
+              onPointerDown={handleCourtDown}
+              onPointerMove={handleCourtMove}
+              onPointerUp={handleCourtUp}
+              onPointerCancel={handleCourtUp}
+            >
+              <rect x="0" y="0" width="500" height="470" fill="#c4893b" />
+              <rect x="170" y="0" width="160" height="190" fill="#1a4a8f" stroke="#fff" strokeWidth="3" />
+              <circle cx="250" cy="190" r="60" fill="none" stroke="#fff" strokeWidth="3" />
+              <line x1="30" y1="2" x2="30" y2="141" stroke="#fff" strokeWidth="4" />
+              <line x1="470" y1="2" x2="470" y2="141" stroke="#fff" strokeWidth="4" />
+              <path d="M 30 141 A 238 238 0 0 0 470 141" fill="none" stroke="#fff" strokeWidth="4" />
+              <rect x="2" y="2" width="496" height="466" fill="none" stroke="#fff" strokeWidth="4" />
+              <circle cx="250" cy="50" r="12" fill="none" stroke="#ff4500" strokeWidth="4" />
+              {editShots.map((shot, i) => (
+                <g key={i} className="edit-shot-marker">
+                  <circle
+                    cx={shot.x}
+                    cy={shot.y}
+                    r={i === selectedShot ? 19 : shot.isFreeThrow ? 10 : 14}
+                    fill={shot.made ? '#2ecc71' : '#e74c3c'}
+                    stroke={i === selectedShot ? '#111' : '#fff'}
+                    strokeWidth={i === selectedShot ? 5 : 3}
+                  />
+                  {!shot.isFreeThrow && (
+                    <text x={shot.x} y={shot.y + 5} textAnchor="middle" fill="#fff" fontSize="14" fontWeight="bold">
+                      {shotIsThree(shot) ? '3' : '2'}
+                    </text>
+                  )}
+                </g>
+              ))}
+            </svg>
+            <div className="edit-ft-row">
+              <span>Lancers francs :</span>
+              {editShots.map((shot, i) => !shot.isFreeThrow ? null : (
+                <button
+                  type="button"
+                  key={i}
+                  className={`edit-ft-chip ${shot.made ? 'made' : 'missed'} ${i === selectedShot ? 'selected' : ''}`}
+                  onClick={() => setSelectedShot(i)}
+                >
+                  {shot.made ? '✓' : '✗'} Q{shot.quarter}
+                </button>
+              ))}
+              <button type="button" className="edit-ft-chip" onClick={addFreeThrow}>+ LF</button>
+            </div>
+            <div className="edit-shot-counts">
+              <span className={`edit-q-sum ${editShotCounts.made2 === editTotals.fg2Made && editShotCounts.total2 === editTotals.fg2Att ? '' : 'edit-q-bad'}`}>
+                2PTS carte {editShotCounts.made2}/{editShotCounts.total2} · total {editTotals.fg2Made}/{editTotals.fg2Att}
+              </span>
+              <span className={`edit-q-sum ${editShotCounts.made3 === editTotals.fg3Made && editShotCounts.total3 === editTotals.fg3Att ? '' : 'edit-q-bad'}`}>
+                3PTS carte {editShotCounts.made3}/{editShotCounts.total3} · total {editTotals.fg3Made}/{editTotals.fg3Att}
+              </span>
+              <span className={`edit-q-sum ${editShotCounts.madeFT === editTotals.ftMade && editShotCounts.totalFT === editTotals.ftAtt ? '' : 'edit-q-bad'}`}>
+                LF carte {editShotCounts.madeFT}/{editShotCounts.totalFT} · total {editTotals.ftMade}/{editTotals.ftAtt}
+              </span>
+            </div>
+            <div className="edit-shot-row edit-q-recalc">
+              <button type="button" onClick={recalcTotals} disabled={editShots.length === 0}>
+                ↻ Recalculer les totaux 2PTS, 3PTS et LF depuis la carte
+              </button>
+            </div>
+            <div className="edit-shot-row edit-q-recalc">
+              <button type="button" className="active" onClick={() => { recalcTotals(); recalcQuarters() }} disabled={editShots.length === 0}>
+                ↻ Tout recalculer depuis la carte
+              </button>
+            </div>
+            {shotsChanged && (
+              <p className="edit-stats-sub edit-streaks">
+                Séries recalculées : {editStreaks.bestStreak} tirs d'affilée · {editStreaks.bestPointsStreak} pts d'affilée
+              </p>
+            )}
+            {selectedShot !== null && editShots[selectedShot] && (
+              <div className="edit-shot-panel">
+                <div className="edit-shot-row">
+                  <button type="button" className={editShots[selectedShot].made ? 'active' : ''} onClick={() => updateShot({ made: true })}>✓ Réussi</button>
+                  <button type="button" className={!editShots[selectedShot].made ? 'active' : ''} onClick={() => updateShot({ made: false })}>✗ Raté</button>
+                </div>
+                {!editShots[selectedShot].isFreeThrow && (
+                  <div className="edit-shot-row">
+                    <button type="button" className={!shotIsThree(editShots[selectedShot]) ? 'active' : ''} onClick={() => updateShot({ isThree: false, type: '2pts' })}>2PTS</button>
+                    <button type="button" className={shotIsThree(editShots[selectedShot]) ? 'active' : ''} onClick={() => updateShot({ isThree: true, type: '3pts' })}>3PTS</button>
+                  </div>
+                )}
+                <div className="edit-shot-row">
+                  {[1, 2, 3, 4].map(q => (
+                    <button type="button" key={q} className={editShots[selectedShot].quarter === q ? 'active' : ''} onClick={() => updateShot({ quarter: q })}>Q{q}</button>
+                  ))}
+                </div>
+                <div className="edit-shot-row">
+                  <button type="button" onClick={deleteShot}>🗑 Supprimer ce {editShots[selectedShot].isFreeThrow ? 'lancer franc' : 'tir'}</button>
+                </div>
+              </div>
+            )}
+            <div className="edit-stats-actions">
+              <button onClick={() => setEditMatch(null)}>Annuler</button>
+              <button className="edit-stats-save" onClick={saveEditStats}>Enregistrer</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Replay modal */}
       {showReplay && selectedMatch && (

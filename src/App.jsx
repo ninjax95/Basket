@@ -3356,6 +3356,250 @@ const styles = `
     border-color: #ff6b35;
   }
 
+  /* Modification des stats d'un match (Historique) */
+  .edit-stats-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .edit-stats-box {
+    background: var(--surface, #141b26);
+    color: var(--text, #eef2f8);
+    border: 1px solid var(--accent, #ff6b35);
+    border-radius: 16px;
+    width: 92%;
+    max-width: 420px;
+    max-height: 90vh;
+    overflow-y: auto;
+    /* sinon l'apparition du panneau d'un tir fait défiler la fenêtre sous le doigt */
+    overflow-anchor: none;
+    padding: 16px;
+  }
+
+  .edit-stats-box h3 {
+    margin: 0 0 4px;
+  }
+
+  .edit-stats-sub {
+    margin: 0 0 12px;
+    color: var(--muted, #8b97aa);
+    font-size: 0.9rem;
+  }
+
+  .edit-streaks {
+    margin: 6px 0 0;
+  }
+
+  .edit-stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 12px;
+  }
+
+  .edit-stats-grid label {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: 0.85rem;
+    color: var(--muted, #8b97aa);
+  }
+
+  .edit-stats-grid input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px;
+    font-size: 1.1rem;
+    border-radius: 8px;
+    border: 1px solid var(--border, rgba(255, 255, 255, 0.2));
+    background: var(--surface-2, #1b2432);
+    color: var(--text, #eef2f8);
+  }
+
+  .edit-pm {
+    display: flex;
+    gap: 6px;
+  }
+
+  .edit-pm button {
+    padding: 0 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border, rgba(255, 255, 255, 0.2));
+    background: var(--surface-2, #1b2432);
+    color: var(--text, #eef2f8);
+    font-size: 1.1rem;
+    cursor: pointer;
+  }
+
+  .edit-q-title {
+    margin: 16px 0 8px;
+  }
+
+  .edit-q-grid {
+    display: grid;
+    gap: 6px;
+    align-items: center;
+    font-size: 0.8rem;
+    color: var(--muted, #8b97aa);
+  }
+
+  .edit-q-grid input {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    padding: 6px 2px;
+    text-align: center;
+    font-size: 1rem;
+    border-radius: 6px;
+    border: 1px solid var(--border, rgba(255, 255, 255, 0.2));
+    background: var(--surface-2, #1b2432);
+    color: var(--text, #eef2f8);
+  }
+
+  .edit-q-head, .edit-q-sum {
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .edit-q-sum {
+    color: var(--good, #22c55e);
+  }
+
+  .edit-q-sum.edit-q-bad {
+    color: var(--bad, #f05252);
+    font-weight: 700;
+  }
+
+  .edit-court {
+    display: block;
+    width: 100%;
+    border-radius: 8px;
+    touch-action: manipulation;
+    cursor: pointer;
+  }
+
+  .edit-shot-marker {
+    pointer-events: none;
+  }
+
+  .edit-ft-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    font-size: 0.85rem;
+    color: var(--muted, #8b97aa);
+  }
+
+  .edit-ft-chip {
+    padding: 6px 10px;
+    border-radius: 999px;
+    border: 2px solid var(--border, rgba(255, 255, 255, 0.2));
+    background: var(--surface-2, #1b2432);
+    color: var(--text, #eef2f8);
+    font-size: 0.9rem;
+    cursor: pointer;
+  }
+
+  .edit-ft-chip.made {
+    background: #2ecc71;
+    color: #fff;
+  }
+
+  .edit-ft-chip.missed {
+    background: #e74c3c;
+    color: #fff;
+  }
+
+  .edit-ft-chip.selected {
+    border-color: var(--text, #eef2f8);
+    font-weight: 700;
+  }
+
+  .edit-shot-counts {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-top: 8px;
+    font-size: 0.85rem;
+  }
+
+  .edit-shot-counts .edit-q-sum {
+    text-align: left;
+  }
+
+  .edit-shot-panel {
+    margin-top: 8px;
+    padding: 8px;
+    border: 1px solid var(--border, rgba(255, 255, 255, 0.2));
+    border-radius: 10px;
+  }
+
+  .edit-shot-row {
+    display: flex;
+    gap: 6px;
+  }
+
+  .edit-q-recalc {
+    margin-top: 8px;
+  }
+
+  .edit-shot-row button:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+
+  .edit-shot-row + .edit-shot-row {
+    margin-top: 6px;
+  }
+
+  .edit-shot-row button {
+    flex: 1;
+    padding: 8px 4px;
+    border-radius: 8px;
+    border: 1px solid var(--border, rgba(255, 255, 255, 0.2));
+    background: var(--surface-2, #1b2432);
+    color: var(--text, #eef2f8);
+    font-size: 0.95rem;
+    cursor: pointer;
+  }
+
+  .edit-shot-row button.active {
+    background: var(--accent, #ff6b35);
+    border-color: var(--accent, #ff6b35);
+    color: #fff;
+    font-weight: 700;
+  }
+
+  .edit-stats-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 14px;
+  }
+
+  .edit-stats-actions button {
+    flex: 1;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid var(--border, rgba(255, 255, 255, 0.2));
+    background: var(--surface-2, #1b2432);
+    color: var(--text, #eef2f8);
+    font-size: 1rem;
+    cursor: pointer;
+  }
+
+  .edit-stats-actions .edit-stats-save {
+    background: var(--accent, #ff6b35);
+    border-color: var(--accent, #ff6b35);
+    color: #fff;
+    font-weight: 700;
+  }
+
   /* Shot Replay Styles */
   .replay-overlay {
     position: fixed;
@@ -7984,7 +8228,7 @@ export default function App() {
   const { stats, updateStat, resetStats, importStats, getSummary, getEfficiency, getStreaks, actionHistory, getStatsByQuarter, undoLastAction, deleteAction } = useStats()
   const { player, updatePlayer } = usePlayer()
   const timer = useTimer()
-  const { history, seasonHistory, season, setSeason, seasons, currentSeason, saveMatch, deleteMatch, updateMatchOpponent, updateMatchScore, updateMatchPhoto, clearHistory, importHistory, getAverages, getRecentAverages, getRecords, checkNewRecords } = useMatchHistory()
+  const { history, seasonHistory, season, setSeason, seasons, currentSeason, saveMatch, deleteMatch, updateMatchOpponent, updateMatchScore, updateMatchStats, updateMatchPhoto, clearHistory, importHistory, getAverages, getRecentAverages, getRecords, checkNewRecords } = useMatchHistory()
   const cloud = useCloud({ history, importHistory, player, updatePlayer })
   const playingTime = usePlayingTime()
 
@@ -9411,6 +9655,7 @@ export default function App() {
             onDelete={handleDeleteMatch}
             onEditOpponent={handleEditOpponent}
             onEditScore={handleEditScore}
+            onEditStats={updateMatchStats}
             onAddPhoto={handleAddPhoto}
             onShare={handleShareMatch}
             onExportPDF={handleExportPDF}
@@ -10059,6 +10304,39 @@ export default function App() {
                 <div className="help-item">
                   <span className="help-term">Zones</span>
                   <span className="help-def">Zones chaudes/froides selon ton % de réussite par zone</span>
+                </div>
+              </div>
+
+              <div className="help-section">
+                <h3>🔢 Modifier un match</h3>
+                <p className="help-text">Dans l'onglet Historique, le bouton 🔢 d'un match ouvre une fenêtre pour corriger ses stats. Rien n'est modifié avant « Enregistrer » : un message liste alors chaque changement et te demande de confirmer.</p>
+                <div className="help-item">
+                  <span className="help-term">Compteurs</span>
+                  <span className="help-def">2PTS, 3PTS, LF (réussis / tentés), rebonds, passes, interceptions, contres, fautes, pertes de balle. Les points et les pourcentages sont recalculés à l'enregistrement.</span>
+                </div>
+                <div className="help-item">
+                  <span className="help-term">+/-</span>
+                  <span className="help-def">Se corrige dans sa case ; le bouton ± change le signe.</span>
+                </div>
+                <div className="help-item">
+                  <span className="help-term">Par quart-temps</span>
+                  <span className="help-def">Tableau Q1 à Q4. La colonne « Σ / total » compare la somme des quart-temps au total du match : vert si ça colle, rouge sinon. Absent des matchs enregistrés sans stats par quart-temps.</span>
+                </div>
+                <div className="help-item">
+                  <span className="help-term">Carte des tirs</span>
+                  <span className="help-def">Touche le terrain pour ajouter un tir. Touche un tir pour changer réussi / raté, 2PTS / 3PTS, son quart-temps, ou le supprimer. Fais-le glisser pour le déplacer.</span>
+                </div>
+                <div className="help-item">
+                  <span className="help-term">Lancers francs</span>
+                  <span className="help-def">Sous le terrain : une pastille par lancer franc (✓ ou ✗ et son quart-temps), à toucher pour le modifier ou le supprimer. « + LF » en ajoute un.</span>
+                </div>
+                <div className="help-item">
+                  <span className="help-term">Carte / total</span>
+                  <span className="help-def">Sous le terrain, trois lignes comparent la carte aux totaux 2PTS, 3PTS et LF (vert ou rouge). Si la carte change, les meilleures séries sont recalculées.</span>
+                </div>
+                <div className="help-item">
+                  <span className="help-term">Tout recalculer</span>
+                  <span className="help-def">« Tout recalculer depuis la carte » remplit d'un coup les totaux 2PTS / 3PTS / LF et les points et tirs de chaque quart-temps d'après la carte. À utiliser une fois la carte corrigée.</span>
                 </div>
               </div>
             </div>

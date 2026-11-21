@@ -4,20 +4,20 @@
 
 ### Règles strictes d'isolation
 
-**Répertoire de base unique :** `/home/ninjax/claude/Idées applications/Score kaiji/`
+**Répertoire de base unique :** `/home/ninjax/claude/apps/Score kaiji/`
 
 **INTERDICTION FORMELLE de :**
-- Lire ou écrire des fichiers en dehors de `/home/ninjax/claude/Idées applications/Score kaiji/`
+- Lire ou écrire des fichiers en dehors de `/home/ninjax/claude/apps/Score kaiji/`
 - Utiliser `..` pour sortir du répertoire
 - Accéder aux sous-projets frères (Geolocalisation, Gestion des Charges, etc.)
-- Accéder au répertoire parent `/home/ninjax/claude/Idées applications/`
+- Accéder au répertoire parent `/home/ninjax/claude/apps/`
 - Accéder à d'autres projets (IT2Society, Mitra, RH, clients, etc.)
 - Faire des recherches Glob/Grep en dehors de ce répertoire
 
 ### Vérification obligatoire
 
 **AVANT toute opération de fichier (Read, Write, Edit, Glob, Grep), tu DOIS :**
-1. Vérifier que le chemin commence par `/home/ninjax/claude/Idées applications/Score kaiji/`
+1. Vérifier que le chemin commence par `/home/ninjax/claude/apps/Score kaiji/`
 2. Si le chemin sort de ce répertoire, **REFUSER** l'opération
 3. Demander confirmation explicite à l'utilisateur
 
@@ -32,7 +32,7 @@ Sans cette confirmation explicite, **REFUSE TOUTE OPÉRATION EXTERNE**.
 
 ## Session locale
 
-**Fichier de session :** `/home/ninjax/claude/Idées applications/Score kaiji/.SESSION.md`
+**Fichier de session :** `/home/ninjax/claude/apps/Score kaiji/.SESSION.md`
 - Ce fichier contient UNIQUEMENT le contexte de ce sous-projet
 - Ne mélange pas avec les sessions d'autres sous-projets ou projets
 
@@ -219,6 +219,7 @@ git add -A && git commit -m "message" && git push origin main
 - Stats détaillées par match
 - **Bouton ✎ pour modifier l'adversaire après sauvegarde**
 - **Bouton 🏆 pour modifier le score après sauvegarde**
+- **Bouton 🔢 pour modifier les stats après sauvegarde** (fenêtre : 13 compteurs, +/-, tableau par quart-temps avec colonne « Σ / total » et bouton « ↻ Recalculer PTS et tirs depuis la carte » ; carte des tirs — toucher le terrain ajoute un tir, toucher un tir permet de changer réussi/raté, 2PTS/3PTS, quart-temps ou de le supprimer, le faire glisser le déplace ; bouton « ↻ Recalculer les totaux 2PTS, 3PTS et LF depuis la carte » ; bouton « ↻ Tout recalculer depuis la carte » (totaux puis quart-temps) ; confirmation listant les changements et les écarts quart-temps / totaux et carte / totaux ; `summary`/`efficiency` recalculés, ainsi que `streaks` depuis les marqueurs (par quart-temps puis ordre d'enregistrement) quand la carte a été modifiée ; lancers francs : pastilles sous le terrain + bouton « + LF », même panneau sans le choix 2PTS/3PTS)
 - **Bouton 📷 pour attacher une photo au match**
 - Bouton × pour supprimer un match
 - Badges records personnels
@@ -321,7 +322,7 @@ git add -A && git commit -m "message" && git push origin main
 
 - `useMatchHistory()` :
   - history (liste des matchs)
-  - saveMatch(), deleteMatch(), **updateMatchOpponent()**, **updateMatchScore()**, **updateMatchPhoto()**
+  - saveMatch(), deleteMatch(), **updateMatchOpponent()**, **updateMatchScore()**, **updateMatchStats()**, **updateMatchPhoto()**
   - clearHistory(), importHistory()
   - **seasonHistory**, **season**, **setSeason()**, **seasons**, **currentSeason**
   - getAverages(), **getRecentAverages(n)**, getRecords(), checkNewRecords() — calculés sur la saison sélectionnée

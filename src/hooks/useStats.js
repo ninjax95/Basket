@@ -496,6 +496,61 @@ export function getSeason(date) {
   return `${y}/${y + 1}`
 }
 
+// Résumé et stats avancées déduits des compteurs bruts
+function computeMatchDerived(stats) {
+  const totalPoints = (stats.fg2Made * 2) + (stats.fg3Made * 3) + stats.ftMade
+  const totalRebounds = stats.offRebounds + stats.defRebounds
+  const fgMade = stats.fg2Made + stats.fg3Made
+  const fgAttempted = stats.fg2Attempted + stats.fg3Attempted
+
+  // Calculate efficiency metrics
+  const ftAttempted = stats.ftAttempted
+  const ftMade = stats.ftMade
+  const tsaDenominator = 2 * (fgAttempted + 0.44 * ftAttempted)
+  const trueShootingPct = tsaDenominator > 0 ? Math.round((totalPoints / tsaDenominator) * 1000) / 10 : 0
+
+  const gameScore = Math.round((totalPoints
+    + 0.4 * fgMade
+    - 0.7 * fgAttempted
+    - 0.4 * (ftAttempted - ftMade)
+    + 0.7 * stats.offRebounds
+    + 0.3 * stats.defRebounds
+    + stats.steals
+    + 0.7 * stats.assists
+    + 0.7 * stats.blocks
+    - 0.4 * stats.fouls
+    - stats.turnovers) * 10) / 10
+
+  // PER (Player Efficiency Rating) - Version simplifiée
+  const missedFG = fgAttempted - fgMade
+  const missedFT = ftAttempted - ftMade
+  const positiveActions = totalPoints + totalRebounds + stats.assists + stats.steals + stats.blocks
+  const negativeActions = missedFG + missedFT + stats.turnovers
+  const totalActions = fgAttempted + ftAttempted + totalRebounds + stats.assists + stats.steals + stats.blocks + stats.turnovers
+  const perRaw = totalActions > 0 ? ((positiveActions - negativeActions) / totalActions) * 30 : 0
+  const per = Math.round(Math.max(0, perRaw) * 10) / 10
+
+  // Usage Rate (USG%)
+  const offensiveUsage = fgAttempted + 0.44 * ftAttempted + stats.turnovers
+  const estimatedPossessions = offensiveUsage + stats.assists
+  const usageRate = estimatedPossessions > 0 ? Math.round((offensiveUsage / estimatedPossessions) * 100) : 0
+
+  return {
+    summary: {
+      points: totalPoints,
+      rebounds: totalRebounds,
+      assists: stats.assists,
+      steals: stats.steals,
+      blocks: stats.blocks,
+      fouls: stats.fouls,
+      turnovers: stats.turnovers,
+      fgPercentage: fgAttempted > 0 ? Math.round((fgMade / fgAttempted) * 100) : 0,
+      ftPercentage: stats.ftAttempted > 0 ? Math.round((stats.ftMade / stats.ftAttempted) * 100) : 0
+    },
+    efficiency: { trueShootingPct, gameScore, per, usageRate }
+  }
+}
+
 export function useMatchHistory() {
   const [history, setHistory] = useState(() => {
     const saved = localStorage.getItem('basketMatchHistory')
@@ -513,43 +568,6 @@ export function useMatchHistory() {
   const seasonHistory = history.filter(m => getSeason(m.date) === season)
 
   const saveMatch = (player, stats, opponent = '', shotMarkers = [], score = null, location = 'home', plusMinus = 0, notes = null, matchStreaks = null, quarterStats = null, playingTimeData = null) => {
-    const totalPoints = (stats.fg2Made * 2) + (stats.fg3Made * 3) + stats.ftMade
-    const totalRebounds = stats.offRebounds + stats.defRebounds
-    const fgMade = stats.fg2Made + stats.fg3Made
-    const fgAttempted = stats.fg2Attempted + stats.fg3Attempted
-
-    // Calculate efficiency metrics
-    const ftAttempted = stats.ftAttempted
-    const ftMade = stats.ftMade
-    const tsaDenominator = 2 * (fgAttempted + 0.44 * ftAttempted)
-    const trueShootingPct = tsaDenominator > 0 ? Math.round((totalPoints / tsaDenominator) * 1000) / 10 : 0
-
-    const gameScore = Math.round((totalPoints
-      + 0.4 * fgMade
-      - 0.7 * fgAttempted
-      - 0.4 * (ftAttempted - ftMade)
-      + 0.7 * stats.offRebounds
-      + 0.3 * stats.defRebounds
-      + stats.steals
-      + 0.7 * stats.assists
-      + 0.7 * stats.blocks
-      - 0.4 * stats.fouls
-      - stats.turnovers) * 10) / 10
-
-    // PER (Player Efficiency Rating) - Version simplifiée
-    const missedFG = fgAttempted - fgMade
-    const missedFT = ftAttempted - ftMade
-    const positiveActions = totalPoints + totalRebounds + stats.assists + stats.steals + stats.blocks
-    const negativeActions = missedFG + missedFT + stats.turnovers
-    const totalActions = fgAttempted + ftAttempted + totalRebounds + stats.assists + stats.steals + stats.blocks + stats.turnovers
-    const perRaw = totalActions > 0 ? ((positiveActions - negativeActions) / totalActions) * 30 : 0
-    const per = Math.round(Math.max(0, perRaw) * 10) / 10
-
-    // Usage Rate (USG%)
-    const offensiveUsage = fgAttempted + 0.44 * ftAttempted + stats.turnovers
-    const estimatedPossessions = offensiveUsage + stats.assists
-    const usageRate = estimatedPossessions > 0 ? Math.round((offensiveUsage / estimatedPossessions) * 100) : 0
-
     const match = {
       id: Date.now(),
       date: new Date().toISOString(),
@@ -560,23 +578,7 @@ export function useMatchHistory() {
       plusMinus,  // +/- differential when on court
       stats: { ...stats },
       shotMarkers: [...shotMarkers],  // Save shot positions
-      summary: {
-        points: totalPoints,
-        rebounds: totalRebounds,
-        assists: stats.assists,
-        steals: stats.steals,
-        blocks: stats.blocks,
-        fouls: stats.fouls,
-        turnovers: stats.turnovers,
-        fgPercentage: fgAttempted > 0 ? Math.round((fgMade / fgAttempted) * 100) : 0,
-        ftPercentage: stats.ftAttempted > 0 ? Math.round((stats.ftMade / stats.ftAttempted) * 100) : 0
-      },
-      efficiency: {
-        trueShootingPct,
-        gameScore,
-        per,
-        usageRate
-      },
+      ...computeMatchDerived(stats),
       notes: notes || null,  // { strengths: '', improvements: '' }
       streaks: matchStreaks || null,  // { bestStreak, bestPointsStreak }
       quarterStats: quarterStats || null,  // Stats par quart-temps
@@ -601,6 +603,15 @@ export function useMatchHistory() {
     setHistory(prev => prev.map(m =>
       m.id === matchId ? { ...m, score: newScore } : m
     ))
+  }
+
+  // extra : champs du match corrigés en même temps ({ plusMinus, quarterStats })
+  const updateMatchStats = (matchId, newStats, extra = {}) => {
+    setHistory(prev => prev.map(m => {
+      if (m.id !== matchId) return m
+      const stats = { ...m.stats, ...newStats }
+      return { ...m, ...extra, stats, ...computeMatchDerived(stats) }
+    }))
   }
 
   const updateMatchPhoto = (matchId, photoData) => {
@@ -736,5 +747,5 @@ export function useMatchHistory() {
     }
   }
 
-  return { history, seasonHistory, season, setSeason, seasons, currentSeason, saveMatch, deleteMatch, updateMatchOpponent, updateMatchScore, updateMatchPhoto, clearHistory, importHistory, getAverages, getRecentAverages, getRecords, checkNewRecords }
+  return { history, seasonHistory, season, setSeason, seasons, currentSeason, saveMatch, deleteMatch, updateMatchOpponent, updateMatchScore, updateMatchStats, updateMatchPhoto, clearHistory, importHistory, getAverages, getRecentAverages, getRecords, checkNewRecords }
 }
