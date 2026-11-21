@@ -388,7 +388,9 @@ git add -A && git commit -m "message" && git push origin main
     improvements      // À améliorer
   },
   quarterStats: [{    // Stats par quart-temps
-    quarter, points, rebounds, assists, steals, blocks, fouls, turnovers, fg
+    quarter, points, rebounds, assists, steals, blocks, fouls, turnovers,
+    fgMade, fgAttempted,  // depuis la 1.10 ; fg = "réussis/tentés". Avant : pas de fgAttempted et fg = "réussis/ratés" → lire via quarterFg(q) (MatchHistory.jsx)
+    fg
   }],
   playingTime: {      // Temps de jeu
     onCourt,          // secondes sur le terrain

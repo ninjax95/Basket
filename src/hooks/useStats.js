@@ -177,7 +177,11 @@ export function useStats() {
     })
 
     // Calculate points for each quarter
-    return Object.entries(quarterStats).map(([q, s]) => ({
+    // Dans l'historique des actions, fgXAttempted = tir raté (un tir réussi n'enregistre pas d'action « tenté »)
+    return Object.entries(quarterStats).map(([q, s]) => {
+      const fgMade = s.fg2Made + s.fg3Made
+      const fgAttempted = fgMade + s.fg2Attempted + s.fg3Attempted
+      return {
       quarter: parseInt(q),
       points: (s.fg2Made * 2) + (s.fg3Made * 3) + s.ftMade,
       rebounds: s.offRebounds + s.defRebounds,
@@ -186,8 +190,11 @@ export function useStats() {
       blocks: s.blocks,
       fouls: s.fouls,
       turnovers: s.turnovers,
-      fg: `${s.fg2Made + s.fg3Made}/${s.fg2Attempted + s.fg3Attempted}`
-    }))
+      fgMade,
+      fgAttempted,
+      fg: `${fgMade}/${fgAttempted}`
+      }
+    })
   }
 
   const undoLastAction = () => {

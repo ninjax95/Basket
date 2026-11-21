@@ -18,9 +18,16 @@ const QUARTER_FIELDS = [
   ['blocks', 'CTR'], ['fouls', 'FTE'], ['turnovers', 'PDB']
 ]
 
+// Tirs réussis / tentés d'un quart-temps. Avant la 1.10, fg valait « réussis/ratés » (sans fgAttempted)
+const quarterFg = (q) => {
+  if (q.fgAttempted !== undefined) return { made: q.fgMade || 0, att: q.fgAttempted || 0 }
+  const [a, b] = String(q.fg || '0/0').split('/').map(n => parseInt(n, 10) || 0)
+  return { made: a, att: a + b }
+}
+
 const quarterToValues = (q) => {
-  const [fgMade, fgAtt] = String(q.fg || '0/0').split('/')
-  const values = { fgMade: String(parseInt(fgMade, 10) || 0), fgAtt: String(parseInt(fgAtt, 10) || 0) }
+  const fg = quarterFg(q)
+  const values = { fgMade: String(fg.made), fgAtt: String(fg.att) }
   QUARTER_FIELDS.forEach(([key]) => { if (!(key in values)) values[key] = String(q[key] ?? 0) })
   return values
 }
@@ -315,7 +322,7 @@ export default function MatchHistory({
     if (confirm(`Modifier ce match ?\n\n${changes.join('\n')}${warning}`)) {
       const extra = { plusMinus }
       if (quarters.length > 0) {
-        extra.quarterStats = quarters.map(({ fgMade, fgAtt, ...rest }, i) => ({ ...oldQuarters[i], ...rest, fg: `${fgMade}/${fgAtt}` }))
+        extra.quarterStats = quarters.map(({ fgMade, fgAtt, ...rest }, i) => ({ ...oldQuarters[i], ...rest, fgMade, fgAttempted: fgAtt, fg: `${fgMade}/${fgAtt}` }))
       }
       if (shotsChanged) {
         extra.shotMarkers = editShots
@@ -699,7 +706,7 @@ export default function MatchHistory({
                   <div key={q.quarter} className="quarter-stat-card">
                     <span className="qs-quarter">Q{q.quarter}</span>
                     <span className="qs-points">{q.points} pts</span>
-                    <span className="qs-detail">{q.fg} FG</span>
+                    <span className="qs-detail">{quarterFg(q).made}/{quarterFg(q).att} FG</span>
                     <span className="qs-detail">{q.rebounds} reb</span>
                     <span className="qs-detail">{q.assists} ast</span>
                   </div>
