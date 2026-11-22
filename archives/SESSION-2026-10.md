@@ -1,0 +1,114 @@
+# Archive de session — 3 au 18 octobre 2026
+
+Points 1 à 20 de `.SESSION.md`, déplacés tels quels le 22 novembre 2026 (fichier de session trop long).
+
+1. **Saisons** — `getSeason(date)` (1er août → 31 juillet), sélecteur « Saison » (Historique, Analyse),
+   moyennes/records/graphiques par saison. Archive non destructive. Titre = saison en cours.
+2. **Sécurité GitHub** — remote nettoyé (token en clair retiré), push via `gh auth setup-git`,
+   token OAuth `gho_` de `~/.git-credentials` révoqué + fichier supprimé.
+3. **Dépendances** — React 19.3, Vite 8.3, plugin-react 6, vite-plugin-pwa 2, Capacitor 8.5, Recharts 3.10.
+4. **Design / ergonomie match** — barre d'onglets en bas, scoreboard collant (QT, chrono, LIVE, score
+   NOUS/EUX + écart, ligne joueur), panneau TIRS ✓/✗ (2PTS, 3PTS, LF), tuiles ACTIONS (tap = +1, − en coin),
+   effets `fx()` (bulles, confettis 3PTS, tremblement sur raté, bandeau EN FEU ≥3 tirs d'affilée).
+5. **16 thèmes** (Options > Apparence) — Classique (défaut, couleurs d'origine), Broadcast, Clair, Cartoon,
+   Minimal, Néon, Rétro 80s, Arcade 8-bit, Playground, Tableau du coach, Parquet, Journal sportif,
+   Violet & Or, Vert & Blanc, Rouge & Noir, Océan.
+6. **APK** — JDK 21 + SDK Android dans `~/Android` (sans sudo), projet migré Capacitor 8 (SDK 36),
+   APK reconstruite à chaque livraison, installée sur le Fold.
+7. **Correctifs** — total PTS en match vide ; boutons − géants sur tactile (`pointer: coarse`) ;
+   PWA bloquée sur l'ancienne version (auto-reload) ; Replay : 3PTS et LF comptés en 2PTS
+   (`isThree` vs `isThreePointer`, marqueurs `isFreeThrow`) + stats par QT et match.
+
+8. **Onglet AS** (6 oct.) — pour les séances d'AS de l'école du fils : compteur de points (−1/+1/+2/+3),
+   « Enregistrer la séance », liste datée + séances/total/moyenne/record. Clés `basketAsSessions`,
+   `basketAsCurrent`. Réutilise les classes `.training-*` (thèmes OK). Libellé onglet « Historique » → « Histo. »
+   (6 onglets collaient). Testé Playwright (Pixel 7). Poussé (`6fc3ebb`) + APK rebuild (`599c1b0`).
+
+9. **Fix APK Fold Z7** (6 oct.) — barre d'état Android par-dessus l'en-tête (plein écran forcé SDK 36) :
+   `env(safe-area-inset-top)` ajouté au padding de `body` et au `top` des éléments collants
+   (`.match-header-compact`, `.match-body-court`). Pas d'émulateur dispo (`~/Android/Sdk/emulator` absent) :
+   1er essai KO sur le Fold (env() = 0 dans le WebView) → ajout de `var(--safe-area-inset-top)` injecté par
+   Capacitor `SystemBars` : `max(env(...), var(--safe-area-inset-top, 0px))`. 2e capture toujours identique au pixel près → le Fold
+   fait sans doute tourner l'ancienne APK (cache GitHub raw ~5 min ou ancien fichier téléchargé). CSS vérifié OK
+   en simulant la variable. APK passée en `versionCode 2` / `versionName "1.1"` pour vérifier la version
+   installée (Paramètres > Applications). 1.1 toujours KO → **APK 1.2 : correction native** (MainActivity pose
+   le padding des barres système, Capacitor SystemBars `insetsHandling: "disable"`, `style: "DARK"`).
+   Émulateur Android 16 installé (AVD `Test36`) : 1.2 OK (barre d'état sombre, titre dessous, nav au-dessus
+   des boutons). L'ancienne 1.1 était déjà OK sur l'émulateur → bug propre au WebView Samsung. ✅ Validé sur le Fold Z7 (6 oct.).
+
+10. **QT dans le bandeau** (10 oct.) — badge `Q1 ›` du scoreboard = bouton : confirm « Passer au Q2 ? » puis
+    `handleNextQuarter()` (partagé avec le Timer : prompt terrain/banc + push Gist). Désactivé au Q4. Testé Playwright.
+    Avant : `App.jsx` local écrasé par kDrive (version du 4 oct.) → restauré via `git checkout` (copie dans scratchpad).
+    Poussé (`1c155c1`) + APK 1.3 (versionCode 4). Sync web ≠ mobile : réglé côté utilisateur.
+
+11. **Version affichée** (10 oct.) — bas de l'onglet Options : « Version 1.4 · date du build », web + APK.
+    Source unique = `versionName` de `android/app/build.gradle`, lue par `vite.config.js` (`__APP_VERSION__`).
+    APK 1.4 (versionCode 5), release GitHub `v1.4`. Lien APK fixe via Releases (`latest/download`).
+    QT dans le bandeau : OK sur émulateur avec l'APK 1.3, KO signalé sur le Fold → probablement ancienne APK,
+    à revérifier avec la version affichée.
+
+12. **Onglet AS retiré** (10 oct., demande utilisateur) — reverse du commit `6fc3ebb` sur App.jsx (libellé
+    « Historique » rétabli, 5 onglets). Données `basketAsSessions`/`basketAsCurrent` laissées dans le localStorage
+    (pas effacées). APK 1.5 (versionCode 6), release `v1.5`.
+
+13. **5 idées** (10 oct., APK 1.6) — écran allumé chrono en marche (keep-awake, vérifié `KEEP_SCREEN_ON` émulateur),
+    sync auto à l'ouverture (testé avec Gist simulé), badges (18, section Analyse + alerte à la sauvegarde),
+    par adversaire (tableau Analyse), bilan de saison (image partageable). Testé Playwright avec faux historique.
+    Prochain sujet : **publication Play Store + multi-joueurs** (voir Idées).
+
+14. **Projet Store + comptes** (11 oct., en discussion) — utilisateur veut publier sur le Play Store, avec des
+    utilisateurs inconnus = comptes email, base de données gratuite. Proposé : **Firebase Spark** (Auth email +
+    Firestore, cache hors-ligne) ; photos en base64 dans Firestore (Cloud Storage exige Blaze depuis fév. 2026).
+    Supabase écarté : projet gratuit mis en pause après 7 j d'inactivité, pas d'offline natif.
+    Modèle envisagé : users/{uid}/players/{pid}/matches/{mid}. **Décidé : Firebase.** Photos NON hébergées (restent locales).
+    Utilisateur réticent à créer un compte Google (console Firebase) → expliqué : utilisateurs finaux = n importe quel email ;
+    compte Google requis seulement pour le dev (et de toute façon pour la Play Console).
+    Compte dev multi-applis : « Ninjax Apps », Gmail dédié (PAS it2society.fr : domaine voué à disparaître).
+    Projet Firebase « Stats Basket » = `stats-basket-2517f` (Spark), Auth email/mdp activé, Firestore Standard créé.
+    **Monétisation visée à terme** → hébergement web à migrer de Vercel Hobby (usage commercial interdit) vers
+    Firebase Hosting (`stats-basket-2517f.web.app`, déploiement auto via GitHub Action). Attente : firebaseConfig.
+
+15. **Comptes Firebase** (11 oct.) — branche `comptes-firebase` (commit `962176c`), PAS encore sur main.
+    `src/firebase.js` (initializeAuth indexedDB + Firestore cache persistant), `src/hooks/useCloud.js` (auth, joueurs,
+    sync matchs bidirectionnelle par diff JSON stable, migration locale à la 1re connexion, logout, suppression compte),
+    `src/components/AuthScreen.jsx`. Gist retiré (CSS `.gist-*` réutilisé pour la section Compte). `firestore.rules`,
+    `firebase.json` (hosting dist + émulateurs), `.firebaserc`.
+    Testé avec émulateurs (`VITE_EMULATORS=1 npm run build` + `npx firebase-tools@14 emulators:start --only auth,firestore`,
+    JAVA_HOME jdk21) : migration, 2 appareils, multi-joueurs, suppression, renommage, logout, suppression compte,
+    règles (403 croisé), hors-ligne + reload hors-ligne. Tous OK.
+    Clé compte de service `deploy-statsbasket` → `.secrets/stats-basket-deploy.json` (choix utilisateur : dans kDrive ; `.secrets/` gitignoré) + secret GitHub.
+    Règles + hosting déployés (https://stats-basket-2517f.web.app). Testé en prod (web 2 appareils + APK émulateur),
+    comptes de test supprimés. Bug corrigé : nom saisi avant création du 1er joueur écrasé (playerRef).
+    Action GitHub `.github/workflows/firebase-deploy.yml` poussée (`61f5041`, scope gh `workflow` ajouté), 1er run OK. APK 1.7 publiée (release v1.7). **Reste** : test par l'utilisateur sur le Fold (migration de ses
+    matchs : se connecter d'abord sur l'appareil qui a l'historique complet), couper/rediriger Vercel ensuite.
+
+16. **Compte de l'utilisateur** (11 oct.) — compte app `jaxmaj@gmail.com` (uid `8Yo1mAWbShVOZGtKx0lKaqvgFcL2`) :
+    13 matchs importés depuis le Gist (18 janv. → 10 oct. 2026, sans photos) via firebase-admin + clé de service,
+    joueur renommé Kaiji #5. Gist laissé intact (archive). ✅ Validé par l'utilisateur (11 oct.).
+
+17. **Ancienne adresse Vercel** (11 oct.) — `vercel.json` + `vercel-redirect/` (index.html + sw.js « kill switch ») :
+    l'ancienne PWA en cache se désinstalle et renvoie vers stats-basket-2517f.web.app. Simulé Playwright OK.
+
+18. **Préparation Play Store** (11 oct., APK/AAB 1.8, versionCode 9) — nouvelle icône (ballon + barres, `store/icon.svg`,
+    icônes Android/PWA/splash régénérées), clé d'importation `.secrets/upload-keystore.jks` + signature release dans
+    `android/app/build.gradle`, `store/StatsBasket-1.8.aab` signé, pages `confidentialite.html` / `suppression-compte.html`
+    (lien Confidentialité en bas d'Options), compte de revue Google (12 matchs fictifs, identifiants dans `.secrets/`),
+    captures 1080×1920 + bannière 1024×500, guide complet `store/FICHE-PLAY-STORE.md`. Fix : « Q1 › » sur 2 lignes à 360 px.
+    **Reste (utilisateur)** : compte Play Console (25 $), créer l'app, remplir les formulaires, test fermé 12 testeurs/14 j.
+    Rapport final envoyé. Utilisateur bloqué en créant un nouveau compte Google (« numéro utilisé à de trop nombreuses
+    reprises ») → conseillé : retrouver les comptes liés au numéro (accounts.google.com/signin/usernamerecovery) ou
+    créer la Play Console directement avec `jaxmaj@gmail.com`.
+19. **Choix du compte Play Console — EN SUSPENS (11 oct.)** — inscription commencée avec `jaxmaj@gmail.com`
+    (écran « À propos de vous » ; texte d'expérience proposé, orienté « plusieurs applications à venir, dont payantes »).
+    Le compte servira à **plusieurs applis**. Personnel = test fermé 12 testeurs/14 j **pour chaque appli** →
+    utilisateur ne peut pas réunir 12 testeurs. Organisation = pas de test fermé mais D-U-N-S requis.
+    IT2Society : pas de D-U-N-S trouvé (outil dnb.com US-only ; en France = Altares https://www.altares.com/?p=119568
+    ou verif.com, gratuit, ≤ 30 j) et la société **va disparaître** → déconseillée.
+    Options présentées : (1) **micro-entreprise** (formalites.entreprises.gouv.fr) → D-U-N-S Altares → compte
+    organisation (~1-1,5 mois, recommandé, utile aussi pour encaisser) ; (2) compte personnel + testeurs d'entraide
+    (r/AndroidClosedTesting, Testers Community, payants ~10-20 €/appli ; un même Google Group réutilisable) ;
+    (3) rester hors Store (PWA + APK, paiement web via Stripe). **L'utilisateur décidera plus tard.**
+
+20. **Match Gist rattrapé** (18 oct.) — le téléphone avait encore une ancienne APK (≤ 1.4, onglet AS) qui synchronise sur le Gist.
+    Match Argenteuil du 18 oct. (id 1792331839346) copié du Gist vers Firebase (firebase-admin, `create`). Compte = 14 matchs.
+    APK 1.8 installée sur le téléphone (19 oct.), compte vérifié : 14 matchs, aucun doublon.
