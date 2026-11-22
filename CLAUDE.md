@@ -181,7 +181,7 @@ git add -A && git commit -m "message" && git push origin main
 - Choix du type de tir (2PTS, 3PTS, LF)
 
 ### Score en direct
-- Boutons +/- pour score équipe et adversaire
+- Boutons −, +1, +2, +3 pour score équipe et adversaire (grille 2×2 à côté du score ; en ligne sous le score si écran ≤ 480 px)
 - Calcul automatique du +/- personnel
 - Indicateur visuel victoire/défaite
 
@@ -248,13 +248,24 @@ git add -A && git commit -m "message" && git push origin main
 - Champ "Points forts" (ce qui a bien marché)
 - Champ "À améliorer" (axes de progression)
 
-### Thèmes (16, choix dans Options > Apparence)
-- Liste `SKINS` en haut d'App.jsx (id, nom, emoji, mode sombre/clair, couleurs de l'aperçu). Stocké dans `basketSkin`, défaut `classic`
+### Thèmes (17, choix dans Options > Apparence)
+- Liste `SKINS` en haut d'App.jsx (id, nom, emoji, mode sombre/clair, couleurs de l'aperçu). Stocké dans `basketSkin`, défaut `pulse` (1er de la liste). `basketSkinV2` : bascule unique des appareils existants vers Pulse au 1er lancement de la refonte
 - `body[data-skin]` = thème ; `body[data-theme]` = mode du thème (pilote les anciennes règles `[data-theme="light"]`)
 - CSS : MODERNISATION + BROADCAST = base commune (structure, tokens par défaut = thème Broadcast) ; bloc « THÈMES » en fin de `styles` = tokens + signatures par thème ; Cartoon = ses règles préfixées `body[data-skin="cartoon"]`
-- Thèmes : Classique (couleurs d'origine), Broadcast, Clair, Cartoon, Minimal, Néon, Rétro 80s, Arcade 8-bit, Playground, Tableau du coach, Parquet, Journal sportif, Violet & Or, Vert & Blanc, Rouge & Noir, Océan
-- Polices auto-hébergées (`@fontsource`, importées dans `main.jsx`) : Barlow Condensed, Bangers, Orbitron, Permanent Marker, Caveat, Press Start 2P, Playfair Display
+- Thèmes : Pulse (défaut depuis la refonte 2027), Classique (couleurs d'origine), Broadcast, Clair, Cartoon, Minimal, Néon, Rétro 80s, Arcade 8-bit, Playground, Tableau du coach, Parquet, Journal sportif, Violet & Or, Vert & Blanc, Rouge & Noir, Océan
+- Polices auto-hébergées (`@fontsource`, importées dans `main.jsx`) : Outfit (variable, `@fontsource-variable/outfit`, thème Pulse), Barlow Condensed, Bangers, Orbitron, Permanent Marker, Caveat, Press Start 2P, Playfair Display
 - Ajouter un thème : une entrée dans `SKINS` + un bloc `body[data-skin="id"] { --bg… }` dans la section THÈMES
+
+### Refonte 2027 (couche CSS « REFONTE 2027 », en fin de `styles`, après THÈMES)
+- **Structure commune à tous les thèmes** (sélecteurs `body[data-skin] #root …` = même poids que les règles de thème, pour primer sur elles) :
+  - navigation : icônes SVG (`NAV_ICONS` / `NavIcon` en haut d'App.jsx) à la place des emojis ; couleur de l'icône active ajustée par thème si la pastille est claire ou noire
+  - **≥ 1024 px : barre latérale** (`.nav-tabs` en colonne, `.nav-brand` en haut, `.nav-foot` avec joueur et aide en bas ; `.app-header` masqué, `--nav-h: 0`), conteneur 1320 px, Options sur 2 colonnes. Écran de connexion : marge de la barre annulée par `body:has(.auth-screen)`
+  - **≥ 1200 px : Historique sur deux colonnes** (`.history-page` en grille) : `.match-list` à gauche (collante, défile seule, cartes compactes), `.compare-view` et `.detailed-stats-section` à droite ; sur téléphone l'ordre reste filtre, détail, liste
+  - **≥ 1024 px : Entraînement sur deux colonnes** (`.training-page` en grille) : terrain à gauche, `.training-stats` (2×2) et `.training-reset` à droite
+  - libellé « Entraînement » : `.nav-short` (téléphone) / `.nav-long` (barre latérale)
+  - cartes de match de l'Historique : en-tête en ligne qui passe à la ligne, stats en grille de 6 colonnes sous 700 px
+  - mouvement : `rf-in` à l'arrivée d'un onglet et de ses sections, survol des cartes à la souris
+- **Thème Pulse** : tokens + signatures (halos animés `body::before`, liseré du bandeau animé via `.scoreboard:has(.sb-live)`, barre du bas flottante sous 1024 px, `--accent-2` violet). Fenêtres d'aide (`.help-modal`) et de replay (`.replay-container`) restylées aux tokens. Le bloc « Ancien cyan d'origine → --accent-2 » est généré (sans `#root`, poids faible : ne prime que sur les anciennes règles)
 
 ### Gestion du temps de jeu
 - **Écran toujours allumé** tant que le chrono tourne : `@capacitor-community/keep-awake` (APK : flag natif `KEEP_SCREEN_ON` ; web : Wake Lock API, repris au retour dans l'app)
@@ -281,7 +292,7 @@ git add -A && git commit -m "message" && git push origin main
 - L'ancienne synchro GitHub Gist est retirée (les classes CSS `.gist-*` servent encore à la section Compte)
 
 ### Layout responsive
-- **Barre d'onglets fixe en bas** (style app mobile), bouton Aide `?` dans l'en-tête
+- **Barre d'onglets fixe en bas** sur téléphone (style app mobile), bouton Aide `?` dans l'en-tête ; barre latérale à partir de 1024 px (voir Refonte 2027)
 - **Style « broadcast »** (couche CSS BROADCAST après MODERNISATION) : police Barlow Condensed auto-hébergée (`@fontsource`, importée dans `main.jsx`), dégradé `--grad` orange→rose→violet
 - **Scoreboard collant** (`.scoreboard`) : QT, chrono, pastille LIVE, score NOUS/EUX + écart, ligne joueur (PTS, série 🔥, REB/PD/INT)
 - **Panneau TIRS** (`.shot-col`, boutons `.sp-btn` — ne pas utiliser `.shot-btn`, pris par la modale de la carte) : ✓ réussi / ✗ raté pour 2PTS, 3PTS, LF + %
@@ -402,6 +413,8 @@ git add -A && git commit -m "message" && git push origin main
 
 ## Pièges connus
 
+- **Animations d'entrée (`rf-in`)** : toujours en `animation-fill-mode: backwards`, jamais `both`/`forwards`. Un transform qui reste appliqué sur une page décalerait les fenêtres en `position: fixed` qu'elle contient (fenêtre 🔢, replay). Ne pas animer `.scoreboard` : sa classe `shake` relancerait l'animation à chaque tir raté.
+- **Tests de thème** : poser aussi `basketSkinV2=1` dans le localStorage, sinon la bascule unique remet Pulse.
 - **`@media (pointer: coarse)`** (base CSS) force `min-width/min-height: 44px` sur TOUS les boutons sur écran tactile. Invisible en test souris : tester avec émulation tactile (Playwright `isMobile: true, hasTouch: true`). Les petits boutons (`.qs-minus`…) l'annulent dans la couche CARTOON.
 - **Barre d'état Android (APK)** : Android 15+ (SDK 36) affiche l'app sous les barres système. Le CSS (`env(safe-area-inset-top)` / variable injectée par Capacitor) ne marchait PAS sur le Fold Z7 (WebView Samsung). Solution native : `SystemBars.insetsHandling: "disable"` + `style: "DARK"` dans `capacitor.config.json`, et `MainActivity` pose un padding = barres système/encoche/clavier sur `android.R.id.content` (fond `#0b1018`). Ne pas réactiver la gestion Capacitor sans tester sur le Fold.
 - **Mise à jour PWA** : `registerSW({ immediate: true })` dans `main.jsx` (virtual:pwa-register) recharge la page quand une nouvelle version s'active et relance `registration.update()` à chaque retour dans l'app. Avant, la PWA installée gardait l'ancienne version.

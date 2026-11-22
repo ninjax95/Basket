@@ -6812,19 +6812,28 @@ const styles = `
   }
   #root .sb-team.them .sb-score-value { order: 2; color: var(--text); }
   #root .sb-team.them .sb-score-btns { order: 1; }
-  #root .sb-score-btns { display: flex; flex-direction: column; gap: 4px; }
+  #root .sb-score-btns { display: grid; grid-template-columns: repeat(2, auto); gap: 4px; justify-content: start; }
   #root .sb-score-btns button {
     width: 34px;
     height: 26px;
+    padding: 0;
     border-radius: 8px;
     border: 1px solid var(--border);
     background: var(--surface-2);
     color: var(--text);
-    font-size: 1rem;
+    font-size: 0.9rem;
     line-height: 1;
     cursor: pointer;
   }
-  #root .sb-team.them .sb-score-btns { align-items: flex-end; }
+  #root .sb-team.them .sb-score-btns { justify-content: end; }
+  /* Écran étroit : les 4 boutons passent en ligne sous le score (sinon un score à 3 chiffres sort du bandeau) */
+  @media (max-width: 480px) {
+    #root .sb-score { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); column-gap: 6px; }
+    #root .sb-team, #root .sb-team.them { grid-template-columns: minmax(0, 1fr); row-gap: 4px; }
+    #root .sb-team.them .sb-score-btns { order: 3; }
+    #root .sb-score-btns, #root .sb-team.them .sb-score-btns { grid-template-columns: repeat(4, minmax(0, 1fr)); justify-content: stretch; }
+    #root .sb-score-btns button { width: auto; height: 30px; }
+  }
   #root .sb-diff {
     font-family: var(--font-display);
     font-weight: 800;
@@ -8110,10 +8119,560 @@ const styles = `
     --grad-good: linear-gradient(135deg, #34d399, #10b981);
     --glow: 0 10px 30px rgba(45, 212, 191, 0.18);
   }
+
+  /* ============================================================
+     REFONTE 2027 — après THÈMES.
+     1. Structure commune à tous les thèmes : navigation, barre latérale
+        et mises en page grand écran, mouvement.
+     2. Thème Pulse (défaut) : tokens + signatures.
+     Sélecteurs « body[data-skin] #root » = même poids que les règles de
+     thème, pour que la structure grand écran prime sur elles.
+     ============================================================ */
+
+  /* ---------- Navigation : icônes, marque, pied ---------- */
+  #root .nav-icon svg { display: block; width: 22px; height: 22px; }
+  #root .nav-brand, #root .nav-foot, #root .nav-long { display: none; }
+  /* Icône de l'onglet actif : contraste avec la pastille du thème (les emojis d'avant étaient en couleur) */
+  body[data-skin="journal"] #root .nav-tab.active .nav-icon,
+  body[data-skin="light"] #root .nav-tab.active .nav-icon,
+  body[data-skin="parquet"] #root .nav-tab.active .nav-icon,
+  body[data-skin="greenwhite"] #root .nav-tab.active .nav-icon { color: #fff; }
+  body[data-skin="chalk"] #root .nav-tab.active .nav-icon,
+  body[data-skin="street"] #root .nav-tab.active .nav-icon,
+  body[data-skin="arcade"] #root .nav-tab.active .nav-icon,
+  body[data-skin="cartoon"] #root .nav-tab.active .nav-icon { color: #1a1a1a; }
+
+  /* ---------- Mouvement : entrée des écrans ----------
+     « backwards » seulement : une fois l'animation finie, plus aucun transform,
+     sinon les fenêtres en position fixe contenues dans la page seraient décalées. */
+  @keyframes rf-in { from { opacity: 0; transform: translateY(18px); } }
+  #root .history-page, #root .analysis-page, #root .options-page, #root .training-page, #root .match-body {
+    animation: rf-in 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+  }
+  #root .options-section, #root .analysis-section { animation: rf-in 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) backwards; }
+  #root .options-section:nth-child(3), #root .analysis-section:nth-child(3) { animation-delay: 0.05s; }
+  #root .options-section:nth-child(4), #root .analysis-section:nth-child(4) { animation-delay: 0.1s; }
+  #root .options-section:nth-child(5), #root .analysis-section:nth-child(5) { animation-delay: 0.15s; }
+  #root .options-section:nth-child(n+6), #root .analysis-section:nth-child(n+6) { animation-delay: 0.2s; }
+
+  /* Cartes de match : en-tête sur une ligne qui passe à la ligne (au lieu d'une colonne sur téléphone) */
+  #root .match-header { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+  #root .match-header .delete-btn { margin-left: auto; }
+  @media (max-width: 700px) {
+    #root .match-stats { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px 4px; }
+    #root .match-stat { min-width: 0; }
+  }
+
+  /* Cartes de match : en-tête sur une ligne qui passe à la ligne (au lieu d'une colonne sur téléphone) */
+  #root .match-header { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+  #root .match-header .delete-btn { margin-left: auto; }
+  @media (max-width: 700px) {
+    #root .match-stats { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px 4px; }
+    #root .match-stat { min-width: 0; }
+  }
+
+  /* Thèmes clairs : boutons et bascule d'Options (texte blanc d'origine, illisible sur fond clair) */
+  body[data-theme="light"] #root .options-btn { background: var(--surface-2); border-color: var(--border); color: var(--text); }
+  body[data-theme="light"] #root .options-btn:hover { background: var(--accent-soft); }
+  body[data-theme="light"] #root .options-btn.danger { border-color: var(--bad); color: var(--bad); }
+  body[data-theme="light"] #root .option-toggle label { color: var(--text); }
+  body[data-theme="light"] #root .toggle-btn:not(.active) { background: var(--surface-2); border-color: var(--border); color: var(--muted); }
+
+  /* Survol (souris uniquement) */
+  @media (hover: hover) and (pointer: fine) {
+    #root .match-card, #root .record-card, #root .skin-card, #root .advanced-stat, #root .detailed-stat, #root .quick-stat, #root .shot-col {
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    }
+    #root .match-card:hover, #root .record-card:hover, #root .skin-card:hover, #root .advanced-stat:hover, #root .detailed-stat:hover {
+      transform: translateY(-3px);
+    }
+  }
+
+  /* ---------- Grand écran : barre latérale ---------- */
+  @media (min-width: 1024px) {
+    body[data-skin] {
+      --nav-h: 0px;
+      --side-w: 252px;
+      padding: 24px 28px 32px calc(var(--side-w) + 28px);
+    }
+    /* Écran de connexion : pas de barre latérale, donc pas de marge à gauche */
+    body[data-skin]:has(.auth-screen) { padding: 24px; }
+    body[data-skin] #root .container { max-width: 1320px; }
+    body[data-skin] #root .app-header { display: none; }
+    body[data-skin] #root .nav-tabs {
+      top: 0;
+      right: auto;
+      bottom: 0;
+      width: var(--side-w);
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: stretch;
+      gap: 4px;
+      padding: 22px 14px 18px;
+      border: none;
+      border-right: 1px solid var(--border);
+      border-radius: 0;
+      box-shadow: none;
+    }
+    body[data-skin] #root .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 2px 8px 22px;
+      color: var(--text);
+    }
+    body[data-skin] #root .nav-brand-logo { font-size: 1.6rem; line-height: 1; }
+    body[data-skin] #root .nav-brand-name { font-family: var(--font-display); font-size: 1.2rem; font-weight: 800; white-space: nowrap; }
+    body[data-skin] #root .nav-brand .app-season { margin-left: auto; font-size: 0.7rem; padding: 2px 7px; white-space: nowrap; }
+    body[data-skin] #root .nav-tab {
+      flex: 0 0 auto;
+      max-width: none;
+      min-height: 46px;
+      flex-direction: row;
+      justify-content: flex-start;
+      gap: 12px;
+      padding: 0 10px;
+      border-radius: 14px;
+      transition: background 0.18s ease, color 0.18s ease;
+    }
+    body[data-skin] #root .nav-tab:hover { background: var(--surface-2); }
+    body[data-skin] #root .nav-tab.active { background: var(--accent-soft); }
+    body[data-skin] #root .nav-icon { padding: 6px; border-radius: 10px; }
+    body[data-skin] #root .nav-label { font-size: 1rem; }
+    body[data-skin] #root .nav-short { display: none; }
+    body[data-skin] #root .nav-long { display: inline; }
+    body[data-skin] #root .nav-badge { position: static; margin-left: auto; }
+    /* Polices larges : la marque passe à la ligne, un libellé trop long est coupé proprement */
+    body[data-skin] #root .nav-brand { flex-wrap: wrap; row-gap: 6px; }
+    body[data-skin] #root .nav-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+    body[data-skin="arcade"] #root .nav-brand-name { font-size: 0.8rem; }
+    body[data-skin="arcade"] #root .nav-label { font-size: 0.62rem; }
+    body[data-skin] #root .nav-foot { display: flex; flex-direction: column; gap: 10px; margin-top: auto; }
+    body[data-skin] #root .nav-player {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      font-weight: 700;
+      min-width: 0;
+    }
+    body[data-skin] #root .nav-player-num {
+      flex-shrink: 0;
+      padding: 2px 8px;
+      border-radius: 8px;
+      background: var(--grad);
+      color: #fff;
+      font-family: var(--font-display);
+      font-size: 1.05rem;
+    }
+    body[data-skin] #root .nav-player-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    body[data-skin] #root .nav-help {
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      font-weight: 600;
+      text-align: left;
+      cursor: pointer;
+    }
+    body[data-skin] #root .nav-help:hover { color: var(--text); background: var(--surface-2); }
+
+    /* Entraînement : terrain à gauche, compteurs et remise à zéro à droite */
+    body[data-skin] #root .training-page {
+      display: grid;
+      grid-template-columns: minmax(0, 640px) minmax(280px, 420px);
+      grid-template-rows: auto auto auto 1fr;
+      justify-content: center;
+      column-gap: 20px;
+      align-items: start;
+    }
+    body[data-skin] #root .training-page > h2,
+    body[data-skin] #root .training-page > .training-desc { grid-column: 1 / -1; }
+    body[data-skin] #root .training-page > .court-container { grid-column: 1; grid-row: 3 / span 2; }
+    body[data-skin] #root .training-stats { grid-column: 2; grid-row: 3; grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 0; }
+    body[data-skin] #root .training-reset { grid-column: 2; grid-row: 4; align-self: start; margin-top: 12px; }
+
+    /* Options : deux colonnes */
+    body[data-skin] #root .options-page { columns: 2; column-gap: 20px; }
+    body[data-skin] #root .options-page > h2 { column-span: all; }
+    body[data-skin] #root .options-section { break-inside: avoid; }
+  }
+
+  /* ---------- Très grand écran : Historique en deux colonnes ----------
+     Liste des matchs à gauche (reste visible, défile seule), comparaison et détail à droite.
+     La 3e rangée en 1fr absorbe la hauteur de la liste : pas de vide entre comparaison et détail. */
+  @media (min-width: 1200px) {
+    body[data-skin] #root .history-page {
+      display: grid;
+      grid-template-columns: minmax(340px, 400px) minmax(0, 1fr);
+      grid-template-rows: auto auto 1fr;
+      column-gap: 20px;
+      align-items: start;
+    }
+    body[data-skin] #root .history-filter { grid-column: 1 / -1; grid-row: 1; }
+    body[data-skin] #root .compare-view { grid-column: 2; grid-row: 2; }
+    body[data-skin] #root .detailed-stats-section { grid-column: 2; grid-row: 3; }
+    body[data-skin] #root .match-list {
+      grid-column: 1;
+      grid-row: 2 / 4;
+      position: sticky;
+      top: 24px;
+      max-height: calc(100vh - 48px);
+      overflow-y: auto;
+      padding: 16px;
+    }
+    body[data-skin] #root .match-list .match-stats { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px 4px; }
+    body[data-skin] #root .match-list .match-stat { min-width: 0; }
+  }
+
+  /* ---------- Thème Pulse ---------- */
+  body[data-skin="pulse"] {
+    --bg: #07090f;
+    --bg-glow: none;
+    --surface: #10131c;
+    --surface-2: #1a1e2b;
+    --border: rgba(255, 255, 255, 0.08);
+    --text: #f5f7fb;
+    --muted: #8f9ab0;
+    --accent: #ff5c38;
+    --accent-soft: rgba(255, 92, 56, 0.14);
+    --good: #34d399;
+    --bad: #ff4d6d;
+    --nav-bg: rgba(12, 14, 22, 0.78);
+    --shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 24px 48px -24px rgba(0, 0, 0, 0.75);
+    --glow: 0 0 0 1px rgba(255, 92, 56, 0.28), 0 18px 50px -14px rgba(255, 45, 111, 0.4);
+    --grad: linear-gradient(120deg, #ff8a1f 0%, #ff2d6f 52%, #7c5cff 100%);
+    --grad-good: linear-gradient(135deg, #22c55e, #10b981);
+    --font-display: 'Barlow Condensed', system-ui, sans-serif;
+    --accent-2: #a394ff;
+    --font-ui: 'Outfit Variable', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    font-family: var(--font-ui);
+  }
+  body[data-skin="pulse"] :where(button, input, select, textarea) { font-family: inherit; }
+
+  /* Fond animé : halos de couleur qui dérivent lentement */
+  @keyframes pulse-drift {
+    from { transform: translate3d(-3vmax, 2vmax, 0) rotate(0deg) scale(1); }
+    to { transform: translate3d(5vmax, -4vmax, 0) rotate(22deg) scale(1.12); }
+  }
+  body[data-skin="pulse"]::before {
+    content: '';
+    position: fixed;
+    inset: -35vmax;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      radial-gradient(34vmax 34vmax at 30% 34%, rgba(255, 122, 24, 0.20), transparent 64%),
+      radial-gradient(40vmax 40vmax at 72% 30%, rgba(124, 92, 255, 0.22), transparent 64%),
+      radial-gradient(34vmax 34vmax at 58% 70%, rgba(255, 45, 111, 0.13), transparent 64%);
+    animation: pulse-drift 24s ease-in-out infinite alternate;
+  }
+
+
+  /* Ancien cyan d'origine → couleur secondaire du thème (--accent-2), titres en couleur de texte.
+     Poids volontairement faible (sans #root) : ne prime que sur les anciennes règles, pas sur les couches récentes. */
+  body[data-skin="pulse"] .action-btn.primary,
+  body[data-skin="pulse"] .action-quarter,
+  body[data-skin="pulse"] .badge,
+  body[data-skin="pulse"] .duration-btn.active,
+  body[data-skin="pulse"] .goal-fill,
+  body[data-skin="pulse"] .quarter-btn.active,
+  body[data-skin="pulse"] .timer-btn { background: var(--accent-2); }
+  body[data-skin="pulse"] .averages-section,
+  body[data-skin="pulse"] .duration-btn:hover,
+  body[data-skin="pulse"] .gist-config-btn,
+  body[data-skin="pulse"] .gist-settings-btn:hover,
+  body[data-skin="pulse"] .help-btn:hover,
+  body[data-skin="pulse"] .help-term,
+  body[data-skin="pulse"] .import-btn:hover,
+  body[data-skin="pulse"] .location-btn.active,
+  body[data-skin="pulse"] .nav-tab.active,
+  body[data-skin="pulse"] .quarter-compact,
+  body[data-skin="pulse"] .score-controls button,
+  body[data-skin="pulse"] .summary,
+  body[data-skin="pulse"] .theme-btn.active,
+  body[data-skin="pulse"] .time-adjust-btn:hover,
+  body[data-skin="pulse"] .timer-btn.quarter-nav:hover:not(.disabled),
+  body[data-skin="pulse"] .timer-toggle-compact,
+  body[data-skin="pulse"] .undo-btn:hover { background: rgba(157, 140, 255, 0.2); }
+  body[data-skin="pulse"] .action-btn.primary,
+  body[data-skin="pulse"] .action-btn:hover,
+  body[data-skin="pulse"] .action-history-toggle:hover,
+  body[data-skin="pulse"] .court-side-btn.history:hover,
+  body[data-skin="pulse"] .duration-btn.active,
+  body[data-skin="pulse"] .duration-btn:hover,
+  body[data-skin="pulse"] .gist-action-btn.settings:hover,
+  body[data-skin="pulse"] .gist-input-group input:focus,
+  body[data-skin="pulse"] .gist-settings-btn:hover,
+  body[data-skin="pulse"] .help-btn:hover,
+  body[data-skin="pulse"] .location-btn.active,
+  body[data-skin="pulse"] .match-notes-input:focus,
+  body[data-skin="pulse"] .match-select:focus,
+  body[data-skin="pulse"] .nav-tab.active,
+  body[data-skin="pulse"] .player-info input:focus,
+  body[data-skin="pulse"] .quarter-btn.active,
+  body[data-skin="pulse"] .quarter-btn:hover:not(:disabled),
+  body[data-skin="pulse"] .quarter-stat-card.current,
+  body[data-skin="pulse"] .replay-toggle:hover,
+  body[data-skin="pulse"] .settings-btn.active,
+  body[data-skin="pulse"] .settings-btn:hover,
+  body[data-skin="pulse"] .theme-btn.active,
+  body[data-skin="pulse"] .time-adjust-btn:hover,
+  body[data-skin="pulse"] .timer-btn.quarter-nav:hover:not(.disabled),
+  body[data-skin="pulse"] .undo-btn:hover { border-color: var(--accent-2); }
+  body[data-skin="pulse"] .action-history-toggle,
+  body[data-skin="pulse"] .action-time,
+  body[data-skin="pulse"] .adv-value,
+  body[data-skin="pulse"] .auto-score-value,
+  body[data-skin="pulse"] .avg-value,
+  body[data-skin="pulse"] .confirm-icon,
+  body[data-skin="pulse"] .court-side-btn.history,
+  body[data-skin="pulse"] .detailed-stat.efficiency .ds-value,
+  body[data-skin="pulse"] .edit-btn:hover,
+  body[data-skin="pulse"] .eff-value,
+  body[data-skin="pulse"] .gist-action-btn,
+  body[data-skin="pulse"] .gist-action-btn.settings:hover,
+  body[data-skin="pulse"] .gist-config-btn,
+  body[data-skin="pulse"] .gist-settings-btn:hover,
+  body[data-skin="pulse"] .heatmap-stat-value,
+  body[data-skin="pulse"] .help-btn:hover,
+  body[data-skin="pulse"] .help-term,
+  body[data-skin="pulse"] .import-btn,
+  body[data-skin="pulse"] .location-btn.active,
+  body[data-skin="pulse"] .marker-menu-header span,
+  body[data-skin="pulse"] .marker-quarter-btn .q-label,
+  body[data-skin="pulse"] .match-opponent,
+  body[data-skin="pulse"] .match-stat.efficiency .stat-val,
+  body[data-skin="pulse"] .nav-tab.active,
+  body[data-skin="pulse"] .player-number-compact,
+  body[data-skin="pulse"] .pm-label,
+  body[data-skin="pulse"] .points-total-display .pts-value,
+  body[data-skin="pulse"] .qs-header,
+  body[data-skin="pulse"] .qs-quarter,
+  body[data-skin="pulse"] .quarter-btn,
+  body[data-skin="pulse"] .quarter-compact,
+  body[data-skin="pulse"] .quarter-display,
+  body[data-skin="pulse"] .quick-stat .qs-controls button,
+  body[data-skin="pulse"] .replay-stat .stat-value,
+  body[data-skin="pulse"] .replay-toggle,
+  body[data-skin="pulse"] .score-controls button,
+  body[data-skin="pulse"] .settings-btn:hover,
+  body[data-skin="pulse"] .share-btn-history,
+  body[data-skin="pulse"] .side-stat-label,
+  body[data-skin="pulse"] .stats-category-title,
+  body[data-skin="pulse"] .summary-value,
+  body[data-skin="pulse"] .theme-btn.active,
+  body[data-skin="pulse"] .time-adjust-btn:hover,
+  body[data-skin="pulse"] .timer-btn.quarter-nav:hover:not(.disabled),
+  body[data-skin="pulse"] .timer-toggle-compact,
+  body[data-skin="pulse"] .ts-pct,
+  body[data-skin="pulse"] .undo-btn:hover { color: var(--accent-2); }
+  body[data-skin="pulse"] .settings-btn:hover { background: linear-gradient(135deg, rgba(157, 140, 255, 0.3) 0%, rgba(157, 140, 255, 0.1) 100%); }
+  body[data-skin="pulse"] .settings-btn.active,
+  body[data-skin="pulse"] .timer-btn.primary { background: linear-gradient(135deg, var(--accent-2) 0%, #4fa8c7 100%); }
+  body[data-skin="pulse"] .settings-btn.active { box-shadow: 0 0 20px rgba(157, 140, 255, 0.4); }
+  body[data-skin="pulse"] .timer-btn.primary:hover { background: linear-gradient(135deg, #7ce3ff 0%, var(--accent-2) 100%); }
+  body[data-skin="pulse"] .confirm-modal,
+  body[data-skin="pulse"] .gist-modal,
+  body[data-skin="pulse"] .help-modal,
+  body[data-skin="pulse"] .match-card.selected,
+  body[data-skin="pulse"] .shot-modal { border: 2px solid var(--accent-2); }
+  body[data-skin="pulse"] .action-panel-header h3,
+  body[data-skin="pulse"] .analysis-page h2,
+  body[data-skin="pulse"] .averages-inline h4,
+  body[data-skin="pulse"] .averages-section h3,
+  body[data-skin="pulse"] .chart-container h3,
+  body[data-skin="pulse"] .compare-view h3,
+  body[data-skin="pulse"] .court-header h3,
+  body[data-skin="pulse"] .detailed-stats-section h3,
+  body[data-skin="pulse"] .gist-header h3,
+  body[data-skin="pulse"] .gist-modal h3,
+  body[data-skin="pulse"] .goals-section h4,
+  body[data-skin="pulse"] .help-modal h2,
+  body[data-skin="pulse"] .live-score-section h3,
+  body[data-skin="pulse"] .match-list-header h3,
+  body[data-skin="pulse"] .match-notes-display h4,
+  body[data-skin="pulse"] .options-page h2,
+  body[data-skin="pulse"] .playing-time-display h4,
+  body[data-skin="pulse"] .playing-time-header h3,
+  body[data-skin="pulse"] .quarter-stats-display h4,
+  body[data-skin="pulse"] .quarter-stats-section h3,
+  body[data-skin="pulse"] .rolling-averages h5,
+  body[data-skin="pulse"] .shooting-stats h4,
+  body[data-skin="pulse"] .stat-card h3,
+  body[data-skin="pulse"] .summary h3,
+  body[data-skin="pulse"] .training-page h2 { color: var(--text); }
+  body[data-skin="pulse"] .averages-section,
+  body[data-skin="pulse"] .gist-action-btn,
+  body[data-skin="pulse"] .gist-config-btn,
+  body[data-skin="pulse"] .import-btn,
+  body[data-skin="pulse"] .summary { border: 1px solid var(--accent-2); }
+  body[data-skin="pulse"] .detailed-stats-section,
+  body[data-skin="pulse"] .gist-modal-info,
+  body[data-skin="pulse"] .gist-section,
+  body[data-skin="pulse"] .score-inputs.auto-score,
+  body[data-skin="pulse"] .training-stat.total { background: rgba(157, 140, 255, 0.1); }
+  body[data-skin="pulse"] .detailed-stats-section,
+  body[data-skin="pulse"] .gist-section,
+  body[data-skin="pulse"] .score-inputs.auto-score,
+  body[data-skin="pulse"] .share-btn-history { border: 1px solid rgba(157, 140, 255, 0.3); }
+  body[data-skin="pulse"] .action-history-toggle:hover,
+  body[data-skin="pulse"] .court-side-btn.history:hover,
+  body[data-skin="pulse"] .match-card.selected,
+  body[data-skin="pulse"] .per-minute-stats,
+  body[data-skin="pulse"] .quarter-btn,
+  body[data-skin="pulse"] .quarter-stat-card.current,
+  body[data-skin="pulse"] .replay-toggle:hover,
+  body[data-skin="pulse"] .share-btn-history,
+  body[data-skin="pulse"] .stats-category-title { background: rgba(157, 140, 255, 0.15); }
+  body[data-skin="pulse"] .gist-config-btn:hover,
+  body[data-skin="pulse"] .quarter-btn:hover:not(:disabled),
+  body[data-skin="pulse"] .share-btn-history:active { background: rgba(157, 140, 255, 0.3); }
+  body[data-skin="pulse"] .score-controls button:active { background: rgba(157, 140, 255, 0.4); }
+  body[data-skin="pulse"] .action-panel,
+  body[data-skin="pulse"] .stats-category-title { border-left: 2px solid var(--accent-2); }
+  body[data-skin="pulse"] .quick-stat .qs-controls button { background: rgba(157, 140, 255, 0.25); }
+  body[data-skin="pulse"] .quick-stat .qs-controls button:active { background: rgba(157, 140, 255, 0.5); }
+  body[data-skin="pulse"] .points-total-display { background: linear-gradient(135deg, rgba(157, 140, 255, 0.2), rgba(157, 140, 255, 0.1)); }
+  body[data-skin="pulse"] .court-side-btn.history { border-color: rgba(157, 140, 255, 0.3); }
+  body[data-skin="pulse"] .replay-stats-label { color: var(--accent, var(--accent-2)); }
+  body[data-skin="pulse"] .quarter-btn { border: 2px solid rgba(157, 140, 255, 0.3); }
+  body[data-skin="pulse"] .gist-action-btn { background: linear-gradient(135deg, rgba(157, 140, 255, 0.2) 0%, rgba(157, 140, 255, 0.1) 100%); }
+  body[data-skin="pulse"] .gist-action-btn:hover:not(:disabled) { background: linear-gradient(135deg, rgba(157, 140, 255, 0.3) 0%, rgba(157, 140, 255, 0.2) 100%); }
+
+  /* Typographie : interface en Outfit, chiffres en condensé */
+  body[data-skin="pulse"] #root h1, body[data-skin="pulse"] #root h2, body[data-skin="pulse"] #root h3, body[data-skin="pulse"] #root h4,
+  body[data-skin="pulse"] #root .stats-category-title, body[data-skin="pulse"] #root .nav-label,
+  body[data-skin="pulse"] #root .qs-label, body[data-skin="pulse"] #root .pts-label, body[data-skin="pulse"] #root .nav-brand-name {
+    font-family: var(--font-ui);
+    text-transform: none;
+    letter-spacing: -0.01em;
+  }
+  body[data-skin="pulse"] #root h2 { font-weight: 700; font-size: 1.5rem; color: var(--text); }
+  body[data-skin="pulse"] #root h3 { font-weight: 650; color: var(--text); }
+  body[data-skin="pulse"] #root .app-header h1 { font-size: 1.35rem; font-weight: 800; letter-spacing: -0.03em; color: var(--text); }
+  body[data-skin="pulse"] #root .stats-category-title { font-size: 0.95rem; font-weight: 650; color: var(--text); }
+  body[data-skin="pulse"] #root .qs-label { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.02em; text-transform: uppercase; }
+  body[data-skin="pulse"] #root .nav-label { font-weight: 600; letter-spacing: 0; }
+
+  /* Cartes : coins amples, liseré, lueur au survol */
+  body[data-skin="pulse"] #root .quick-stat,
+  body[data-skin="pulse"] #root .shot-col,
+  body[data-skin="pulse"] #root .match-header-compact,
+  body[data-skin="pulse"] #root .court-container,
+  body[data-skin="pulse"] #root .points-total-display,
+  body[data-skin="pulse"] #root .options-section,
+  body[data-skin="pulse"] #root .analysis-section,
+  body[data-skin="pulse"] #root .match-card,
+  body[data-skin="pulse"] #root .record-card { border-radius: 22px; }
+  @media (hover: hover) and (pointer: fine) {
+    body[data-skin="pulse"] #root .match-card:hover, body[data-skin="pulse"] #root .record-card:hover,
+    body[data-skin="pulse"] #root .skin-card:hover, body[data-skin="pulse"] #root .advanced-stat:hover,
+    body[data-skin="pulse"] #root .detailed-stat:hover, body[data-skin="pulse"] #root .quick-stat:hover,
+    body[data-skin="pulse"] #root .shot-col:hover {
+      border-color: rgba(255, 92, 56, 0.45);
+      box-shadow: var(--shadow), 0 16px 40px -18px rgba(255, 45, 111, 0.55);
+    }
+  }
+
+  /* Autres onglets : panneaux, tuiles et records aux couleurs du thème */
+  body[data-skin="pulse"] #root .detailed-stats-section,
+  body[data-skin="pulse"] #root .match-list,
+  body[data-skin="pulse"] #root .history-filter,
+  body[data-skin="pulse"] #root .analysis-filter,
+  body[data-skin="pulse"] #root .chart-container,
+  body[data-skin="pulse"] #root .compare-view {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    box-shadow: var(--shadow);
+  }
+  body[data-skin="pulse"] #root .shooting-stats,
+  body[data-skin="pulse"] #root .averages-inline,
+  body[data-skin="pulse"] #root .records-inline,
+  body[data-skin="pulse"] #root .quarter-stats-display,
+  body[data-skin="pulse"] #root .playing-time-display,
+  body[data-skin="pulse"] #root .match-notes-display,
+  body[data-skin="pulse"] #root .goals-section {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+  }
+  body[data-skin="pulse"] #root .detailed-stat { background: var(--surface-2); border: 1px solid var(--border); border-radius: 16px; }
+  body[data-skin="pulse"] #root .detailed-stat.big { background: var(--grad); border-color: transparent; box-shadow: 0 16px 36px -16px rgba(255, 45, 111, 0.7); }
+  body[data-skin="pulse"] #root .detailed-stat.big .ds-value { color: #fff; }
+  body[data-skin="pulse"] #root .detailed-stat.big .ds-label { color: rgba(255, 255, 255, 0.85); }
+  body[data-skin="pulse"] #root .records-inline h4 { color: var(--text); }
+  body[data-skin="pulse"] #root .record-card { background: var(--surface); border: 1px solid var(--border); }
+  body[data-skin="pulse"] #root .record-value {
+    background: var(--grad);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: none;
+  }
+  body[data-skin="pulse"] #root .match-card { background: var(--surface-2); border: 1px solid var(--border); }
+  body[data-skin="pulse"] #root .match-card.selected { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent), 0 16px 40px -18px rgba(255, 45, 111, 0.6); }
+  body[data-skin="pulse"] #root .match-opponent { color: var(--text); font-weight: 700; }
+  body[data-skin="pulse"] #root .match-select option { background: var(--surface); color: var(--text); }
+  body[data-skin="pulse"] #root .auth-card { border-radius: 26px; box-shadow: var(--shadow), 0 40px 90px -40px rgba(124, 92, 255, 0.55); }
+
+  /* Fenêtres d'aide et de replay : fond et contour du thème (au lieu du bleu marine d'origine) */
+  body[data-skin="pulse"] #root .help-modal,
+  body[data-skin="pulse"] #root .replay-container {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    box-shadow: var(--shadow), 0 40px 90px -40px rgba(124, 92, 255, 0.55);
+  }
+  body[data-skin="pulse"] #root .help-modal h2, body[data-skin="pulse"] #root .replay-header h2 { color: var(--text); }
+  body[data-skin="pulse"] #root .help-term { background: var(--accent-soft); color: var(--accent); }
+  body[data-skin="pulse"] #root .replay-stats, body[data-skin="pulse"] #root .replay-info { background: var(--surface-2); border-radius: 16px; }
+  body[data-skin="pulse"] #root .replay-btn.primary { background: var(--grad); border-color: transparent; color: #fff; }
+  body[data-skin="pulse"] #root .replay-stats-label { color: var(--accent); }
+
+  /* Bandeau de score : liseré dégradé, animé quand le chrono tourne */
+  @keyframes pulse-live { to { background-position: 200% 0; } }
+  body[data-skin="pulse"] #root .scoreboard::before {
+    height: 3px;
+    background: var(--grad);
+    background-size: 200% 100%;
+  }
+  body[data-skin="pulse"] #root .scoreboard:has(.sb-live)::before { animation: pulse-live 2.4s linear infinite; background-image: linear-gradient(90deg, #ff8a1f, #ff2d6f, #7c5cff, #ff8a1f); }
+  body[data-skin="pulse"] #root .scoreboard:has(.sb-live) { box-shadow: var(--shadow), var(--glow); }
+
+  /* Navigation flottante (téléphone) */
+  @media (max-width: 1023.98px) {
+    body[data-skin="pulse"] { --nav-h: 74px; }
+    body[data-skin="pulse"] #root .nav-label { font-size: 0.68rem; }
+    body[data-skin="pulse"] #root .nav-tabs {
+      left: max(10px, env(safe-area-inset-left));
+      right: max(10px, env(safe-area-inset-right));
+      bottom: calc(10px + env(safe-area-inset-bottom));
+      padding: 6px;
+      border: 1px solid var(--border);
+      border-radius: 26px;
+      box-shadow: 0 20px 44px -14px rgba(0, 0, 0, 0.8);
+    }
+    body[data-skin="pulse"] #root .nav-tab { border-radius: 20px; transition: color 0.2s ease; }
+    body[data-skin="pulse"] #root .nav-icon { transition: background 0.25s ease, transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1.4), box-shadow 0.25s ease; }
+    body[data-skin="pulse"] #root .nav-tab.active .nav-icon { transform: translateY(-2px) scale(1.06); color: #fff; }
+  }
+  @media (min-width: 1024px) {
+    body[data-skin="pulse"] #root .nav-tabs { background: rgba(12, 14, 22, 0.6); }
+    body[data-skin="pulse"] #root .nav-tab.active { background: linear-gradient(90deg, rgba(255, 92, 56, 0.2), rgba(124, 92, 255, 0.08)); }
+    body[data-skin="pulse"] #root .nav-tab.active .nav-icon { color: #fff; }
+  }
 `
 
 // Thèmes disponibles : mode = sombre/clair (pilote aussi les anciennes règles [data-theme="light"])
 const SKINS = [
+  { id: 'pulse', name: 'Pulse', emoji: '✨', mode: 'dark', colors: ['#07090f', '#ff5c38', '#7c5cff'] },
   { id: 'classic', name: 'Classique', emoji: '🏀', mode: 'dark', colors: ['#16213e', '#61dafb', '#ff6b35'] },
   { id: 'broadcast', name: 'Broadcast', emoji: '📺', mode: 'dark', colors: ['#0b1018', '#ff8a1f', '#8b5cf6'] },
   { id: 'light', name: 'Clair', emoji: '☀️', mode: 'light', colors: ['#f3f5f9', '#ea580c', '#111827'] },
@@ -8131,6 +8690,18 @@ const SKINS = [
   { id: 'redblack', name: 'Rouge & Noir', emoji: '🐂', mode: 'dark', colors: ['#0a0a0a', '#ce1141', '#ffffff'] },
   { id: 'ocean', name: 'Océan', emoji: '🌊', mode: 'dark', colors: ['#021a2b', '#2dd4bf', '#38bdf8'] }
 ]
+
+// Icônes de la navigation (trait, couleur du texte)
+const NAV_ICONS = {
+  match: <><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3v18M5.6 5.6c3.1 3.2 3.1 9.6 0 12.8M18.4 5.6c-3.1 3.2-3.1 9.6 0 12.8" /></>,
+  history: <><rect x="5" y="4" width="14" height="17" rx="2.5" /><path d="M9 4V3h6v1M9 10h6M9 14h6M9 18h3" /></>,
+  training: <><circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="5" /><circle cx="12" cy="12" r="1" /></>,
+  analysis: <path d="M4 4v16h16M8 16l4-5 3 3 5-7" />,
+  options: <><path d="M4 7h9M19 7h1M4 17h1M11 17h9" /><circle cx="16" cy="7" r="2.5" /><circle cx="8" cy="17" r="2.5" /></>
+}
+const NavIcon = ({ name }) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{NAV_ICONS[name]}</svg>
+)
 
 // Petite vibration au tap (ignorée si non supportée)
 const tapFeedback = () => { if (navigator.vibrate) navigator.vibrate(12) }
@@ -8201,7 +8772,14 @@ export default function App() {
     const saved = localStorage.getItem('basketMatchNotes')
     return saved ? JSON.parse(saved) : { strengths: '', improvements: '' }
   })
-  const [skin, setSkin] = useState(() => localStorage.getItem('basketSkin') || 'classic')
+  // Refonte 2027 : Pulse devient le thème de départ ; les appareils existants y basculent une seule fois
+  const [skin, setSkin] = useState(() => {
+    if (!localStorage.getItem('basketSkinV2')) {
+      localStorage.setItem('basketSkinV2', '1')
+      return 'pulse'
+    }
+    return localStorage.getItem('basketSkin') || 'pulse'
+  })
   const skinDef = SKINS.find(sk => sk.id === skin) || SKINS[0]
   const [goals, setGoals] = useState(() => {
     const saved = localStorage.getItem('basketGoals')
@@ -9204,17 +9782,23 @@ export default function App() {
 
         {/* Navigation */}
         <nav className="nav-tabs">
+          {/* Marque de la barre latérale (grand écran) */}
+          <div className="nav-brand">
+            <span className="nav-brand-logo">🏀</span>
+            <span className="nav-brand-name">Stats Basket</span>
+            <span className="app-season">{currentSeason}</span>
+          </div>
           <button
             className={`nav-tab ${activeTab === 'match' ? 'active' : ''}`}
             onClick={() => setActiveTab('match')}
           >
-            <span className="nav-icon">🎮</span><span className="nav-label">Match</span>
+            <span className="nav-icon"><NavIcon name="match" /></span><span className="nav-label">Match</span>
           </button>
           <button
             className={`nav-tab ${activeTab === 'history' ? 'active' : ''}`}
             onClick={() => setActiveTab('history')}
           >
-            <span className="nav-icon">📋</span><span className="nav-label">Historique</span>
+            <span className="nav-icon"><NavIcon name="history" /></span><span className="nav-label">Historique</span>
             {seasonHistory.length > 0 && <span className="nav-badge">{seasonHistory.length}</span>}
           </button>
           {showTraining && (
@@ -9222,21 +9806,29 @@ export default function App() {
               className={`nav-tab ${activeTab === 'training' ? 'active' : ''}`}
               onClick={() => setActiveTab('training')}
             >
-              <span className="nav-icon">🏋️</span><span className="nav-label">Entraîn.</span>
+              <span className="nav-icon"><NavIcon name="training" /></span><span className="nav-label"><span className="nav-short">Entraîn.</span><span className="nav-long">Entraînement</span></span>
             </button>
           )}
           <button
             className={`nav-tab ${activeTab === 'analysis' ? 'active' : ''}`}
             onClick={() => setActiveTab('analysis')}
           >
-            <span className="nav-icon">📈</span><span className="nav-label">Analyse</span>
+            <span className="nav-icon"><NavIcon name="analysis" /></span><span className="nav-label">Analyse</span>
           </button>
           <button
             className={`nav-tab ${activeTab === 'options' ? 'active' : ''}`}
             onClick={() => setActiveTab('options')}
           >
-            <span className="nav-icon">⚙️</span><span className="nav-label">Options</span>
+            <span className="nav-icon"><NavIcon name="options" /></span><span className="nav-label">Options</span>
           </button>
+          {/* Pied de la barre latérale (grand écran) */}
+          <div className="nav-foot">
+            <div className="nav-player">
+              <span className="nav-player-num">#{player.number || '0'}</span>
+              <span className="nav-player-name">{player.name || 'Joueur'}</span>
+            </div>
+            <button className="nav-help" onClick={() => setShowHelpModal(true)}>? Aide et légende</button>
+          </div>
         </nav>
 
         {activeTab === 'match' ? (
@@ -9302,7 +9894,9 @@ export default function App() {
                   <span key={liveScoreTeam} className="sb-score-value bump">{liveScoreTeam}</span>
                   <div className="sb-score-btns">
                     <button onClick={() => setLiveScoreTeam(Math.max(0, liveScoreTeam - 1))}>−</button>
-                    <button onClick={(e) => { fx(e, 'us'); setLiveScoreTeam(liveScoreTeam + 1) }}>+</button>
+                    <button onClick={(e) => { fx(e, 'us'); setLiveScoreTeam(liveScoreTeam + 1) }}>+1</button>
+                    <button onClick={(e) => { fx(e, 'us'); setLiveScoreTeam(liveScoreTeam + 2) }}>+2</button>
+                    <button onClick={(e) => { fx(e, 'us'); setLiveScoreTeam(liveScoreTeam + 3) }}>+3</button>
                   </div>
                 </div>
                 <span className={`sb-diff ${liveScoreTeam > liveScoreOpponent ? 'up' : liveScoreTeam < liveScoreOpponent ? 'down' : ''}`}>
@@ -9313,7 +9907,9 @@ export default function App() {
                   <span key={liveScoreOpponent} className="sb-score-value bump">{liveScoreOpponent}</span>
                   <div className="sb-score-btns">
                     <button onClick={() => setLiveScoreOpponent(Math.max(0, liveScoreOpponent - 1))}>−</button>
-                    <button onClick={(e) => { fx(e, 'them'); setLiveScoreOpponent(liveScoreOpponent + 1) }}>+</button>
+                    <button onClick={(e) => { fx(e, 'them'); setLiveScoreOpponent(liveScoreOpponent + 1) }}>+1</button>
+                    <button onClick={(e) => { fx(e, 'them'); setLiveScoreOpponent(liveScoreOpponent + 2) }}>+2</button>
+                    <button onClick={(e) => { fx(e, 'them'); setLiveScoreOpponent(liveScoreOpponent + 3) }}>+3</button>
                   </div>
                 </div>
               </div>
